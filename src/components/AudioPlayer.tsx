@@ -3,14 +3,16 @@ import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 
 export function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.2); // Volume léger par défaut (20%)
+  const [sliderVolume, setSliderVolume] = useState(0.3); // Curseur à 30% par défaut
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume;
+      // Courbe exponentielle (puissance 3) : rend les bas volumes VRAIMENT très bas.
+      // 0.3 sur le curseur donne un volume réel de 0.027 (très doux)
+      audioRef.current.volume = Math.pow(sliderVolume, 3);
     }
-  }, [volume]);
+  }, [sliderVolume]);
 
   // Autoplay logic with browser bypass
   useEffect(() => {
@@ -77,14 +79,14 @@ export function AudioPlayer() {
       <div className="h-6 w-px bg-white/10 mx-1"></div>
       
       <div className="flex items-center gap-2">
-        <button onClick={() => setVolume(volume === 0 ? 0.2 : 0)} className="text-white/60 hover:text-white transition-colors">
-          {volume === 0 ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        <button onClick={() => setSliderVolume(sliderVolume === 0 ? 0.3 : 0)} className="text-white/60 hover:text-white transition-colors">
+          {sliderVolume === 0 ? <VolumeX size={16} /> : <Volume2 size={16} />}
         </button>
         <input 
           type="range" 
           min="0" max="1" step="0.01" 
-          value={volume} 
-          onChange={(e) => setVolume(parseFloat(e.target.value))}
+          value={sliderVolume} 
+          onChange={(e) => setSliderVolume(parseFloat(e.target.value))}
           className="w-16 md:w-20 h-1.5 rounded-full bg-white/10 appearance-none cursor-pointer accent-red-600"
         />
       </div>
