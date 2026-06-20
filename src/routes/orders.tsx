@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/Header";
@@ -32,6 +33,13 @@ function OrdersPage() {
     });
   }, [user]);
 
+  const deleteOrder = async (id: string) => {
+    // Suppression optimiste de l'UI
+    setOrders(prev => prev.filter(o => o.id !== id));
+    // Suppression en base de données
+    await supabase.from("orders").delete().eq("id", id);
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -58,6 +66,15 @@ function OrdersPage() {
                     {o.status === "pending" ? "En attente paiement" : o.status}
                   </span>
                   <span className="font-bold text-lg text-primary">{Number(o.total).toFixed(2)}€</span>
+                  {o.status === "pending" && (
+                    <button 
+                      onClick={() => deleteOrder(o.id)} 
+                      className="p-1 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/30 transition-colors"
+                      title="Annuler la commande"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
               <ul className="space-y-1 text-sm">
