@@ -36,6 +36,11 @@ export function Header() {
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              {profile?.role === "admin" && (
+                <Link to="/admin" className="text-sm px-3 py-2 rounded-lg hover:bg-muted text-red-500 flex items-center gap-2">
+                  <Shield size={16} /> <span className="hidden sm:inline">Admin</span>
+                </Link>
+              )}
               <Link to="/orders" className="text-sm px-3 py-2 rounded-lg hover:bg-muted flex items-center gap-2">
                 <User size={16} /> <span className="hidden sm:inline">Commandes</span>
               </Link>
