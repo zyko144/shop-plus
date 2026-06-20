@@ -45,7 +45,7 @@ export const sendOrderEmail = createServerFn({ method: "POST" })
 
     try {
       const { data: responseData, error } = await resend.emails.send({
-        from: "SHOP+ <commandes@resend.dev>", // By default, Resend allows testing with @resend.dev
+        from: "SHOP+ <onboarding@resend.dev>", // Resend requires 'onboarding@resend.dev' for free unverified accounts
         to: data.email,
         subject: "Votre commande SHOP+ - Récupérez votre produit !",
         html: htmlBody,
