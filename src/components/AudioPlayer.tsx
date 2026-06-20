@@ -89,8 +89,8 @@ export function AudioPlayer() {
         />
       </div>
       
-      {/* Fichier audio à placer dans le dossier public */}
-      <audio ref={audioRef} src="/music.mp3" loop />
+      {/* Fichier audio/vidéo (.mp4) à placer dans le dossier public */}
+      <audio ref={audioRef} src="/music.mp4" loop autoPlay />
     </div>
   );
 }
