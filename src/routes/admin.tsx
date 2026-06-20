@@ -27,15 +27,22 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   // Security check: only admin can access
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        navigate({ to: "/auth" });
-      } else if (profile?.role !== "admin") {
-        navigate({ to: "/" });
-      }
-    }
-  }, [authLoading, user, profile, navigate]);
+  // Instead of redirecting instantly, we show an error to debug
+  if (!authLoading && (!user || profile?.role !== "admin")) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-2xl font-bold text-red-500 mb-4">Accès Refusé</h1>
+        <p className="text-muted-foreground mb-2">Vous n'avez pas les droits d'administrateur.</p>
+        <div className="p-4 bg-black/50 rounded-lg text-sm font-mono mt-4">
+          <p>Connecté en tant que : {user ? user.email : "Non connecté"}</p>
+          <p>Rôle détecté dans la base : {profile?.role ? `"${profile.role}"` : "Aucun profil/rôle trouvé"}</p>
+        </div>
+        <button onClick={() => window.location.reload()} className="mt-6 px-4 py-2 bg-primary rounded-lg text-primary-foreground">
+          Rafraîchir la page
+        </button>
+      </div>
+    );
+  }
 
   const loadOrders = async () => {
     setLoading(true);
