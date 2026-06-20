@@ -27,7 +27,48 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   // Security check: only admin can access
-  // Instead of redirecting instantly, we show an error to debug
+  const loadOrders = async () => {
+    setLoading(true);
+    // Fetch all orders with user emails
+    // Since there is no direct FK between orders and profiles, we fetch auth.users indirectly or fetch profiles manually.
+    // Actually, orders.user_id references auth.users(id), and profiles.id references auth.users(id). 
+    // To fix the join error, we fetch orders, then fetch profiles for those orders.
+    const { data: ordersData, error } = await supabase
+      .from("orders")
+      .select("id,user_id,total,status,created_at,payment_ref,order_items(product_name,quantity,unit_price)")
+      .order("created_at", { ascending: false });
+
+    if (!error && ordersData) {
+      // Fetch profiles manually to join them
+      const userIds = [...new Set(ordersData.map(o => o.user_id))];
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id,email,username")
+        .in("id", userIds);
+        
+      const profilesMap = (profilesData || []).reduce((acc: any, p) => {
+        acc[p.id] = p;
+        return acc;
+      }, {});
+
+      const mergedOrders = ordersData.map(o => ({
+        ...o,
+        profiles: profilesMap[o.user_id] || null
+      }));
+      
+      setOrders(mergedOrders as any);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (profile?.role === "admin") {
+      loadOrders();
+    }
+  }, [profile]);
+
+  // Security check: only admin can access
+  // Placed AFTER all hooks to respect React Rules of Hooks!
   if (!authLoading && (!user || profile?.role !== "admin")) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
@@ -43,26 +84,6 @@ function AdminDashboard() {
       </div>
     );
   }
-
-  const loadOrders = async () => {
-    setLoading(true);
-    // Fetch all orders with user emails from profiles
-    const { data, error } = await supabase
-      .from("orders")
-      .select("id,total,status,created_at,payment_ref,profiles(email,username),order_items(product_name,quantity,unit_price)")
-      .order("created_at", { ascending: false });
-
-    if (!error && data) {
-      setOrders(data as any);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (profile?.role === "admin") {
-      loadOrders();
-    }
-  }, [profile]);
 
   const updateStatus = async (id: string, status: string) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
