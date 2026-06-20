@@ -70,7 +70,7 @@ export function AudioPlayer() {
       <div className="flex flex-col">
         <div className="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-0.5">En cours</div>
         <div className="text-xs font-medium text-white/90 truncate w-32 md:w-40 scroll-text">
-          Barbie ft. RK - Le Crime
+          SKIMA BENZ
         </div>
       </div>
       
