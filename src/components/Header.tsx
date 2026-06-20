@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User, LogOut } from "lucide-react";
+import { ShoppingCart, User, LogOut, Shield } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import logoImg from "@/assets/logo.png";
 
 export function Header() {
   const { count, setOpen } = useCart();
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   return (
     <header className="sticky top-0 z-50 glass border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -15,6 +15,11 @@ export function Header() {
           <span className="tracking-tight">SHOP<span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent">+</span></span>
         </Link>
         <div className="hidden md:flex items-center gap-4 text-xs">
+          {profile?.role === "admin" && (
+            <Link to="/admin" className="text-red-500 hover:text-red-400 transition-colors flex items-center gap-2 font-medium">
+              <Shield size={16} /> Dashboard
+            </Link>
+          )}
           <span className="flex items-center gap-1.5 text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"/> Livraison instantanée
           </span>
