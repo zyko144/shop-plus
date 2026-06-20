@@ -148,8 +148,8 @@ function AdminDashboard() {
                 ) : orders.map((o) => (
                   <tr key={o.id} className="hover:bg-white/5 transition-colors group">
                     <td className="p-4">
-                      <div className="font-medium">{new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
-                      <div className="text-xs text-muted-foreground mt-1">#{o.id.slice(0, 8)}</div>
+                      <div className="font-medium">{o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</div>
+                      <div className="text-xs text-muted-foreground mt-1">#{o.id ? o.id.slice(0, 8) : 'N/A'}</div>
                     </td>
                     <td className="p-4">
                       <div className="font-bold text-white/90">{o.profiles?.email || 'Email introuvable'}</div>
@@ -157,13 +157,13 @@ function AdminDashboard() {
                     </td>
                     <td className="p-4">
                       <ul className="space-y-1 text-sm text-muted-foreground">
-                        {o.order_items.map((it, idx) => (
+                        {o.order_items && Array.isArray(o.order_items) ? o.order_items.map((it, idx) => (
                           <li key={idx}><span className="text-white/70">{it.quantity}x</span> {it.product_name}</li>
-                        ))}
+                        )) : <li className="text-red-400">Erreur produits</li>}
                       </ul>
                     </td>
                     <td className="p-4 font-bold text-primary">
-                      {Number(o.total).toFixed(2)}€
+                      {Number(o.total || 0).toFixed(2)}€
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
