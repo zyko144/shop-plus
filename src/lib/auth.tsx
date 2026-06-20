@@ -3,17 +3,20 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 type Profile = { id: string; username: string | null; role: string | null; email: string | null };
-type AuthCtx = { user: User | null; session: Session | null; profile: Profile | null; loading: boolean; signOut: () => Promise<void> };
-const Ctx = createContext<AuthCtx>({ user: null, session: null, profile: null, loading: true, signOut: async () => {} });
+type AuthCtx = { user: User | null; session: Session | null; profile: Profile | null; loading: boolean; profileError: string | null; signOut: () => Promise<void> };
+const Ctx = createContext<AuthCtx>({ user: null, session: null, profile: null, loading: true, profileError: null, signOut: async () => {} });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfile = async (userId: string) => {
-      const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+      if (error) setProfileError(error.message || JSON.stringify(error));
+      else setProfileError(null);
       if (data) setProfile(data as Profile);
     };
 
@@ -35,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <Ctx.Provider value={{ user: session?.user ?? null, session, profile, loading, signOut: async () => { await supabase.auth.signOut(); } }}>
+    <Ctx.Provider value={{ user: session?.user ?? null, session, profile, loading, profileError, signOut: async () => { await supabase.auth.signOut(); } }}>
       {children}
     </Ctx.Provider>
   );

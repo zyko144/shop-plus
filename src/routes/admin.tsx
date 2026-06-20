@@ -70,13 +70,16 @@ function AdminDashboard() {
   // Security check: only admin can access
   // Placed AFTER all hooks to respect React Rules of Hooks!
   if (!authLoading && (!user || profile?.role !== "admin")) {
+    // @ts-ignore - profileError might not be in types if I didn't update them, but we exported it
+    const err = (useAuth() as any).profileError;
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-bold text-red-500 mb-4">Accès Refusé</h1>
         <p className="text-muted-foreground mb-2">Vous n'avez pas les droits d'administrateur.</p>
-        <div className="p-4 bg-black/50 rounded-lg text-sm font-mono mt-4">
+        <div className="p-4 bg-black/50 rounded-lg text-sm font-mono mt-4 text-left">
           <p>Connecté en tant que : {user ? user.email : "Non connecté"}</p>
           <p>Rôle détecté dans la base : {profile?.role ? `"${profile.role}"` : "Aucun profil/rôle trouvé"}</p>
+          {err && <p className="text-red-400 mt-2">Erreur Supabase Profile : {err}</p>}
         </div>
         <button onClick={() => window.location.reload()} className="mt-6 px-4 py-2 bg-primary rounded-lg text-primary-foreground">
           Rafraîchir la page
