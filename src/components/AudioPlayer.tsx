@@ -12,12 +12,47 @@ export function AudioPlayer() {
     }
   }, [volume]);
 
+  // Autoplay logic with browser bypass
+  useEffect(() => {
+    const playAudio = async () => {
+      if (!audioRef.current) return;
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (err) {
+        // Autoplay was blocked by the browser (normal behavior for unmuted audio)
+        // We wait for the first user interaction to play it
+        const onInteract = async () => {
+          if (audioRef.current && !isPlaying) {
+            try {
+              await audioRef.current.play();
+              setIsPlaying(true);
+            } catch (e) {
+              console.error("Interaction play blocked", e);
+            }
+          }
+          document.removeEventListener('click', onInteract);
+          document.removeEventListener('keydown', onInteract);
+        };
+        document.addEventListener('click', onInteract);
+        document.addEventListener('keydown', onInteract);
+      }
+    };
+    
+    // Small timeout to ensure DOM is ready
+    const timer = setTimeout(() => {
+      playAudio();
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const togglePlay = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch(e => console.error("Autoplay blocked:", e));
+        audioRef.current.play().catch(e => console.error("Play blocked:", e));
       }
       setIsPlaying(!isPlaying);
     }
