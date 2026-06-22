@@ -1,12 +1,41 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User, LogOut, Shield } from "lucide-react";
+import { ShoppingCart, User, LogOut, Shield, MessageSquare } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import logoImg from "@/assets/logo.png";
 
 export function Header() {
   const { count, setOpen } = useCart();
   const { user, profile, signOut } = useAuth();
+  const [hasUnreadSupport, setHasUnreadSupport] = useState(false);
+
+  useEffect(() => {
+    if (profile?.role === "admin") {
+      const checkUnread = async () => {
+        const { count } = await supabase
+          .from("support_messages")
+          .select("*", { count: "exact", head: true })
+          .eq("is_admin_reply", false)
+          .eq("read", false);
+        setHasUnreadSupport((count || 0) > 0);
+      };
+      checkUnread();
+
+      const channel = supabase
+        .channel("admin_notifications")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "support_messages", filter: "is_admin_reply=eq.false" },
+          () => setHasUnreadSupport(true)
+        )
+        .subscribe();
+      
+      return () => { supabase.removeChannel(channel); };
+    }
+  }, [profile]);
+
   return (
     <header className="sticky top-0 z-50 glass border-b border-border">
       <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -24,14 +53,12 @@ export function Header() {
           <Link to="/premium" className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md">
             👑 Premium
           </Link>
-          <a
-            href="https://discord.gg/UUBFjjCp"
-            target="_blank"
-            rel="noreferrer"
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("open-support-chat"))}
             className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md"
           >
-            🎫 Support Discord
-          </a>
+            <MessageSquare size={16} /> Support en direct
+          </button>
         </div>
         
         {/* Right: User Actions */}
@@ -39,8 +66,14 @@ export function Header() {
           {user ? (
             <div className="flex items-center gap-1">
               {profile?.role === "admin" && (
-                <Link to="/admin" className="text-sm px-3 py-2 rounded-xl hover:bg-white/5 text-red-500 flex items-center gap-2 font-bold transition-colors">
+                <Link to="/admin" className="relative text-sm px-3 py-2 rounded-xl hover:bg-white/5 text-red-500 flex items-center gap-2 font-bold transition-colors">
                   <Shield size={16} /> <span className="hidden sm:inline">Admin</span>
+                  {hasUnreadSupport && (
+                    <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                  )}
                 </Link>
               )}
               <Link to="/profile" className="text-sm px-3 py-2 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-foreground flex items-center gap-2 font-medium transition-colors">

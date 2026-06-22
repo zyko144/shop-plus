@@ -3,9 +3,10 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/Header";
-import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save, Settings, ShoppingCart, BarChart3, Plus, Edit, LogOut } from "lucide-react";
+import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save, Settings, ShoppingCart, BarChart3, Plus, Edit, LogOut, MessageSquare } from "lucide-react";
 import { getAllProducts, Product } from "@/lib/products";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
+import { AdminSupport } from "@/components/AdminSupport";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
@@ -67,7 +68,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a238ff', '#f47521'
 function AdminDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "stocks" | "products" | "settings">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "stocks" | "products" | "settings" | "support">("overview");
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
   const [stocks, setStocks] = useState<Record<string, StockData>>({});
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
@@ -370,9 +371,17 @@ function AdminDashboard() {
             <Settings size={20} />
             Paramètres
           </button>
+          <button 
+            onClick={() => setActiveTab("support")}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "support" ? "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+          >
+            <MessageSquare size={20} />
+            Support En Direct
+          </button>
         </div>
 
         {/* Main Content Area */}
+        {activeTab === "support" && <AdminSupport />}
         {activeTab === "overview" && (
           <div className="space-y-8">
             {/* Stats Overview */}

@@ -15,7 +15,7 @@ import { CartProvider } from "@/lib/cart";
 import { AuthProvider } from "@/lib/auth";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { Toaster } from "sonner";
-import { DiscordSupport } from "@/components/DiscordSupport";
+import { LiveSupportChat } from "@/components/LiveSupportChat";
 import { FakeReviewsCarousel } from "@/components/FakeReviewsCarousel";
 import { CursorGlow } from "@/components/CursorGlow";
 
@@ -150,7 +150,7 @@ function AppContent() {
       
       <CursorGlow />
       <Outlet />
-      <DiscordSupport link={settings.discord_link} />
+      <LiveSupportChat />
       
       {showReviews ? (
         <FakeReviewsCarousel />
@@ -165,7 +165,6 @@ function AppContent() {
         </div>
       )}
       
-      <DiscordSupport link={settings.discord_link} />
       <AudioPlayer />
       
       <Toaster theme="dark" position="top-right" richColors />
