@@ -70,7 +70,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
               src={logoUrl}
               alt={product.name}
               loading="lazy"
-              className="max-h-28 max-w-[60%] object-contain transition-transform duration-500 group-hover:scale-110"
+              className="max-h-28 max-w-[75%] object-contain transition-transform duration-500 group-hover:scale-110"
               style={{ filter: `drop-shadow(0 0 24px ${product.color}cc)` }}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
