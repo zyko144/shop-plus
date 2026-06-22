@@ -24,6 +24,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
   
   const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
@@ -96,24 +97,22 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
           }}
         />
         {/* logo */}
-        <div className="absolute inset-0 grid place-items-center p-8">
-          {logoUrl ? (
+        <div className="absolute inset-0 grid place-items-center p-8 text-center">
+          {logoUrl && !imgError ? (
             <img
               src={logoUrl}
               alt={product.name}
               loading="lazy"
               className={`${skinImg ? 'max-h-48 max-w-[90%]' : 'max-h-28 max-w-[75%]'} object-contain transition-transform duration-500 group-hover:scale-110`}
               style={{ filter: `drop-shadow(0 0 24px ${product.color}cc)` }}
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
+              onError={() => setImgError(true)}
             />
           ) : (
             <div
-              className="text-7xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-110"
-              style={{ color: product.color, textShadow: `0 0 40px ${product.color}` }}
+              className="text-4xl md:text-5xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-110 px-4"
+              style={{ color: product.color, textShadow: `0 0 40px ${product.color}`, wordBreak: "break-word", lineHeight: "1.1" }}
             >
-              {displayEmoji}
+              {displayEmoji || product.name}
             </div>
           )}
         </div>
