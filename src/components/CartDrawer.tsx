@@ -37,9 +37,20 @@ export function CartDrawer() {
   }, [user, open]);
 
   const hasPremiumDiscount = isPremium && premiumOrdersLeft > 0;
-  const baseDiscounted = total * (1 - discount);
-  const premiumDiscounted = hasPremiumDiscount ? baseDiscounted * 0.7 : baseDiscounted;
-  const finalTotal = useCoins ? premiumDiscounted * 0.5 : premiumDiscounted;
+  
+  // Calcul du total avec réduction Premium (sauf sur la catégorie Discord)
+  const calculatePremiumTotal = () => {
+    if (!hasPremiumDiscount) return total;
+    return items.reduce((acc, item) => {
+      const isDiscord = item.category?.toLowerCase().includes("discord") || item.name.toLowerCase().includes("discord");
+      const itemTotal = item.price * item.quantity;
+      return acc + (isDiscord ? itemTotal : itemTotal * 0.7);
+    }, 0);
+  };
+
+  const totalAfterPremium = calculatePremiumTotal();
+  const baseDiscounted = totalAfterPremium * (1 - discount);
+  const finalTotal = useCoins ? baseDiscounted * 0.5 : baseDiscounted;
   
   const coinsEarned = Math.floor(finalTotal * 100);
 

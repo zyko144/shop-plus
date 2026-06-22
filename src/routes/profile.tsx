@@ -126,7 +126,7 @@ function ProfilePage() {
                         <Crown size={24} /> Avantages Premium
                       </h2>
                       <p className="text-white/70 max-w-md">
-                        En tant que membre Premium, vous bénéficiez de <strong className="text-purple-400">-30% de réduction automatique</strong> sur vos prochaines commandes, ainsi qu'un accès exclusif au salon VIP sur notre Discord !
+                        En tant que membre Premium, vous bénéficiez de <strong className="text-purple-400">-30% de réduction automatique</strong> sur vos prochaines commandes (hors services Discord), ainsi qu'un accès exclusif au salon VIP sur notre Discord !
                       </p>
                       <a href="https://discord.gg/8RBgw6ykQK" target="_blank" className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)]">
                         Accéder au VIP Discord
