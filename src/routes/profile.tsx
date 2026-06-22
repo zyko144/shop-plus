@@ -202,7 +202,7 @@ function ProfilePage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${o.status === "pending" ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" : "bg-green-500/20 text-green-400 border border-green-500/30"}`}>
-                          {o.status === "pending" ? "En attente de paiement" : o.status}
+                          {o.status === "pending" ? "En attente de confirmation de la commande" : o.status}
                         </span>
                         <span className="font-black text-xl text-white">{Number(o.total).toFixed(2)}€</span>
                         {o.status === "pending" && (
