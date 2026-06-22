@@ -111,7 +111,7 @@ function Index() {
       <CartDrawer />
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-black border-b border-border/40">
+      <section className="relative overflow-hidden bg-transparent border-b border-border/40">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/10 via-black to-black pointer-events-none" />
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
         
