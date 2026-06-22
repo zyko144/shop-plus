@@ -14,7 +14,7 @@ const RARE_SKIN_IMAGES: Record<string, string> = {
   "Travis Scott": "https://fortnite-api.com/images/cosmetics/br/cid_703_athena_commando_m_cyclone/icon.png",
   "The Reaper": "https://fortnite-api.com/images/cosmetics/br/cid_084_athena_commando_m_assassin/icon.png",
   "Take The L": "https://fortnite-api.com/images/cosmetics/br/eid_takethel/icon.png",
-  "Minty Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_322_mintcandy/icon.png",
+  "Minty Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_294_candycane/icon.png",
   "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_508_historianmale_6bqsw/icon.png"
 };
 
@@ -33,6 +33,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
     : null);
     
   let displayEmoji = product.emoji;
+  let finalBgImg = bgImg;
 
   if (product.category === "Fortnite") {
     logoUrl = `https://cdn.simpleicons.org/fortnite/${hex(product.color)}`;
@@ -41,6 +42,11 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
   if (product.category === "V-Bucks") {
     logoUrl = `https://cdn.simpleicons.org/epicgames/${hex(product.color)}`;
     displayEmoji = undefined;
+  }
+  if (product.category === "Discord") {
+    logoUrl = `https://cdn.simpleicons.org/discord/${hex(product.color)}`;
+    displayEmoji = undefined;
+    finalBgImg = undefined; // Hide the abstract background that has the star
   }
 
   const isOutOfStock = !stockInfo.is_unlimited && stockInfo.stock <= 0;
@@ -71,9 +77,9 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
         }}
       >
         {/* subtle texture from category image */}
-        {bgImg && (
+        {finalBgImg && (
           <img
-            src={bgImg}
+            src={finalBgImg}
             alt=""
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-screen"
