@@ -170,15 +170,19 @@ export function LiveSupportChat() {
                     <div className="p-4 text-xs space-y-3 bg-black/40 border-t border-white/5">
                       <div>
                         <strong className="text-red-400 block mb-0.5">Mon compte a un problème ?</strong>
-                        <span className="text-muted-foreground">Tout problème avec un compte est remplacé immédiatement sous preuve (capture d'écran). N'hésitez pas à l'envoyer ici.</span>
+                        <span className="text-muted-foreground">Tout problème avec un compte est remplacé immédiatement sous preuve (capture d'écran). N'hésitez pas à coller/uploader vos images ici.</span>
                       </div>
                       <div>
-                        <strong className="text-red-400 block mb-0.5">Comment envoyer une image ?</strong>
-                        <span className="text-muted-foreground">Cliquez sur le trombone ou faites simplement Ctrl+V / Coller directement dans le champ de texte !</span>
+                        <strong className="text-red-400 block mb-0.5">Puis-je changer les identifiants ?</strong>
+                        <span className="text-muted-foreground">Il est strictement interdit de modifier l'e-mail ou le mot de passe des comptes fournis, sous peine d'annulation de votre garantie.</span>
                       </div>
                       <div>
-                        <strong className="text-red-400 block mb-0.5">Comment se passe la livraison ?</strong>
-                        <span className="text-muted-foreground">La livraison est 100% instantanée directement par e-mail après le paiement.</span>
+                        <strong className="text-red-400 block mb-0.5">Combien de temps dure la garantie ?</strong>
+                        <span className="text-muted-foreground">La garantie est valable sur toute la durée de l'abonnement acheté. S'il y a une coupure, nous vous fournissons un compte de remplacement.</span>
+                      </div>
+                      <div>
+                        <strong className="text-red-400 block mb-0.5">Quels paiements acceptez-vous ?</strong>
+                        <span className="text-muted-foreground">Les paiements s'effectuent de manière 100% sécurisée via PayPal pour une livraison instantanée.</span>
                       </div>
                     </div>
                   )}
