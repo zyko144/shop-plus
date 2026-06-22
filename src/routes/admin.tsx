@@ -142,10 +142,44 @@ function AdminDashboard() {
     }
   }, [profile]);
 
+  // Data for charts (MUST BE BEFORE EARLY RETURNS)
+  const salesByDay = useMemo(() => {
+    const days: Record<string, number> = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days[d.toLocaleDateString('fr-FR', { weekday: 'short' })] = 0;
+    }
+    
+    orders.forEach(o => {
+      if (!o.created_at) return;
+      const d = new Date(o.created_at).toLocaleDateString('fr-FR', { weekday: 'short' });
+      if (days[d] !== undefined) {
+        days[d] += Number(o.total || 0);
+      }
+    });
+    
+    return Object.entries(days).map(([name, total]) => ({ name, total }));
+  }, [orders]);
+
+  const topProducts = useMemo(() => {
+    const map: Record<string, number> = {};
+    orders.forEach(o => {
+      if (!o.order_items) return;
+      o.order_items.forEach(item => {
+        if (!map[item.product_name]) map[item.product_name] = 0;
+        map[item.product_name] += item.quantity;
+      });
+    });
+    return Object.entries(map)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [orders]);
+
   // Security check: only admin can access
-  // Placed AFTER all hooks to respect React Rules of Hooks!
   if (!authLoading && (!user || profile?.role !== "admin")) {
-    // @ts-ignore - profileError might not be in types if I didn't update them, but we exported it
+    // @ts-ignore
     const err = (useAuth() as any).profileError;
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
@@ -211,7 +245,7 @@ function AdminDashboard() {
     } else {
       toast.success("Code promo créé !");
       setNewPromo({ code: "", discount: 10, max_uses: 100 });
-      loadSettings();
+      loadData();
     }
   };
 
@@ -227,41 +261,6 @@ function AdminDashboard() {
 
   const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const pendingCount = orders.filter(o => o.status === "pending").length;
-
-  // Data for charts
-  const salesByDay = useMemo(() => {
-    const days: Record<string, number> = {};
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      days[d.toLocaleDateString('fr-FR', { weekday: 'short' })] = 0;
-    }
-    
-    orders.forEach(o => {
-      if (!o.created_at) return;
-      const d = new Date(o.created_at).toLocaleDateString('fr-FR', { weekday: 'short' });
-      if (days[d] !== undefined) {
-        days[d] += Number(o.total || 0);
-      }
-    });
-    
-    return Object.entries(days).map(([name, total]) => ({ name, total }));
-  }, [orders]);
-
-  const topProducts = useMemo(() => {
-    const map: Record<string, number> = {};
-    orders.forEach(o => {
-      if (!o.order_items) return;
-      o.order_items.forEach(item => {
-        if (!map[item.product_name]) map[item.product_name] = 0;
-        map[item.product_name] += item.quantity;
-      });
-    });
-    return Object.entries(map)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
-  }, [orders]);
 
   return (
     <div className="min-h-screen bg-background">
