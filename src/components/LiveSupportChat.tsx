@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageSquare, X, Send, User } from "lucide-react";
+import { MessageSquare, X, Send, User, Paperclip, ChevronDown, ChevronUp, Image as ImageIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
@@ -15,6 +15,8 @@ export function LiveSupportChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [showFaq, setShowFaq] = useState(false);
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -60,9 +62,50 @@ export function LiveSupportChat() {
     }
   }, [messages, open]);
 
+  const handleUpload = async (file: File) => {
+    if (!user) return;
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('chat_attachments')
+        .upload(fileName, file);
+        
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('chat_attachments')
+        .getPublicUrl(fileName);
+        
+      await supabase.from("support_messages").insert({
+        user_id: user.id,
+        content: `[IMAGE] ${publicUrl}`,
+        is_admin_reply: false,
+      });
+    } catch (e) {
+      console.error("Upload error:", e);
+      alert("Erreur lors de l'envoi de l'image.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const file = items[i].getAsFile();
+        if (file) handleUpload(file);
+      }
+    }
+  };
+
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim() || !user || isUploading) return;
 
     const content = newMessage.trim();
     setNewMessage("");
@@ -114,22 +157,61 @@ export function LiveSupportChat() {
               </div>
             ) : (
               <>
-                <div className="text-center text-xs text-muted-foreground my-2">
-                  Un membre de l'équipe vous répondra dans les plus brefs délais.
+                {/* FAQ Section */}
+                <div className="mb-2 bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                  <button 
+                    onClick={() => setShowFaq(!showFaq)}
+                    className="w-full px-4 py-2 flex items-center justify-between text-sm font-bold text-white/80 hover:bg-white/5 transition"
+                  >
+                    <span>Foire Aux Questions</span>
+                    {showFaq ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                  {showFaq && (
+                    <div className="p-4 text-xs space-y-3 bg-black/40 border-t border-white/5">
+                      <div>
+                        <strong className="text-red-400 block mb-0.5">Mon compte a un problème ?</strong>
+                        <span className="text-muted-foreground">Tout problème avec un compte est remplacé immédiatement sous preuve (capture d'écran). N'hésitez pas à l'envoyer ici.</span>
+                      </div>
+                      <div>
+                        <strong className="text-red-400 block mb-0.5">Comment envoyer une image ?</strong>
+                        <span className="text-muted-foreground">Cliquez sur le trombone ou faites simplement Ctrl+V / Coller directement dans le champ de texte !</span>
+                      </div>
+                      <div>
+                        <strong className="text-red-400 block mb-0.5">Comment se passe la livraison ?</strong>
+                        <span className="text-muted-foreground">La livraison est 100% instantanée directement par e-mail après le paiement.</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                {messages.map((msg) => (
+
+                <div className="text-center text-[10px] text-muted-foreground my-2 uppercase tracking-wider font-bold">
+                  Un membre de l'équipe vous répondra
+                </div>
+                {messages.map((msg) => {
+                  const isImage = msg.content.startsWith('[IMAGE] ');
+                  const imageUrl = isImage ? msg.content.replace('[IMAGE] ', '') : '';
+                  return (
                   <div key={msg.id} className={`flex ${msg.is_admin_reply ? "justify-start" : "justify-end"}`}>
                     <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
+                      className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
                         msg.is_admin_reply
                           ? "bg-white/10 text-white rounded-tl-none"
                           : "bg-red-600 text-white rounded-tr-none"
                       }`}
                     >
-                      {msg.content}
+                      {isImage ? (
+                        <a href={imageUrl} target="_blank" rel="noreferrer">
+                          <img src={imageUrl} alt="Pièce jointe" className="rounded-lg max-w-full h-auto max-h-[150px] object-contain border border-white/10 mt-1 mb-1 hover:opacity-80 transition cursor-zoom-in" />
+                        </a>
+                      ) : (
+                        msg.content
+                      )}
+                      <div className={`text-[10px] mt-1 ${msg.is_admin_reply ? "text-white/40" : "text-red-200"}`}>
+                        {new Date(msg.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
                   </div>
-                ))}
+                )})}
                 <div ref={messagesEndRef} />
               </>
             )}
@@ -138,17 +220,23 @@ export function LiveSupportChat() {
           {user && (
             <div className="p-3 border-t border-white/10 bg-black/50">
               <form onSubmit={sendMessage} className="flex gap-2">
+                <label className={`p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-muted-foreground hover:text-white rounded-xl transition cursor-pointer flex items-center justify-center ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Paperclip size={18} />}
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} />
+                </label>
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Écrivez votre message..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-red-500 outline-none transition"
+                  onPaste={handlePaste}
+                  placeholder="Écrivez ou Ctrl+V..."
+                  disabled={isUploading}
+                  className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-red-500 outline-none transition disabled:opacity-50"
                 />
                 <button
                   type="submit"
-                  disabled={!newMessage.trim()}
-                  className="p-2.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white rounded-xl transition"
+                  disabled={!newMessage.trim() || isUploading}
+                  className="p-2.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white rounded-xl transition flex-shrink-0"
                 >
                   <Send size={18} />
                 </button>
