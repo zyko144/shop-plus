@@ -70,19 +70,21 @@ export function CustomCaptcha({ onSuccess }: { onSuccess: () => void }) {
       const op = ops[Math.floor(Math.random() * ops.length)];
       
       let answer = 0;
-      if (op === "+") answer = num1 + num2;
-      if (op === "-") {
-        // Ensure positive result for simplicity
+      let qStr = "";
+      if (op === "+") {
+        answer = num1 + num2;
+        qStr = `${num1} + ${num2}`;
+      } else if (op === "-") {
         const max = Math.max(num1, num2);
         const min = Math.min(num1, num2);
         answer = max - min;
-        setMathQuestion(`${max} ${op} ${min}`);
+        qStr = `${max} - ${min}`;
       } else {
         answer = num1 * num2;
-        setMathQuestion(`${num1} ${op} ${num2}`);
+        qStr = `${num1} x ${num2}`;
       }
       
-      if (op !== "-") setMathQuestion(`${num1} ${op} ${num2}`);
+      setMathQuestion(qStr);
       setCorrectMathAnswer(answer);
 
       // Generate 4 random options including the correct one
