@@ -116,7 +116,7 @@ function ProfilePage() {
                   <div className="w-full bg-black/50 h-4 rounded-full overflow-hidden border border-white/10 relative">
                     <div 
                       className="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 transition-all duration-1000 relative"
-                      style={{ width: \`\${progressPercent}%\` }}
+                      style={{ width: `${progressPercent}%` }}
                     >
                       <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] animate-[shimmer_2s_infinite]" style={{ backgroundSize: "200% 100%" }}></div>
                     </div>
@@ -182,7 +182,7 @@ function ProfilePage() {
                       ))}
                     </ul>
                     {o.status === "pending" && (
-                    <a href={`\${PAYPAL_URL}/\${Number(o.total).toFixed(2)}EUR`} target="_blank" className="inline-block w-full text-center py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-black font-bold shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:scale-[1.02] transition-transform">
+                    <a href={`${PAYPAL_URL}/${Number(o.total).toFixed(2)}EUR`} target="_blank" className="inline-block w-full text-center py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-black font-bold shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:scale-[1.02] transition-transform">
                         Payer maintenant (PayPal)
                       </a>
                     )}
