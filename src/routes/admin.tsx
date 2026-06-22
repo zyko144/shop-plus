@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/Header";
-import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save, Settings } from "lucide-react";
-import { getAllProducts } from "@/lib/products";
+import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save, Settings, ShoppingCart, BarChart3, Plus, Edit, LogOut } from "lucide-react";
+import { getAllProducts, Product } from "@/lib/products";
 import { toast } from "sonner";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Dashboard Admin — SHOP+" }] }),
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/admin")({
 
 type AdminOrderRow = {
   id: string;
+  user_id: string;
   total: number;
   status: string;
   created_at: string;
@@ -36,79 +38,57 @@ type StockData = {
   is_unlimited: boolean;
 };
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a238ff', '#f47521'];
+
 function AdminDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"orders" | "stocks" | "settings">("orders");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "stocks" | "products" | "settings">("overview");
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
   const [stocks, setStocks] = useState<Record<string, StockData>>({});
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [newPromo, setNewPromo] = useState({ code: "", discount: 10, max_uses: 100 });
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const allProducts = getAllProducts();
 
-  // Security check: only admin can access
-  const loadOrders = async () => {
+  const loadData = async () => {
     setLoading(true);
-    // Fetch all orders with user emails
-    // Since there is no direct FK between orders and profiles, we fetch auth.users indirectly or fetch profiles manually.
-    // Actually, orders.user_id references auth.users(id), and profiles.id references auth.users(id). 
-    // To fix the join error, we fetch orders, then fetch profiles for those orders.
-    const { data: ordersData, error } = await supabase
-      .from("orders")
-      .select("id,user_id,total,status,created_at,payment_ref,order_items(product_name,quantity,unit_price)")
-      .order("created_at", { ascending: false });
-
-    if (!error && ordersData) {
-      // Fetch profiles manually to join them
-      const userIds = [...new Set(ordersData.map(o => o.user_id))];
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("id,email,username")
-        .in("id", userIds);
-        
-      const profilesMap = (profilesData || []).reduce((acc: any, p) => {
-        acc[p.id] = p;
-        return acc;
-      }, {});
-
-      const mergedOrders = ordersData.map(o => ({
-        ...o,
-        profiles: profilesMap[o.user_id] || null
-      }));
-      
-      setOrders(mergedOrders as any);
-    }
-    setLoading(false);
-  };
-
-  const loadStocks = async () => {
-    const { data } = await supabase.from("product_stock").select("*");
-    if (data) {
-      const map: Record<string, StockData> = {};
-      data.forEach(s => map[s.product_id] = s);
-      setStocks(map);
-    }
-  };
-
-  const loadSettings = async () => {
-    const { data } = await supabase.from("store_settings").select("*");
-    if (data) {
+    
+    // Charger Paramètres et Promos
+    const { data: storeData } = await supabase.from("store_settings").select("*");
+    if (storeData) {
       const map: Record<string, string> = {};
-      data.forEach(s => map[s.key] = s.value);
+      storeData.forEach(s => map[s.key] = s.value);
       setStoreSettings(map);
     }
     const { data: promoData } = await supabase.from("promo_codes").select("*").order("created_at", { ascending: false });
     if (promoData) setPromos(promoData);
+
+    // Charger Stocks
+    const { data: stocksData } = await supabase.from("product_stock").select("*");
+    if (stocksData) {
+      const map: Record<string, StockData> = {};
+      stocksData.forEach(s => map[s.product_id] = { product_id: s.product_id, is_unlimited: s.is_unlimited, stock: s.stock });
+      setStocks(map);
+    }
+
+    // Charger Produits Admin (tous, même inactifs)
+    const { data: productsData } = await supabase.from("products").select("*").order("category", { ascending: true });
+    if (productsData) setAllProducts(productsData);
+    
+    // Charger Commandes
+    const { data: ordersData } = await supabase.from("orders").select("*, profiles(email, username)").order("created_at", { ascending: false }).limit(50);
+    if (ordersData) setOrders(ordersData as AdminOrderRow[]);
+
+    setLoading(false);
   };
 
   useEffect(() => {
-    if (profile?.role === "admin") {
-      loadOrders();
-      loadStocks();
-      loadSettings();
+    if (profile && profile.role === "admin") {
+      loadData();
+    } else if (profile && profile.role !== "admin") {
+      setLoading(false);
     }
   }, [profile]);
 
@@ -195,8 +175,43 @@ function AdminDashboard() {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
 
-  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
+  const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const pendingCount = orders.filter(o => o.status === "pending").length;
+
+  // Data for charts
+  const salesByDay = useMemo(() => {
+    const days: Record<string, number> = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days[d.toLocaleDateString('fr-FR', { weekday: 'short' })] = 0;
+    }
+    
+    orders.forEach(o => {
+      if (!o.created_at) return;
+      const d = new Date(o.created_at).toLocaleDateString('fr-FR', { weekday: 'short' });
+      if (days[d] !== undefined) {
+        days[d] += Number(o.total || 0);
+      }
+    });
+    
+    return Object.entries(days).map(([name, total]) => ({ name, total }));
+  }, [orders]);
+
+  const topProducts = useMemo(() => {
+    const map: Record<string, number> = {};
+    orders.forEach(o => {
+      if (!o.order_items) return;
+      o.order_items.forEach(item => {
+        if (!map[item.product_name]) map[item.product_name] = 0;
+        map[item.product_name] += item.quantity;
+      });
+    });
+    return Object.entries(map)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [orders]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -212,10 +227,24 @@ function AdminDashboard() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+          <button 
+            onClick={() => setActiveTab("overview")}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "overview" ? "bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+          >
+            <BarChart3 size={20} />
+            Vue d'ensemble
+          </button>
+          <button 
+            onClick={() => setActiveTab("products")}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "products" ? "bg-orange-600 text-white shadow-[0_0_20px_rgba(234,88,12,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+          >
+            <ShoppingCart size={20} />
+            Produits
+          </button>
           <button 
             onClick={() => setActiveTab("orders")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "orders" ? "bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "orders" ? "bg-yellow-600 text-white shadow-[0_0_20px_rgba(202,138,4,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
           >
             <Package size={20} />
             Commandes
@@ -225,7 +254,7 @@ function AdminDashboard() {
             className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "stocks" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
           >
             <Layers size={20} />
-            Gestion des Stocks
+            Stocks
           </button>
           <button 
             onClick={() => setActiveTab("settings")}
@@ -236,10 +265,11 @@ function AdminDashboard() {
           </button>
         </div>
 
-        {activeTab === "orders" && (
-          <>
+        {/* Main Content Area */}
+        {activeTab === "overview" && (
+          <div className="space-y-8">
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="glass rounded-2xl p-6 border-t-4 border-red-500 flex items-center justify-between">
                 <div>
                   <p className="text-muted-foreground font-medium mb-1">Chiffre d'affaires</p>
@@ -268,11 +298,77 @@ function AdminDashboard() {
                 </div>
               </div>
             </div>
-          </>
+
+            {/* Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="glass rounded-2xl p-6 border border-border/50">
+                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                  <BarChart3 size={18} className="text-red-500" />
+                  Ventes des 7 derniers jours
+                </h3>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={salesByDay}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                      <XAxis dataKey="name" stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}€`} />
+                      <RechartsTooltip 
+                        contentStyle={{ backgroundColor: '#000000dd', border: '1px solid #333', borderRadius: '8px' }}
+                        itemStyle={{ color: '#ff0033' }}
+                      />
+                      <Line type="monotone" dataKey="total" stroke="#ff0033" strokeWidth={3} dot={{ fill: '#ff0033', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="glass rounded-2xl p-6 border border-border/50">
+                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                  <Package size={18} className="text-orange-500" />
+                  Top 5 Produits Vendus
+                </h3>
+                <div className="h-[300px] w-full flex items-center justify-center">
+                  {topProducts.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={topProducts}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {topProducts.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip 
+                          contentStyle={{ backgroundColor: '#000000dd', border: '1px solid #333', borderRadius: '8px' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">Pas assez de données pour le moment.</p>
+                  )}
+                </div>
+                {topProducts.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-3 mt-2">
+                    {topProducts.map((entry, index) => (
+                      <div key={entry.name} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                        {entry.name} ({entry.value})
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* Main Content Area */}
-        {activeTab === "orders" ? (
+        {activeTab === "orders" && (
           <div className="glass rounded-2xl overflow-hidden border border-border/50">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -345,7 +441,56 @@ function AdminDashboard() {
               </table>
             </div>
           </div>
-        ) : activeTab === "stocks" ? (
+        )}
+
+        {activeTab === "products" && (
+          <div className="glass rounded-2xl p-8 border border-border/50">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Catalogue Produits</h2>
+              <button className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(234,88,12,0.3)]">
+                <Plus size={16} /> Ajouter un produit
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {allProducts.map(p => (
+                <div key={p.id} className="p-4 rounded-xl border bg-black/40 border-white/10 hover:border-orange-500/50 transition-colors group relative overflow-hidden">
+                  {/* Color strip */}
+                  <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: p.color || '#fff' }}></div>
+                  
+                  <div className="flex justify-between items-start mb-3 pl-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg">
+                        {p.emoji || (p.logo && !p.logo.includes('.') ? <i className={`si si-${p.logo}`}></i> : '📦')}
+                      </div>
+                      <div>
+                        <div className="font-bold text-sm truncate w-32" title={p.name}>{p.name}</div>
+                        <div className="text-xs text-muted-foreground">{p.category}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-end justify-between mt-4 pl-3">
+                    <div className="font-black text-lg text-primary">{p.price}€</div>
+                    <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button className="p-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 rounded-md transition" title="Modifier">
+                        <Edit size={14} />
+                      </button>
+                      <button className="p-1.5 bg-red-500/20 text-red-500 hover:bg-red-500/40 rounded-md transition" title="Supprimer">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  {!p.is_active && (
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-500">Inactif</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "stocks" && (
           <div className="glass rounded-2xl overflow-hidden border border-border/50">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -426,7 +571,9 @@ function AdminDashboard() {
               </table>
             </div>
           </div>
-        ) : activeTab === "settings" ? (
+        )}
+
+        {activeTab === "settings" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Paramètres globaux */}
             <div className="glass rounded-2xl p-8 border border-border/50">
@@ -553,7 +700,7 @@ function AdminDashboard() {
               </div>
             </div>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

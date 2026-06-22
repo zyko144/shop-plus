@@ -1,4 +1,4 @@
-CREATE TABLE public.promo_codes (
+CREATE TABLE IF NOT EXISTS public.promo_codes (
   code text PRIMARY KEY,
   discount_percentage integer DEFAULT 0,
   max_uses integer DEFAULT 100,
@@ -7,10 +7,14 @@ CREATE TABLE public.promo_codes (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now())
 );
 
+DROP POLICY IF EXISTS "Public can read promo codes" ON public.promo_codes;
 CREATE POLICY "Public can read promo codes" ON public.promo_codes FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Admins can manage promo codes" ON public.promo_codes;
 CREATE POLICY "Admins can manage promo codes" ON public.promo_codes FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
+
 ALTER TABLE public.promo_codes ENABLE ROW LEVEL SECURITY;
 
 CREATE OR REPLACE FUNCTION increment_promo_use(promo_code text)
@@ -22,7 +26,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TABLE public.store_settings (
+CREATE TABLE IF NOT EXISTS public.store_settings (
   key text PRIMARY KEY,
   value text NOT NULL
 );
@@ -33,8 +37,14 @@ INSERT INTO public.store_settings (key, value) VALUES
   ('discord_link', 'https://discord.gg/UUBFjjCp')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
+DROP POLICY IF EXISTS "Public can read settings" ON public.store_settings;
 CREATE POLICY "Public can read settings" ON public.store_settings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Admins can manage settings" ON public.store_settings;
 CREATE POLICY "Admins can manage settings" ON public.store_settings FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
+
 ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
+
+NOTIFY pgrst, 'reload schema';

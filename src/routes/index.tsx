@@ -6,10 +6,7 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { ProductCard3D } from "@/components/ProductCard3D";
 import { SteamMenu } from "@/components/SteamMenu";
 import { CategorySidebar, type Cat } from "@/components/CategorySidebar";
-import {
-  STREAMING, VPN, TWITCH, FORTNITE_CLASSIC, FORTNITE_RARE, VBUCKS, DISCORD_DECO,
-  CATEGORY_IMAGES,
-} from "@/lib/products";
+import { CATEGORY_IMAGES, getAllProducts } from "@/lib/products";
 import type { Product } from "@/lib/products";
 import { Sparkles, Zap, ShieldCheck, ShoppingBag, Search } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -28,41 +25,63 @@ export const Route = createFileRoute("/")({
 
 type Group = { id: string; label: string; emoji: string; color: string; items: Product[]; description: string };
 
-const GROUPS: Group[] = [
-  { id: "streaming", label: "Streaming", emoji: "📺", color: "#ff0033", items: STREAMING, description: "Films, séries, musique — vos plateformes préférées dès 1€." },
-  { id: "vpn", label: "VPN", emoji: "🛡", color: "#4687ff", items: VPN, description: "Navigation sécurisée, débridez tout le web." },
-  { id: "twitch", label: "Twitch", emoji: "💜", color: "#9146ff", items: TWITCH, description: "Boostez votre chaîne avec de vrais followers." },
-  { id: "fortnite", label: "Fortnite", emoji: "🎯", color: "#00d2ff", items: FORTNITE_CLASSIC, description: "Comptes Fortnite aléatoires avec skins inclus." },
-  { id: "rare", label: "Skins Rares", emoji: "👑", color: "#ffb800", items: FORTNITE_RARE, description: "Pioches exclusives, skins légendaires, OG only." },
-  { id: "vbucks", label: "V-Bucks", emoji: "💰", color: "#f0b400", items: VBUCKS, description: "Comptes chargés en V-Bucks prêts à dépenser." },
-  { id: "steam", label: "Steam", emoji: "🎮", color: "#1b9cff", items: [], description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
-  { id: "discord", label: "Discord", emoji: "✦", color: "#5865f2", items: DISCORD_DECO, description: "Décorations de profil — grille tarifaire officielle." },
-];
+const GROUP_META: Record<string, Omit<Group, "items">> = {
+  "Streaming": { id: "streaming", label: "Streaming", emoji: "📺", color: "#ff0033", description: "Films, séries, musique — vos plateformes préférées dès 1€." },
+  "VPN": { id: "vpn", label: "VPN", emoji: "🛡", color: "#4687ff", description: "Navigation sécurisée, débridez tout le web." },
+  "Twitch": { id: "twitch", label: "Twitch", emoji: "💜", color: "#9146ff", description: "Boostez votre chaîne avec de vrais followers." },
+  "Fortnite": { id: "fortnite", label: "Fortnite", emoji: "🎯", color: "#00d2ff", description: "Comptes Fortnite aléatoires avec skins inclus." },
+  "Fortnite Rare": { id: "rare", label: "Skins Rares", emoji: "👑", color: "#ffb800", description: "Pioches exclusives, skins légendaires, OG only." },
+  "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", color: "#f0b400", description: "Comptes chargés en V-Bucks prêts à dépenser." },
+  "Steam": { id: "steam", label: "Steam", emoji: "🎮", color: "#1b9cff", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
+  "Discord": { id: "discord", label: "Discord", emoji: "✦", color: "#5865f2", description: "Décorations de profil — grille tarifaire officielle." },
+};
 
 function Index() {
   const [active, setActive] = useState("streaming");
   const [query, setQuery] = useState("");
   const [stocks, setStocks] = useState<Record<string, { is_unlimited: boolean, stock: number }>>({});
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   useEffect(() => {
-    const fetchStocks = async () => {
-      const { data } = await supabase.from("product_stock").select("*");
-      if (data) {
+    const fetchData = async () => {
+      const [stocksData, productsData] = await Promise.all([
+        supabase.from("product_stock").select("*"),
+        getAllProducts()
+      ]);
+      
+      if (stocksData.data) {
         const map: Record<string, { is_unlimited: boolean, stock: number }> = {};
-        data.forEach((s) => map[s.product_id] = { is_unlimited: s.is_unlimited, stock: s.stock });
+        stocksData.data.forEach((s) => map[s.product_id] = { is_unlimited: s.is_unlimited, stock: s.stock });
         setStocks(map);
       }
+      
+      if (productsData) {
+        setAllProducts(productsData);
+      }
+      setLoadingProducts(false);
     };
-    fetchStocks();
+    fetchData();
   }, []);
 
+  const GROUPS = useMemo(() => {
+    const groups: Group[] = [];
+    Object.keys(GROUP_META).forEach(catName => {
+      const meta = GROUP_META[catName];
+      const items = allProducts.filter(p => p.category === catName);
+      groups.push({ ...meta, items });
+    });
+    return groups;
+  }, [allProducts]);
+
   const cats: Cat[] = useMemo(
-    () => GROUPS.map((g) => ({ id: g.id, label: g.label, emoji: g.emoji, color: g.color, count: g.items.length || 4 })),
-    []
+    () => GROUPS.map((g) => ({ id: g.id, label: g.label, emoji: g.emoji, color: g.color, count: g.items.length || (g.id === "steam" ? 40 : 0) })),
+    [GROUPS]
   );
 
-  const group = GROUPS.find((g) => g.id === active)!;
+  const group = GROUPS.find((g) => g.id === active) || GROUPS[0];
   const filtered = useMemo(() => {
+    if (!group) return [];
     if (!query.trim()) return group.items;
     const q = query.toLowerCase();
     return group.items.filter((p) => p.name.toLowerCase().includes(q));
