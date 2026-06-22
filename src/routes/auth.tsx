@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
-import { Turnstile } from '@marsidev/react-turnstile';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Connexion — ZYKO Store" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur ZYKO Store." }] }),
@@ -128,7 +128,7 @@ function AuthPage() {
           </div>
 
           <div className="flex justify-center py-2">
-            <Turnstile siteKey="1x00000000000000000000AA" onSuccess={setCaptchaToken} />
+            <Turnstile siteKey="0x4AAAAAADpIT4eAsIwUn19H" onSuccess={setCaptchaToken} />
           </div>
 
           <div className="pt-2">
