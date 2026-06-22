@@ -619,68 +619,79 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
-                  {allProducts.map((p) => {
-                    // Si on a pas de donnée, on assume illimité (par défaut jusqu'à maintenant)
-                    const stockInfo = stocks[p.id] || { is_unlimited: true, stock: 0 };
-                    return (
-                      <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                        <td className="p-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-sm" style={{ backgroundColor: p.color }}>
-                              {p.emoji}
+                  {Object.entries(
+                    allProducts.reduce((acc, p) => {
+                      acc[p.category] = acc[p.category] || [];
+                      acc[p.category].push(p);
+                      return acc;
+                    }, {} as Record<string, Product[]>)
+                  ).flatMap(([category, products]) => [
+                    <tr key={`cat-${category}`} className="bg-black/60 border-t border-b border-border/50">
+                      <td colSpan={6} className="p-3 text-sm font-bold text-primary uppercase tracking-widest pl-4">
+                        {category} <span className="text-muted-foreground ml-2">({products.length})</span>
+                      </td>
+                    </tr>,
+                    ...products.map((p) => {
+                      const stockInfo = stocks[p.id] || { is_unlimited: true, stock: 0 };
+                      return (
+                        <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-sm" style={{ backgroundColor: p.color }}>
+                                {p.emoji || (p.logo && !p.logo.includes('.') ? <i className={`si si-${p.logo}`}></i> : '📦')}
+                              </div>
+                              <div>
+                                <div className="font-bold text-white/90">{p.name}</div>
+                                {p.subtitle && <div className="text-xs text-muted-foreground">{p.subtitle}</div>}
+                              </div>
                             </div>
-                            <div>
-                              <div className="font-bold text-white/90">{p.name}</div>
-                              {p.subtitle && <div className="text-xs text-muted-foreground">{p.subtitle}</div>}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="p-4 text-muted-foreground text-sm">{p.category}</td>
-                        <td className="p-4 font-medium text-white/80">{Number(p.price).toFixed(2)}€</td>
-                        
-                        <td className="p-4 text-center">
-                          <select 
-                            className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-medium focus:border-blue-500 outline-none"
-                            value={stockInfo.is_unlimited ? "unlimited" : "limited"}
-                            onChange={(e) => {
-                              const isUnlim = e.target.value === "unlimited";
-                              // Mise à jour immédiate locale, on cliquera sur Save pour envoyer
-                              setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: isUnlim, stock: stockInfo.stock }}));
-                            }}
-                          >
-                            <option value="unlimited">Illimité ♾️</option>
-                            <option value="limited">Limité (Chiffre)</option>
-                          </select>
-                        </td>
-                        
-                        <td className="p-4 text-center">
-                          {!stockInfo.is_unlimited ? (
-                            <input 
-                              type="number" 
-                              min="0"
-                              className="w-20 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center focus:border-blue-500 outline-none"
-                              value={stockInfo.stock}
+                          </td>
+                          <td className="p-4 text-muted-foreground text-sm">{p.category}</td>
+                          <td className="p-4 font-medium text-white/80">{Number(p.price).toFixed(2)}€</td>
+                          
+                          <td className="p-4 text-center">
+                            <select 
+                              className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-medium focus:border-blue-500 outline-none"
+                              value={stockInfo.is_unlimited ? "unlimited" : "limited"}
                               onChange={(e) => {
-                                setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: false, stock: parseInt(e.target.value) || 0 }}));
+                                const isUnlim = e.target.value === "unlimited";
+                                setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: isUnlim, stock: stockInfo.stock }}));
                               }}
-                            />
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </td>
-                        
-                        <td className="p-4 text-right">
-                          <button 
-                            onClick={() => saveStock(p.id, stockInfo.stock, stockInfo.is_unlimited)}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-colors"
-                          >
-                            <Save size={14} />
-                            Enregistrer
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                            >
+                              <option value="unlimited">Illimité ♾️</option>
+                              <option value="limited">Limité (Chiffre)</option>
+                            </select>
+                          </td>
+                          
+                          <td className="p-4 text-center">
+                            {!stockInfo.is_unlimited ? (
+                              <input 
+                                type="number" 
+                                min="0"
+                                className="w-20 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center focus:border-blue-500 outline-none"
+                                value={stockInfo.stock}
+                                onChange={(e) => {
+                                  setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: false, stock: parseInt(e.target.value) || 0 }}));
+                                }}
+                              />
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </td>
+                          
+                          <td className="p-4 text-right">
+                            <button 
+                              onClick={() => saveStock(p.id, stockInfo.stock, stockInfo.is_unlimited)}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-colors"
+                            >
+                              <Save size={14} />
+                              Enregistrer
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ])}
                 </tbody>
               </table>
             </div>

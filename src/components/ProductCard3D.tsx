@@ -8,16 +8,29 @@ function hex(c: string) {
   return c.replace("#", "");
 }
 
+const RARE_SKIN_IMAGES: Record<string, string> = {
+  "Black Knight": "https://fortnite-api.com/images/cosmetics/br/cid_035_athena_commando_m_medieval/icon.png",
+  "Galaxy": "https://fortnite-api.com/images/cosmetics/br/cid_175_athena_commando_m_celestial/icon.png",
+  "Travis Scott": "https://fortnite-api.com/images/cosmetics/br/cid_731_athena_commando_m_cactusjack/icon.png",
+  "The Reaper": "https://fortnite-api.com/images/cosmetics/br/cid_101_athena_commando_m_tacticalassassin/icon.png",
+  "Take The L": "https://fortnite-api.com/images/cosmetics/br/eid_takethel/icon.png",
+  "Minty Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_322_mintcandy/icon.png",
+  "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_505_journey/icon.png"
+};
+
 export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
   const { add } = useCart();
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
-  const logoUrl = product.logo
+  
+  const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
+
+  const logoUrl = skinImg || (product.logo
     ? product.logo.startsWith("http") || product.logo.startsWith("/")
       ? product.logo
       : `https://cdn.simpleicons.org/${product.logo}/${hex(product.color)}`
-    : null;
+    : null);
 
   const isOutOfStock = !stockInfo.is_unlimited && stockInfo.stock <= 0;
 
