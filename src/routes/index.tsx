@@ -65,10 +65,22 @@ function Index() {
   }, []);
 
   const GROUPS = useMemo(() => {
+    const STREAMING_ORDER = ["netflix", "disney", "spotify", "crunchyroll", "amazon", "youtube", "deezer"];
     const groups: Group[] = [];
     Object.keys(GROUP_META).forEach(catName => {
       const meta = GROUP_META[catName];
       const items = allProducts.filter(p => p.category === catName);
+      if (catName === "Streaming") {
+        items.sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          const scoreA = STREAMING_ORDER.findIndex(k => nameA.includes(k));
+          const scoreB = STREAMING_ORDER.findIndex(k => nameB.includes(k));
+          const finalA = scoreA === -1 ? 999 : scoreA;
+          const finalB = scoreB === -1 ? 999 : scoreB;
+          return finalA - finalB;
+        });
+      }
       groups.push({ ...meta, items });
     });
     return groups;

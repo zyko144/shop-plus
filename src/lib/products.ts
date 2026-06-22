@@ -6,7 +6,7 @@ import fortniteImg from "@/assets/cat-fortnite.jpg";
 import rareImg from "@/assets/cat-rare.jpg";
 import vbucksImg from "@/assets/cat-vbucks.jpg";
 import steamImg from "@/assets/cat-steam.jpg";
-import discordImg from "@/assets/cat-discord.jpg";
+const discordImg = "/discord-bg.png";
 
 export const CATEGORY_IMAGES: Record<string, string> = {
   Streaming: streamingImg,
