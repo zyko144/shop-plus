@@ -81,9 +81,6 @@ export function CartDrawer() {
     }
     if (items.length === 0) return;
     
-    // Astuce anti-bloqueur de popups : ouvrir la fenêtre tout de suite
-    const paymentWindow = window.open('', '_blank');
-    
     setLoading(true);
     try {
       const { data: order, error } = await supabase
@@ -126,18 +123,12 @@ export function CartDrawer() {
 
       clear();
       setOpen(false);
-      toast.success(`Commande enregistrée ! Vous gagnerez ${coinsEarned} Coins une fois validée. Redirection PayPal...`, { duration: 8000 });
+      toast.success(`Commande enregistrée ! Redirection vers PayPal...`, { duration: 5000 });
       
-      if (paymentWindow) {
-        paymentWindow.location.href = `${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`;
-      } else {
-        // Fallback si vraiment bloqué
-        window.location.href = `${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`;
-      }
+      // Redirection directe sur la même page (100% fiable, aucun bloqueur de popups)
+      window.location.href = `${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`;
       
-      navigate({ to: "/profile" });
     } catch (e: any) {
-      if (paymentWindow) paymentWindow.close();
       toast.error(e.message ?? "Erreur");
     } finally {
       setLoading(false);
