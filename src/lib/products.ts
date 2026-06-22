@@ -79,7 +79,7 @@ export async function getAllProducts(): Promise<Product[]> {
     console.error("Erreur chargement produits:", error);
     return [];
   }
-  return data || [];
+  return (data || []).filter(p => !['CDA', 'Polsat Box Go'].includes(p.name));
 }
 
 // Fonction pour l'admin (inclut les inactifs)

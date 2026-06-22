@@ -11,11 +11,11 @@ function hex(c: string) {
 const RARE_SKIN_IMAGES: Record<string, string> = {
   "Black Knight": "https://fortnite-api.com/images/cosmetics/br/cid_035_athena_commando_m_medieval/icon.png",
   "Galaxy": "https://fortnite-api.com/images/cosmetics/br/cid_175_athena_commando_m_celestial/icon.png",
-  "Travis Scott": "https://fortnite-api.com/images/cosmetics/br/cid_731_athena_commando_m_cactusjack/icon.png",
-  "The Reaper": "https://fortnite-api.com/images/cosmetics/br/cid_101_athena_commando_m_tacticalassassin/icon.png",
+  "Travis Scott": "https://fortnite-api.com/images/cosmetics/br/cid_703_athena_commando_m_cyclone/icon.png",
+  "The Reaper": "https://fortnite-api.com/images/cosmetics/br/cid_084_athena_commando_m_assassin/icon.png",
   "Take The L": "https://fortnite-api.com/images/cosmetics/br/eid_takethel/icon.png",
   "Minty Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_322_mintcandy/icon.png",
-  "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_505_journey/icon.png"
+  "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_508_historianmale_6bqsw/icon.png"
 };
 
 export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
@@ -26,11 +26,22 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
   
   const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
 
-  const logoUrl = skinImg || (product.logo
+  let logoUrl = skinImg || (product.logo
     ? product.logo.startsWith("http") || product.logo.startsWith("/")
       ? product.logo
       : `https://cdn.simpleicons.org/${product.logo}/${hex(product.color)}`
     : null);
+    
+  let displayEmoji = product.emoji;
+
+  if (product.category === "Fortnite") {
+    logoUrl = `https://cdn.simpleicons.org/fortnite/${hex(product.color)}`;
+    displayEmoji = undefined;
+  }
+  if (product.category === "V-Bucks") {
+    logoUrl = `https://cdn.simpleicons.org/epicgames/${hex(product.color)}`;
+    displayEmoji = undefined;
+  }
 
   const isOutOfStock = !stockInfo.is_unlimited && stockInfo.stock <= 0;
 
@@ -83,7 +94,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
               src={logoUrl}
               alt={product.name}
               loading="lazy"
-              className="max-h-28 max-w-[75%] object-contain transition-transform duration-500 group-hover:scale-110"
+              className={`${skinImg ? 'max-h-48 max-w-[90%]' : 'max-h-28 max-w-[75%]'} object-contain transition-transform duration-500 group-hover:scale-110`}
               style={{ filter: `drop-shadow(0 0 24px ${product.color}cc)` }}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -94,7 +105,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
               className="text-7xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-110"
               style={{ color: product.color, textShadow: `0 0 40px ${product.color}` }}
             >
-              {product.emoji}
+              {displayEmoji}
             </div>
           )}
         </div>
