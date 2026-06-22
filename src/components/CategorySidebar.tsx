@@ -5,15 +5,15 @@ export type Cat = { id: string; label: string; emoji: string; color: string; cou
 export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; active: string; onSelect: (id: string) => void }) {
   return (
     <aside className="w-full z-40 sticky top-16 bg-background/90 backdrop-blur-xl border-b border-white/5 py-4 mt-0 shadow-xl">
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6">
-        <nav className="flex items-center justify-center gap-3 overflow-x-auto no-scrollbar pb-1">
+      <div className="max-w-[1920px] mx-auto px-2 md:px-6">
+        <nav className="flex items-center justify-start xl:justify-center gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-1 px-2">
           {cats.map((c) => {
             const isActive = c.id === active;
             return (
               <button
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className={`group shrink-0 relative flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
+                className={`group shrink-0 relative flex items-center gap-2 md:gap-3 px-3 py-2 md:px-4 md:py-2.5 rounded-2xl text-xs md:text-sm font-medium transition-all ${
                   isActive ? "text-white" : "text-muted-foreground hover:text-foreground bg-white/5 hover:bg-white/10"
                 }`}
                 style={isActive ? { background: `linear-gradient(135deg, ${c.color}33, transparent)`, boxShadow: `inset 0 0 0 1px ${c.color}66` } : undefined}

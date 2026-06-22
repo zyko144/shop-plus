@@ -267,6 +267,34 @@ function AdminDashboard() {
     }
   };
 
+  const injectNewProducts = async () => {
+    if (!window.confirm("Injecter les nouveaux produits (Robux, Valorant, Epic Games) ?")) return;
+    const newProducts = [
+      { name: 'Robux 1000-2500', category: 'Robux', price: 7.50, logo: 'roblox', color: '#ffffff', is_active: true },
+      { name: 'Robux 2500-5000', category: 'Robux', price: 12.50, logo: 'roblox', color: '#ffffff', is_active: true },
+      { name: 'Robux 5000-10.000', category: 'Robux', price: 20.00, logo: 'roblox', color: '#ffffff', is_active: true },
+      { name: 'Robux 10.000-15.000', category: 'Robux', price: 31.25, logo: 'roblox', color: '#ffffff', is_active: true },
+      { name: 'Robux 50.000+', category: 'Robux', price: 75.00, logo: 'roblox', color: '#ffffff', is_active: true },
+      { name: 'Valorant EU [1000-3000VP Inventory]', category: 'Valorant EU', price: 30.00, logo: 'valorant', color: '#ff4655', is_active: true },
+      { name: 'Valorant EU [3000-5000VP Inventory]', category: 'Valorant EU', price: 42.50, logo: 'valorant', color: '#ff4655', is_active: true },
+      { name: 'Valorant EU [5000-7000VP Inventory]', category: 'Valorant EU', price: 62.50, logo: 'valorant', color: '#ff4655', is_active: true },
+      { name: 'Valorant EU [7000-12.000VP Inventory]', category: 'Valorant EU', price: 87.50, logo: 'valorant', color: '#ff4655', is_active: true },
+      { name: 'Valorant EU [15.000-25.000VP Inventory]', category: 'Valorant EU', price: 105.00, logo: 'valorant', color: '#ff4655', is_active: true },
+      { name: 'Epic Games [50-100 Games] FA', category: 'Epic Games', price: 0.75, logo: 'epicgames', color: '#ffffff', is_active: true },
+      { name: 'Epic Games [100-200 Games] FA', category: 'Epic Games', price: 2.50, logo: 'epicgames', color: '#ffffff', is_active: true },
+      { name: 'Epic Games [200-350 Games] FA', category: 'Epic Games', price: 5.00, logo: 'epicgames', color: '#ffffff', is_active: true },
+      { name: 'Epic Games [350+ Games] FA', category: 'Epic Games', price: 12.50, logo: 'epicgames', color: '#ffffff', is_active: true }
+    ];
+    try {
+      const { error } = await supabase.from('products').insert(newProducts);
+      if (error) throw error;
+      toast.success("Produits ajoutés avec succès !");
+      loadData();
+    } catch (e: any) {
+      toast.error("Erreur d'injection: " + e.message);
+    }
+  };
+
   const saveStock = async (productId: string, newStock: number, isUnlimited: boolean) => {
     const { error } = await supabase.from("product_stock").upsert({
       product_id: productId,
@@ -563,12 +591,20 @@ function AdminDashboard() {
           <div className="glass rounded-2xl p-8 border border-border/50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2"><Layers size={20} className="text-primary" /> Catalogue Produits</h2>
-              <button 
-                onClick={() => setEditingProduct({})}
-                className="px-4 py-2 bg-primary rounded-lg text-primary-foreground text-sm font-bold flex items-center gap-2"
-              >
-                <Plus size={16} /> Ajouter un produit
-              </button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={injectNewProducts}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-white text-sm font-bold transition-colors"
+                >
+                  🚀 Injecter Nouveaux Produits
+                </button>
+                <button 
+                  onClick={() => setEditingProduct({})}
+                  className="px-4 py-2 bg-primary rounded-lg text-primary-foreground text-sm font-bold flex items-center gap-2"
+                >
+                  <Plus size={16} /> Ajouter un produit
+                </button>
+              </div>
             </div>
             
             <div className="space-y-8">
