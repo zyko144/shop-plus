@@ -9,26 +9,22 @@ export function Header() {
   const { user, profile, signOut } = useAuth();
   return (
     <header className="sticky top-0 z-50 glass border-b border-border">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 font-black text-lg">
           <img src={logoImg} alt="SHOP+" className="w-9 h-9 rounded-xl shadow-[0_0_24px_rgba(220,38,38,.6)]" />
           <span className="tracking-tight">SHOP<span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent">+</span></span>
         </Link>
-        <div className="hidden lg:flex items-center gap-6 text-sm">
-          <span className="flex items-center gap-1.5 text-muted-foreground font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"/> Livraison instantanée
-          </span>
-          <Link to="/premium" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all hover:scale-105">
-            👑 Premium VIP
+        <div className="hidden md:flex items-center gap-8 text-sm">
+          <Link to="/premium" className="text-muted-foreground hover:text-purple-400 font-bold transition-colors flex items-center gap-2">
+            👑 Premium
           </Link>
           <a
             href="https://discord.gg/UUBFjjCp"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-white transition hover:scale-105 shadow-lg"
-            style={{ background: "linear-gradient(135deg,#dc2626,#991b1b)" }}
+            className="text-muted-foreground hover:text-red-500 font-bold transition-colors flex items-center gap-2"
           >
-            🎫 Ticket Discord
+            🎫 Support Discord
           </a>
         </div>
         
