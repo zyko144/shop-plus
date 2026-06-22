@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/Header";
 import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save, Settings, ShoppingCart, BarChart3, Plus, Edit, LogOut } from "lucide-react";
 import { getAllProducts, Product } from "@/lib/products";
+import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { toast } from "sonner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
@@ -74,6 +75,7 @@ function AdminDashboard() {
   const [newPromo, setNewPromo] = useState({ code: "", discount: 10, max_uses: 100 });
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -206,6 +208,36 @@ function AdminDashboard() {
     if (!window.confirm("Supprimer cette commande définitivement ?")) return;
     setOrders(prev => prev.filter(o => o.id !== id));
     await supabase.from("orders").delete().eq("id", id);
+  };
+
+  const saveProduct = async (productData: Partial<Product>) => {
+    try {
+      const isNew = !allProducts.find(p => p.id === productData.id);
+      if (isNew) {
+        const { error } = await supabase.from("products").insert(productData);
+        if (error) throw error;
+        toast.success("Produit ajouté avec succès");
+      } else {
+        const { error } = await supabase.from("products").update(productData).eq("id", productData.id);
+        if (error) throw error;
+        toast.success("Produit mis à jour");
+      }
+      setEditingProduct(null);
+      loadData(); // refresh products
+    } catch (e: any) {
+      toast.error("Erreur lors de la sauvegarde : " + e.message);
+    }
+  };
+
+  const deleteProduct = async (id: string) => {
+    if (!window.confirm("Supprimer ce produit définitivement ?")) return;
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur: " + error.message);
+    } else {
+      toast.success("Produit supprimé");
+      setAllProducts(prev => prev.filter(p => p.id !== id));
+    }
   };
 
   const saveStock = async (productId: string, newStock: number, isUnlimited: boolean) => {
@@ -495,8 +527,11 @@ function AdminDashboard() {
         {activeTab === "products" && (
           <div className="glass rounded-2xl p-8 border border-border/50">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Catalogue Produits</h2>
-              <button className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(234,88,12,0.3)]">
+              <h2 className="text-xl font-bold flex items-center gap-2"><Layers size={20} className="text-primary" /> Catalogue Produits</h2>
+              <button 
+                onClick={() => setEditingProduct({})}
+                className="px-4 py-2 bg-primary rounded-lg text-primary-foreground text-sm font-bold flex items-center gap-2"
+              >
                 <Plus size={16} /> Ajouter un produit
               </button>
             </div>
@@ -522,10 +557,16 @@ function AdminDashboard() {
                   <div className="flex items-end justify-between mt-4 pl-3">
                     <div className="font-black text-lg text-primary">{p.price}€</div>
                     <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 rounded-md transition" title="Modifier">
+                      <button 
+                        onClick={() => setEditingProduct(p)}
+                        className="p-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 rounded-md transition" title="Modifier"
+                      >
                         <Edit size={14} />
                       </button>
-                      <button className="p-1.5 bg-red-500/20 text-red-500 hover:bg-red-500/40 rounded-md transition" title="Supprimer">
+                      <button 
+                        onClick={() => deleteProduct(p.id)}
+                        className="p-1.5 bg-red-500/20 text-red-500 hover:bg-red-500/40 rounded-md transition" title="Supprimer"
+                      >
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -537,6 +578,15 @@ function AdminDashboard() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* Modal d'édition */}
+        {editingProduct && (
+          <AdminProductEditor
+            initialProduct={editingProduct}
+            onSave={saveProduct}
+            onCancel={() => setEditingProduct(null)}
+          />
         )}
 
         {activeTab === "stocks" && (
