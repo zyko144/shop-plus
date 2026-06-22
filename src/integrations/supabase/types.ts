@@ -92,6 +92,7 @@ export type Database = {
           username: string | null
           role: string | null
           email: string | null
+          plus_coins: number | null
         }
         Insert: {
           created_at?: string
@@ -99,6 +100,7 @@ export type Database = {
           username?: string | null
           role?: string | null
           email?: string | null
+          plus_coins?: number | null
         }
         Update: {
           created_at?: string
@@ -106,8 +108,44 @@ export type Database = {
           username?: string | null
           role?: string | null
           email?: string | null
+          plus_coins?: number | null
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          id: string
+          product_id: string
+          user_id: string | null
+          rating: number | null
+          comment: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          user_id?: string | null
+          rating?: number | null
+          comment?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          user_id?: string | null
+          rating?: number | null
+          comment?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

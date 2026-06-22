@@ -31,12 +31,18 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin, data: { username } },
         });
         if (error) throw error;
+        
+        // Bonus de bienvenue de 50 + Coins
+        if (data.user) {
+          await supabase.from("profiles").update({ plus_coins: 50 }).eq("id", data.user.id);
+        }
+
         toast.success("Compte créé ! Vérifie tes emails pour confirmer ton adresse.", { duration: 6000 });
         setMode("login");
       } else {

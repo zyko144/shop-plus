@@ -3,6 +3,7 @@ import { Plus, Check } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { CATEGORY_IMAGES } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import { ProductReviewsModal } from "./ProductReviews";
 
 function hex(c: string) {
   return c.replace("#", "");
@@ -22,6 +23,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
   const { add } = useCart();
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
   
   const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
@@ -145,21 +147,38 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
               {Number(product.price).toFixed(2)}€
             </div>
           </div>
-          <button
-            onClick={handleAdd}
-            disabled={isOutOfStock}
-            className={`shrink-0 px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${isOutOfStock ? "cursor-not-allowed" : "hover:scale-105 active:scale-95"}`}
-            style={{ 
-              background: isOutOfStock ? "#333" : product.color, 
-              color: isOutOfStock ? "#888" : "#000", 
-              boxShadow: isOutOfStock ? "none" : `0 8px 24px ${product.color}66` 
-            }}
-            aria-label="Ajouter au panier"
-          >
-            {isOutOfStock ? "Rupture" : added ? <><Check size={16}/> Ajouté</> : <><Plus size={16}/> Panier</>}
-          </button>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => setShowReviews(true)}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors flex items-center justify-center gap-1"
+            >
+              ⭐ Avis
+            </button>
+            <button
+              onClick={handleAdd}
+              disabled={isOutOfStock}
+              className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${isOutOfStock ? "cursor-not-allowed" : "hover:scale-105 active:scale-95"}`}
+              style={{ 
+                background: isOutOfStock ? "#333" : product.color, 
+                color: isOutOfStock ? "#888" : "#000", 
+                boxShadow: isOutOfStock ? "none" : `0 8px 24px ${product.color}66` 
+              }}
+              aria-label="Ajouter au panier"
+            >
+              {isOutOfStock ? "Rupture" : added ? <><Check size={16}/> Ajouté</> : <><Plus size={16}/> Panier</>}
+            </button>
+          </div>
         </div>
       </div>
+      
+      {showReviews && (
+        <ProductReviewsModal
+          productId={product.id}
+          productName={product.name}
+          color={product.color}
+          onClose={() => setShowReviews(false)}
+        />
+      )}
     </div>
   );
 }

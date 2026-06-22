@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X, Plus, Minus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Plus, Minus, Trash2, Coins } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
@@ -17,8 +17,21 @@ export function CartDrawer() {
   const [promoError, setPromoError] = useState("");
   const [discount, setDiscount] = useState(0);
   const [promoApplied, setPromoApplied] = useState("");
+  
+  // Système + Coins
+  const [plusCoins, setPlusCoins] = useState(0);
+  const [useCoins, setUseCoins] = useState(false);
 
-  const finalTotal = total * (1 - discount);
+  useEffect(() => {
+    if (user && open) {
+      supabase.from("profiles").select("plus_coins").eq("id", user.id).single().then(({ data }) => {
+        if (data) setPlusCoins(data.plus_coins || 0);
+      });
+    }
+  }, [user, open]);
+
+  const finalTotal = useCoins ? (total * (1 - discount)) * 0.5 : total * (1 - discount);
+  const coinsEarned = Math.floor(finalTotal * 10);
 
   const applyPromo = async () => {
     if (!promoInput.trim()) return;
@@ -77,9 +90,16 @@ export function CartDrawer() {
         await supabase.rpc('increment_promo_use', { promo_code: promoApplied }).catch(() => {});
       }
 
+      // Mise à jour des + Coins du client
+      let coinsDelta = coinsEarned;
+      if (useCoins) coinsDelta -= 1000;
+      if (coinsDelta !== 0) {
+        await supabase.from("profiles").update({ plus_coins: plusCoins + coinsDelta }).eq("id", user.id);
+      }
+
       clear();
       setOpen(false);
-      toast.success("Commande enregistrée ! Un email t'a été envoyé. PayPal s'ouvre — ensuite ouvre un ticket Discord pour ton produit.", { duration: 8000 });
+      toast.success(`Commande enregistrée ! Vous avez gagné ${coinsEarned} + Coins. PayPal s'ouvre — ensuite ouvre un ticket Discord.`, { duration: 8000 });
       window.open(`${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`, "_blank");
       window.open("https://discord.gg/8RBgw6ykQK", "_blank");
       navigate({ to: "/orders" });
@@ -122,35 +142,65 @@ export function CartDrawer() {
         </div>
         <div className="p-4 border-t border-border space-y-3">
           {items.length > 0 && (
-            <div className="mb-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Code promo"
-                  value={promoInput}
-                  onChange={e => setPromoInput(e.target.value)}
-                  className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 text-sm focus:border-primary outline-none"
-                  disabled={!!promoApplied}
-                />
-                {!promoApplied ? (
-                  <button onClick={applyPromo} disabled={loading || !promoInput.trim()} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition">
-                    Appliquer
-                  </button>
-                ) : (
-                  <button onClick={() => { setDiscount(0); setPromoApplied(""); setPromoInput(""); }} className="px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-lg text-sm font-bold transition">
-                    Retirer
-                  </button>
-                )}
+            <>
+              {/* Système + Coins */}
+              {user && (
+                <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-3 flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2 text-yellow-500 font-bold text-sm">
+                      <Coins size={16} />
+                      Vos + Coins : {plusCoins}
+                    </div>
+                    <div className="text-xs text-yellow-500/70">
+                      Gagnez +{coinsEarned} Coins
+                    </div>
+                  </div>
+                  {plusCoins >= 1000 && (
+                    <button
+                      onClick={() => setUseCoins(!useCoins)}
+                      className={`text-xs font-bold py-1.5 px-3 rounded-lg transition border ${useCoins ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-yellow-500/20 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500/30'}`}
+                    >
+                      {useCoins ? "1000 Coins utilisés (-50%)" : "Utiliser 1000 Coins pour -50%"}
+                    </button>
+                  )}
+                  {plusCoins < 1000 && (
+                    <div className="text-xs text-white/40 italic">
+                      Il vous manque {1000 - plusCoins} Coins pour avoir -50% !
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mb-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Code promo"
+                    value={promoInput}
+                    onChange={e => setPromoInput(e.target.value)}
+                    className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 text-sm focus:border-primary outline-none"
+                    disabled={!!promoApplied}
+                  />
+                  {!promoApplied ? (
+                    <button onClick={applyPromo} disabled={loading || !promoInput.trim()} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition">
+                      Appliquer
+                    </button>
+                  ) : (
+                    <button onClick={() => { setDiscount(0); setPromoApplied(""); setPromoInput(""); }} className="px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-lg text-sm font-bold transition">
+                      Retirer
+                    </button>
+                  )}
+                </div>
+                {promoError && <div className="text-red-400 text-xs mt-1 font-medium">{promoError}</div>}
+                {promoApplied && <div className="text-green-400 text-xs mt-1 font-medium">Code {promoApplied} actif (-{(discount * 100).toFixed(0)}%)</div>}
               </div>
-              {promoError && <div className="text-red-400 text-xs mt-1 font-medium">{promoError}</div>}
-              {promoApplied && <div className="text-green-400 text-xs mt-1 font-medium">Code {promoApplied} actif (-{(discount * 100).toFixed(0)}%)</div>}
-            </div>
+            </>
           )}
 
           <div className="flex items-center justify-between text-lg font-bold">
             <span>Total</span>
             <div className="text-right">
-              {discount > 0 && <div className="text-sm text-muted-foreground line-through decoration-red-500">{total.toFixed(2)}€</div>}
+              {(discount > 0 || useCoins) && <div className="text-sm text-muted-foreground line-through decoration-red-500">{total.toFixed(2)}€</div>}
               <span className="text-primary">{finalTotal.toFixed(2)}€</span>
             </div>
           </div>
