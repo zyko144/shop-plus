@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
+import { Turnstile } from '@marsidev/react-turnstile';
+
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Connexion — ZYKO Store" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur ZYKO Store." }] }),
   component: AuthPage,
@@ -15,6 +17,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -123,9 +126,14 @@ function AuthPage() {
               className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 outline-none transition-all"
             />
           </div>
+
+          <div className="flex justify-center py-2">
+            <Turnstile siteKey="1x00000000000000000000AA" onSuccess={setCaptchaToken} />
+          </div>
+
           <div className="pt-2">
             <button
-              disabled={loading}
+              disabled={loading || !captchaToken}
               className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-800 text-white font-bold tracking-wide disabled:opacity-50 hover:shadow-[0_0_30px_-5px_rgba(220,38,38,0.6)] hover:-translate-y-0.5 transition-all duration-300"
             >
               {loading ? "Chargement..." : mode === "login" ? "Accéder à mon compte" : "Créer mon compte"}
