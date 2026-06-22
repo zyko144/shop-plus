@@ -34,6 +34,8 @@ export const STREAMING: Product[] = [
   { id: "ytb", name: "YouTube Premium", subtitle: "1 Mois", price: 1, category: "Streaming", color: "#ff0033", emoji: "▶", logo: "youtube" },
   { id: "deezer", name: "Deezer Premium", subtitle: "Lifetime", price: 1, category: "Streaming", color: "#a238ff", emoji: "♪", logo: "deezer" },
   { id: "netflix", name: "Netflix", subtitle: "Premium", price: 1, category: "Streaming", color: "#e50914", emoji: "N", logo: "netflix" },
+  { id: "disney", name: "Disney+", subtitle: "Premium", price: 1, category: "Streaming", color: "#113ccf", emoji: "✨", logo: "disneyplus" },
+  { id: "spotify", name: "Spotify Premium", subtitle: "1 Mois", price: 1, category: "Streaming", color: "#1db954", emoji: "🎧", logo: "spotify" },
   { id: "crunchy", name: "Crunchyroll", subtitle: "Premium", price: 1, category: "Streaming", color: "#f47521", emoji: "🍥", logo: "crunchyroll" },
   { id: "nba", name: "NBA League Pass", subtitle: "Premium", price: 1, category: "Streaming", color: "#c9082a", emoji: "🏀", logo: "nba" },
   { id: "ufc", name: "UFC Fight Pass", subtitle: "Lifetime", price: 1, category: "Streaming", color: "#d20a0a", emoji: "🥋", logo: "ufc" },
@@ -139,3 +141,16 @@ export const DISCORD_DECO: Product[] = [
 ];
 
 export const PAYPAL_URL = "https://paypal.me/zyko921";
+
+export function getAllProducts(): Product[] {
+  return [
+    ...STREAMING,
+    ...VPN,
+    ...TWITCH,
+    ...FORTNITE_CLASSIC,
+    ...FORTNITE_RARE,
+    ...VBUCKS,
+    STEAM_PRODUCT,
+    ...DISCORD_DECO,
+  ];
+}

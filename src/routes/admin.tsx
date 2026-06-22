@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/Header";
-import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2 } from "lucide-react";
+import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save } from "lucide-react";
+import { getAllProducts } from "@/lib/products";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Dashboard Admin — SHOP+" }] }),
@@ -20,11 +22,21 @@ type AdminOrderRow = {
   order_items: { product_name: string; quantity: number; unit_price: number }[];
 };
 
+type StockData = {
+  product_id: string;
+  stock: number;
+  is_unlimited: boolean;
+};
+
 function AdminDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<"orders" | "stocks">("orders");
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
+  const [stocks, setStocks] = useState<Record<string, StockData>>({});
   const [loading, setLoading] = useState(true);
+  
+  const allProducts = getAllProducts();
 
   // Security check: only admin can access
   const loadOrders = async () => {
@@ -61,9 +73,19 @@ function AdminDashboard() {
     setLoading(false);
   };
 
+  const loadStocks = async () => {
+    const { data } = await supabase.from("product_stock").select("*");
+    if (data) {
+      const map: Record<string, StockData> = {};
+      data.forEach(s => map[s.product_id] = s);
+      setStocks(map);
+    }
+  };
+
   useEffect(() => {
     if (profile?.role === "admin") {
       loadOrders();
+      loadStocks();
     }
   }, [profile]);
 
@@ -99,6 +121,21 @@ function AdminDashboard() {
     await supabase.from("orders").delete().eq("id", id);
   };
 
+  const saveStock = async (productId: string, newStock: number, isUnlimited: boolean) => {
+    const { error } = await supabase.from("product_stock").upsert({
+      product_id: productId,
+      stock: newStock,
+      is_unlimited: isUnlimited
+    }, { onConflict: "product_id" });
+    
+    if (!error) {
+      setStocks(prev => ({ ...prev, [productId]: { product_id: productId, stock: newStock, is_unlimited: isUnlimited } }));
+      toast.success("Stock mis à jour pour " + productId);
+    } else {
+      toast.error("Erreur: " + error.message);
+    }
+  };
+
   if (authLoading || loading) {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
@@ -119,109 +156,215 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="glass rounded-2xl p-6 border-t-4 border-red-500 flex items-center justify-between">
-            <div>
-              <p className="text-muted-foreground font-medium mb-1">Chiffre d'affaires</p>
-              <h2 className="text-3xl font-black">{totalRevenue.toFixed(2)}€</h2>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
-              <DollarSign size={24} />
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-6 border-t-4 border-orange-500 flex items-center justify-between">
-            <div>
-              <p className="text-muted-foreground font-medium mb-1">Commandes totales</p>
-              <h2 className="text-3xl font-black">{orders.length}</h2>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
-              <Package size={24} />
-            </div>
-          </div>
-          <div className="glass rounded-2xl p-6 border-t-4 border-yellow-500 flex items-center justify-between">
-            <div>
-              <p className="text-muted-foreground font-medium mb-1">En attente</p>
-              <h2 className="text-3xl font-black">{pendingCount}</h2>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500">
-              <Clock size={24} />
-            </div>
-          </div>
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-4 mb-8">
+          <button 
+            onClick={() => setActiveTab("orders")}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "orders" ? "bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+          >
+            <Package size={20} />
+            Commandes
+          </button>
+          <button 
+            onClick={() => setActiveTab("stocks")}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "stocks" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+          >
+            <Layers size={20} />
+            Gestion des Stocks
+          </button>
         </div>
 
-        {/* Orders Table */}
-        <div className="glass rounded-2xl overflow-hidden border border-border/50">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
-                  <th className="p-4 font-semibold">Date & ID</th>
-                  <th className="p-4 font-semibold">Client (E-mail)</th>
-                  <th className="p-4 font-semibold">Produits</th>
-                  <th className="p-4 font-semibold">Total</th>
-                  <th className="p-4 font-semibold">Statut</th>
-                  <th className="p-4 font-semibold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {orders.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="p-8 text-center text-muted-foreground">Aucune commande trouvée.</td>
+        {activeTab === "orders" && (
+          <>
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div className="glass rounded-2xl p-6 border-t-4 border-red-500 flex items-center justify-between">
+                <div>
+                  <p className="text-muted-foreground font-medium mb-1">Chiffre d'affaires</p>
+                  <h2 className="text-3xl font-black">{totalRevenue.toFixed(2)}€</h2>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
+                  <DollarSign size={24} />
+                </div>
+              </div>
+              <div className="glass rounded-2xl p-6 border-t-4 border-orange-500 flex items-center justify-between">
+                <div>
+                  <p className="text-muted-foreground font-medium mb-1">Commandes totales</p>
+                  <h2 className="text-3xl font-black">{orders.length}</h2>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+                  <Package size={24} />
+                </div>
+              </div>
+              <div className="glass rounded-2xl p-6 border-t-4 border-yellow-500 flex items-center justify-between">
+                <div>
+                  <p className="text-muted-foreground font-medium mb-1">En attente</p>
+                  <h2 className="text-3xl font-black">{pendingCount}</h2>
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500">
+                  <Clock size={24} />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Main Content Area */}
+        {activeTab === "orders" ? (
+          <div className="glass rounded-2xl overflow-hidden border border-border/50">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
+                    <th className="p-4 font-semibold">Date & ID</th>
+                    <th className="p-4 font-semibold">Client (E-mail)</th>
+                    <th className="p-4 font-semibold">Produits</th>
+                    <th className="p-4 font-semibold">Total</th>
+                    <th className="p-4 font-semibold">Statut</th>
+                    <th className="p-4 font-semibold text-right">Actions</th>
                   </tr>
-                ) : orders.map((o) => (
-                  <tr key={o.id} className="hover:bg-white/5 transition-colors group">
-                    <td className="p-4">
-                      <div className="font-medium">{o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</div>
-                      <div className="text-xs text-muted-foreground mt-1">#{o.id ? o.id.slice(0, 8) : 'N/A'}</div>
-                    </td>
-                    <td className="p-4">
-                      <div className="font-bold text-white/90">{o.profiles?.email || 'Email introuvable'}</div>
-                      <div className="text-xs text-muted-foreground">{o.profiles?.username || 'Anonyme'}</div>
-                    </td>
-                    <td className="p-4">
-                      <ul className="space-y-1 text-sm text-muted-foreground">
-                        {o.order_items && Array.isArray(o.order_items) ? o.order_items.map((it, idx) => (
-                          <li key={idx}><span className="text-white/70">{it.quantity}x</span> {it.product_name}</li>
-                        )) : <li className="text-red-400">Erreur produits</li>}
-                      </ul>
-                    </td>
-                    <td className="p-4 font-bold text-primary">
-                      {Number(o.total || 0).toFixed(2)}€
-                    </td>
-                    <td className="p-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                        o.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
-                        o.status === 'completed' ? 'bg-green-500/20 text-green-400' : 
-                        'bg-red-500/20 text-red-400'
-                      }`}>
-                        {o.status === 'pending' && 'En attente'}
-                        {o.status === 'completed' && 'Livré'}
-                        {o.status === 'cancelled' && 'Annulé'}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {o.status === 'pending' && (
-                          <button onClick={() => updateStatus(o.id, 'completed')} title="Marquer comme livré" className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/40 transition">
-                            <CheckCircle size={16} />
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {orders.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-muted-foreground">Aucune commande trouvée.</td>
+                    </tr>
+                  ) : orders.map((o) => (
+                    <tr key={o.id} className="hover:bg-white/5 transition-colors group">
+                      <td className="p-4">
+                        <div className="font-medium">{o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</div>
+                        <div className="text-xs text-muted-foreground mt-1">#{o.id ? o.id.slice(0, 8) : 'N/A'}</div>
+                      </td>
+                      <td className="p-4">
+                        <div className="font-bold text-white/90">{o.profiles?.email || 'Email introuvable'}</div>
+                        <div className="text-xs text-muted-foreground">{o.profiles?.username || 'Anonyme'}</div>
+                      </td>
+                      <td className="p-4">
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          {o.order_items && Array.isArray(o.order_items) ? o.order_items.map((it, idx) => (
+                            <li key={idx}><span className="text-white/70">{it.quantity}x</span> {it.product_name}</li>
+                          )) : <li className="text-red-400">Erreur produits</li>}
+                        </ul>
+                      </td>
+                      <td className="p-4 font-bold text-primary">
+                        {Number(o.total || 0).toFixed(2)}€
+                      </td>
+                      <td className="p-4">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                          o.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                          o.status === 'completed' ? 'bg-green-500/20 text-green-400' : 
+                          'bg-red-500/20 text-red-400'
+                        }`}>
+                          {o.status === 'pending' && 'En attente'}
+                          {o.status === 'completed' && 'Livré'}
+                          {o.status === 'cancelled' && 'Annulé'}
+                        </span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {o.status === 'pending' && (
+                            <button onClick={() => updateStatus(o.id, 'completed')} title="Marquer comme livré" className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/40 transition">
+                              <CheckCircle size={16} />
+                            </button>
+                          )}
+                          {o.status !== 'cancelled' && (
+                            <button onClick={() => updateStatus(o.id, 'cancelled')} title="Annuler la commande" className="p-1.5 rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition">
+                              <XCircle size={16} />
+                            </button>
+                          )}
+                          <button onClick={() => deleteOrder(o.id)} title="Supprimer définitivement" className="p-1.5 rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/40 transition">
+                            <Trash2 size={16} />
                           </button>
-                        )}
-                        {o.status !== 'cancelled' && (
-                          <button onClick={() => updateStatus(o.id, 'cancelled')} title="Annuler la commande" className="p-1.5 rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition">
-                            <XCircle size={16} />
-                          </button>
-                        )}
-                        <button onClick={() => deleteOrder(o.id)} title="Supprimer définitivement" className="p-1.5 rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/40 transition">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
+        ) : (
+          <div className="glass rounded-2xl overflow-hidden border border-border/50">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
+                    <th className="p-4 font-semibold">Produit</th>
+                    <th className="p-4 font-semibold">Catégorie</th>
+                    <th className="p-4 font-semibold">Prix</th>
+                    <th className="p-4 font-semibold text-center">Type de Stock</th>
+                    <th className="p-4 font-semibold text-center">Quantité</th>
+                    <th className="p-4 font-semibold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {allProducts.map((p) => {
+                    // Si on a pas de donnée, on assume illimité (par défaut jusqu'à maintenant)
+                    const stockInfo = stocks[p.id] || { is_unlimited: true, stock: 0 };
+                    return (
+                      <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-sm" style={{ backgroundColor: p.color }}>
+                              {p.emoji}
+                            </div>
+                            <div>
+                              <div className="font-bold text-white/90">{p.name}</div>
+                              {p.subtitle && <div className="text-xs text-muted-foreground">{p.subtitle}</div>}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4 text-muted-foreground text-sm">{p.category}</td>
+                        <td className="p-4 font-medium text-white/80">{p.price.toFixed(2)}€</td>
+                        
+                        <td className="p-4 text-center">
+                          <select 
+                            className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-medium focus:border-blue-500 outline-none"
+                            value={stockInfo.is_unlimited ? "unlimited" : "limited"}
+                            onChange={(e) => {
+                              const isUnlim = e.target.value === "unlimited";
+                              // Mise à jour immédiate locale, on cliquera sur Save pour envoyer
+                              setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: isUnlim, stock: stockInfo.stock }}));
+                            }}
+                          >
+                            <option value="unlimited">Illimité ♾️</option>
+                            <option value="limited">Limité (Chiffre)</option>
+                          </select>
+                        </td>
+                        
+                        <td className="p-4 text-center">
+                          {!stockInfo.is_unlimited ? (
+                            <input 
+                              type="number" 
+                              min="0"
+                              className="w-20 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center focus:border-blue-500 outline-none"
+                              value={stockInfo.stock}
+                              onChange={(e) => {
+                                setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: false, stock: parseInt(e.target.value) || 0 }}));
+                              }}
+                            />
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </td>
+                        
+                        <td className="p-4 text-right">
+                          <button 
+                            onClick={() => saveStock(p.id, stockInfo.stock, stockInfo.is_unlimited)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-colors"
+                          >
+                            <Save size={14} />
+                            Enregistrer
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </div>

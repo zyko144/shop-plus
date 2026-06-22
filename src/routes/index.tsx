@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { CartDrawer } from "@/components/CartDrawer";
 import { ProductCard3D } from "@/components/ProductCard3D";
@@ -41,6 +42,19 @@ const GROUPS: Group[] = [
 function Index() {
   const [active, setActive] = useState("streaming");
   const [query, setQuery] = useState("");
+  const [stocks, setStocks] = useState<Record<string, { is_unlimited: boolean, stock: number }>>({});
+
+  useEffect(() => {
+    const fetchStocks = async () => {
+      const { data } = await supabase.from("product_stock").select("*");
+      if (data) {
+        const map: Record<string, { is_unlimited: boolean, stock: number }> = {};
+        data.forEach((s) => map[s.product_id] = { is_unlimited: s.is_unlimited, stock: s.stock });
+        setStocks(map);
+      }
+    };
+    fetchStocks();
+  }, []);
 
   const cats: Cat[] = useMemo(
     () => GROUPS.map((g) => ({ id: g.id, label: g.label, emoji: g.emoji, color: g.color, count: g.items.length || 4 })),
@@ -141,13 +155,13 @@ function Index() {
           ) : group.id === "fortnite" ? (
             <div className="space-y-10">
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map((p) => <ProductCard3D key={p.id} product={p} />)}
+                {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
               </div>
             </div>
           ) : (
             <>
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map((p) => <ProductCard3D key={p.id} product={p} />)}
+                {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
               </div>
               {filtered.length === 0 && (
                 <div className="text-center py-20 text-muted-foreground">Aucun produit ne correspond à "{query}"</div>

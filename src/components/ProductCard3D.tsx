@@ -8,7 +8,7 @@ function hex(c: string) {
   return c.replace("#", "");
 }
 
-export function ProductCard3D({ product }: { product: Product }) {
+export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
   const { add } = useCart();
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
@@ -19,7 +19,10 @@ export function ProductCard3D({ product }: { product: Product }) {
       : `https://cdn.simpleicons.org/${product.logo}/${hex(product.color)}`
     : null;
 
+  const isOutOfStock = !stockInfo.is_unlimited && stockInfo.stock <= 0;
+
   function handleAdd() {
+    if (isOutOfStock) return;
     add(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
@@ -29,9 +32,9 @@ export function ProductCard3D({ product }: { product: Product }) {
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 bg-card border border-white/5"
+      className={`group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 bg-card border border-white/5 ${isOutOfStock ? "opacity-75 grayscale" : ""}`}
       style={{
-        boxShadow: hover
+        boxShadow: hover && !isOutOfStock
           ? `0 30px 80px -20px ${product.color}80, 0 0 0 1px ${product.color}55 inset`
           : `0 10px 40px -15px #000`,
       }}
@@ -57,7 +60,7 @@ export function ProductCard3D({ product }: { product: Product }) {
           className="absolute inset-0 transition-opacity duration-500"
           style={{
             background: `radial-gradient(circle at 50% 55%, ${product.color}66, transparent 60%)`,
-            opacity: hover ? 0.9 : 0.55,
+            opacity: hover && !isOutOfStock ? 0.9 : 0.55,
           }}
         />
         {/* logo */}
@@ -90,6 +93,13 @@ export function ProductCard3D({ product }: { product: Product }) {
         >
           {product.category}
         </div>
+        
+        {/* Stock Badge */}
+        {!stockInfo.is_unlimited && stockInfo.stock > 0 && stockInfo.stock <= 5 && (
+          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-orange-500 text-white shadow-lg shadow-orange-500/50">
+            Plus que {stockInfo.stock} !
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -101,17 +111,22 @@ export function ProductCard3D({ product }: { product: Product }) {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">À partir de</div>
-            <div className="text-2xl font-black" style={{ color: product.color, textShadow: `0 0 24px ${product.color}90` }}>
+            <div className="text-2xl font-black" style={{ color: isOutOfStock ? "#666" : product.color, textShadow: isOutOfStock ? "none" : `0 0 24px ${product.color}90` }}>
               {product.price.toFixed(2)}€
             </div>
           </div>
           <button
             onClick={handleAdd}
-            className="shrink-0 px-4 py-3 rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
-            style={{ background: product.color, color: "#000", boxShadow: `0 8px 24px ${product.color}66` }}
+            disabled={isOutOfStock}
+            className={`shrink-0 px-4 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${isOutOfStock ? "cursor-not-allowed" : "hover:scale-105 active:scale-95"}`}
+            style={{ 
+              background: isOutOfStock ? "#333" : product.color, 
+              color: isOutOfStock ? "#888" : "#000", 
+              boxShadow: isOutOfStock ? "none" : `0 8px 24px ${product.color}66` 
+            }}
             aria-label="Ajouter au panier"
           >
-            {added ? <><Check size={16}/> Ajouté</> : <><Plus size={16}/> Panier</>}
+            {isOutOfStock ? "Rupture" : added ? <><Check size={16}/> Ajouté</> : <><Plus size={16}/> Panier</>}
           </button>
         </div>
       </div>
