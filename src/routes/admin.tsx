@@ -203,21 +203,29 @@ function AdminDashboard() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
     await supabase.from("orders").update({ status }).eq("id", id);
 
-    // Activer l'abonnement Premium si la commande est marquée comme "Livré"
+    // Valider les récompenses si la commande est marquée comme "Livré"
     if (status === "completed") {
       const order = orders.find(o => o.id === id);
-      if (order && order.order_items) {
-        const hasPremium = order.order_items.some(
+      if (order) {
+        // Récupérer le profil actuel pour ajouter les coins
+        const { data: profileData } = await supabase.from("profiles").select("plus_coins").eq("id", order.user_id).single();
+        const currentCoins = profileData?.plus_coins || 0;
+        const coinsEarned = Math.floor(Number(order.total) * 100);
+        
+        const updatePayload: any = { plus_coins: currentCoins + coinsEarned };
+
+        const hasPremium = order.order_items && order.order_items.some(
           item => item.product_name.toLowerCase().includes("premium") || 
                   (item as any).category?.toLowerCase().includes("premium")
         );
+        
         if (hasPremium) {
-          await supabase.from("profiles").update({ 
-            is_premium: true, 
-            premium_orders_left: 10 
-          }).eq("id", order.user_id);
-          toast.success("Abonnement Premium activé automatiquement pour ce client !");
+          updatePayload.is_premium = true;
+          updatePayload.premium_orders_left = 10;
         }
+
+        await supabase.from("profiles").update(updatePayload).eq("id", order.user_id);
+        toast.success(`Commande livrée : le client a reçu ses ${coinsEarned} Coins ! ${hasPremium ? "(Premium activé 👑)" : ""}`);
       }
     }
   };

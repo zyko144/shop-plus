@@ -80,6 +80,10 @@ export function CartDrawer() {
       return;
     }
     if (items.length === 0) return;
+    
+    // Astuce anti-bloqueur de popups : ouvrir la fenêtre tout de suite
+    const paymentWindow = window.open('', '_blank');
+    
     setLoading(true);
     try {
       const { data: order, error } = await supabase
@@ -110,12 +114,10 @@ export function CartDrawer() {
         await supabase.rpc('increment_promo_use', { promo_code: promoApplied }).catch(() => {});
       }
 
-      // Mise à jour Coins & Premium
-      let coinsDelta = coinsEarned;
-      if (useCoins) coinsDelta -= 1000;
-      
+      // On déduit seulement si on utilise les coins ou le premium.
+      // Le gain de coins se fera uniquement quand l'admin validera la commande !
       const updatePayload: any = {};
-      if (coinsDelta !== 0) updatePayload.plus_coins = plusCoins + coinsDelta;
+      if (useCoins) updatePayload.plus_coins = plusCoins - 1000;
       if (hasPremiumDiscount) updatePayload.premium_orders_left = premiumOrdersLeft - 1;
 
       if (Object.keys(updatePayload).length > 0) {
@@ -124,11 +126,18 @@ export function CartDrawer() {
 
       clear();
       setOpen(false);
-      toast.success(`Commande enregistrée ! Vous avez gagné ${coinsEarned} + Coins. PayPal s'ouvre — paiement en amis proches requis.`, { duration: 8000 });
-      window.open(`${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`, "_blank");
-      window.open("https://discord.gg/8RBgw6ykQK", "_blank");
+      toast.success(`Commande enregistrée ! Vous gagnerez ${coinsEarned} Coins une fois validée. Redirection PayPal...`, { duration: 8000 });
+      
+      if (paymentWindow) {
+        paymentWindow.location.href = `${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`;
+      } else {
+        // Fallback si vraiment bloqué
+        window.location.href = `${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`;
+      }
+      
       navigate({ to: "/profile" });
     } catch (e: any) {
+      if (paymentWindow) paymentWindow.close();
       toast.error(e.message ?? "Erreur");
     } finally {
       setLoading(false);
