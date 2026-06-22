@@ -34,6 +34,9 @@ const GROUP_META: Record<string, Omit<Group, "items">> = {
   "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", color: "#f0b400", description: "Comptes chargés en V-Bucks prêts à dépenser." },
   "Steam": { id: "steam", label: "Steam", emoji: "🎮", color: "#1b9cff", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
   "Discord": { id: "discord", label: "Discord", emoji: "✦", color: "#5865f2", description: "Décorations de profil — grille tarifaire officielle." },
+  "Robux": { id: "robux", label: "Robux", emoji: "💰", color: "#1bd96a", description: "Des milliers de Robux instantanément sur votre compte." },
+  "Valorant EU": { id: "valorant", label: "Valorant EU", emoji: "🔫", color: "#ff4655", description: "Comptes Valorant région EU blindés de Valorant Points." },
+  "Epic Games": { id: "epicgames", label: "Epic Games", emoji: "🎮", color: "#ffffff", description: "Des comptes avec des centaines de jeux premium." },
 };
 
 function Index() {

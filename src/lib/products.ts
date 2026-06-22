@@ -7,6 +7,9 @@ import rareImg from "@/assets/cat-rare.jpg";
 import vbucksImg from "@/assets/cat-vbucks.jpg";
 import steamImg from "@/assets/cat-steam.jpg";
 import discordImg from "@/assets/cat-discord.jpg";
+import robuxImg from "@/assets/cat-robux.png";
+import valorantImg from "@/assets/cat-valorant.png";
+import epicGamesImg from "@/assets/cat-epicgames.png";
 
 export const CATEGORY_IMAGES: Record<string, string> = {
   Streaming: streamingImg,
@@ -17,6 +20,9 @@ export const CATEGORY_IMAGES: Record<string, string> = {
   "V-Bucks": vbucksImg,
   Steam: steamImg,
   Discord: discordImg,
+  "Robux": robuxImg,
+  "Valorant EU": valorantImg,
+  "Epic Games": epicGamesImg,
 };
 
 export type Product = {
