@@ -270,20 +270,20 @@ function AdminDashboard() {
   const injectNewProducts = async () => {
     if (!window.confirm("Injecter les nouveaux produits (Robux, Valorant, Epic Games) ?")) return;
     const newProducts = [
-      { name: 'Robux 1000-2500', category: 'Robux', price: 7.50, logo: 'roblox', color: '#ffffff', is_active: true },
-      { name: 'Robux 2500-5000', category: 'Robux', price: 12.50, logo: 'roblox', color: '#ffffff', is_active: true },
-      { name: 'Robux 5000-10.000', category: 'Robux', price: 20.00, logo: 'roblox', color: '#ffffff', is_active: true },
-      { name: 'Robux 10.000-15.000', category: 'Robux', price: 31.25, logo: 'roblox', color: '#ffffff', is_active: true },
-      { name: 'Robux 50.000+', category: 'Robux', price: 75.00, logo: 'roblox', color: '#ffffff', is_active: true },
-      { name: 'Valorant EU [1000-3000VP Inventory]', category: 'Valorant EU', price: 30.00, logo: 'valorant', color: '#ff4655', is_active: true },
-      { name: 'Valorant EU [3000-5000VP Inventory]', category: 'Valorant EU', price: 42.50, logo: 'valorant', color: '#ff4655', is_active: true },
-      { name: 'Valorant EU [5000-7000VP Inventory]', category: 'Valorant EU', price: 62.50, logo: 'valorant', color: '#ff4655', is_active: true },
-      { name: 'Valorant EU [7000-12.000VP Inventory]', category: 'Valorant EU', price: 87.50, logo: 'valorant', color: '#ff4655', is_active: true },
-      { name: 'Valorant EU [15.000-25.000VP Inventory]', category: 'Valorant EU', price: 105.00, logo: 'valorant', color: '#ff4655', is_active: true },
-      { name: 'Epic Games [50-100 Games] FA', category: 'Epic Games', price: 0.75, logo: 'epicgames', color: '#ffffff', is_active: true },
-      { name: 'Epic Games [100-200 Games] FA', category: 'Epic Games', price: 2.50, logo: 'epicgames', color: '#ffffff', is_active: true },
-      { name: 'Epic Games [200-350 Games] FA', category: 'Epic Games', price: 5.00, logo: 'epicgames', color: '#ffffff', is_active: true },
-      { name: 'Epic Games [350+ Games] FA', category: 'Epic Games', price: 12.50, logo: 'epicgames', color: '#ffffff', is_active: true }
+      { id: 'robux-1000', name: 'Robux 1000-2500', category: 'Robux', price: 7.50, logo: 'roblox', color: '#ffffff', is_active: true },
+      { id: 'robux-2500', name: 'Robux 2500-5000', category: 'Robux', price: 12.50, logo: 'roblox', color: '#ffffff', is_active: true },
+      { id: 'robux-5000', name: 'Robux 5000-10.000', category: 'Robux', price: 20.00, logo: 'roblox', color: '#ffffff', is_active: true },
+      { id: 'robux-10000', name: 'Robux 10.000-15.000', category: 'Robux', price: 31.25, logo: 'roblox', color: '#ffffff', is_active: true },
+      { id: 'robux-50000', name: 'Robux 50.000+', category: 'Robux', price: 75.00, logo: 'roblox', color: '#ffffff', is_active: true },
+      { id: 'val-1000', name: 'Valorant EU [1000-3000VP Inventory]', category: 'Valorant EU', price: 30.00, logo: 'valorant', color: '#ff4655', is_active: true },
+      { id: 'val-3000', name: 'Valorant EU [3000-5000VP Inventory]', category: 'Valorant EU', price: 42.50, logo: 'valorant', color: '#ff4655', is_active: true },
+      { id: 'val-5000', name: 'Valorant EU [5000-7000VP Inventory]', category: 'Valorant EU', price: 62.50, logo: 'valorant', color: '#ff4655', is_active: true },
+      { id: 'val-7000', name: 'Valorant EU [7000-12.000VP Inventory]', category: 'Valorant EU', price: 87.50, logo: 'valorant', color: '#ff4655', is_active: true },
+      { id: 'val-15000', name: 'Valorant EU [15.000-25.000VP Inventory]', category: 'Valorant EU', price: 105.00, logo: 'valorant', color: '#ff4655', is_active: true },
+      { id: 'epic-50', name: 'Epic Games [50-100 Games] FA', category: 'Epic Games', price: 0.75, logo: 'epicgames', color: '#ffffff', is_active: true },
+      { id: 'epic-100', name: 'Epic Games [100-200 Games] FA', category: 'Epic Games', price: 2.50, logo: 'epicgames', color: '#ffffff', is_active: true },
+      { id: 'epic-200', name: 'Epic Games [200-350 Games] FA', category: 'Epic Games', price: 5.00, logo: 'epicgames', color: '#ffffff', is_active: true },
+      { id: 'epic-350', name: 'Epic Games [350+ Games] FA', category: 'Epic Games', price: 12.50, logo: 'epicgames', color: '#ffffff', is_active: true }
     ];
     try {
       const { error } = await supabase.from('products').insert(newProducts);
