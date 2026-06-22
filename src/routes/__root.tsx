@@ -17,6 +17,7 @@ import { AudioPlayer } from "@/components/AudioPlayer";
 import { Toaster } from "sonner";
 import { DiscordSupport } from "@/components/DiscordSupport";
 import { FakeReviewsCarousel } from "@/components/FakeReviewsCarousel";
+import { CursorGlow } from "@/components/CursorGlow";
 
 function NotFoundComponent() {
   return (
@@ -147,7 +148,7 @@ function AppContent() {
         </div>
       )}
       
-      <div className="fixed inset-0 hero-red-pulse pointer-events-none -z-10" />
+      <CursorGlow />
       <Outlet />
       <DiscordSupport link={settings.discord_link} />
       

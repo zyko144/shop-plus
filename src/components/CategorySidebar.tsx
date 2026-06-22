@@ -6,7 +6,7 @@ export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; activ
   return (
     <aside className="w-full z-40 sticky top-16 bg-background/90 backdrop-blur-xl border-b border-white/5 py-4 mt-0 shadow-xl">
       <div className="max-w-[1600px] mx-auto px-4 md:px-6">
-        <nav className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1">
+        <nav className="flex items-center justify-center gap-3 overflow-x-auto no-scrollbar pb-1">
           {cats.map((c) => {
             const isActive = c.id === active;
             return (
