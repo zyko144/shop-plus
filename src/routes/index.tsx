@@ -138,11 +138,12 @@ function Index() {
         </div>
       </section>
 
-      {/* MAIN LAYOUT */}
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-10 grid lg:grid-cols-[260px_minmax(0,1fr)] gap-6">
-        <CategorySidebar cats={cats} active={active} onSelect={handleSelect} />
+      {/* CATEGORY BAR */}
+      <CategorySidebar cats={cats} active={active} onSelect={handleSelect} />
 
-        <section className="min-w-0 space-y-6">
+      {/* MAIN LAYOUT */}
+      <main className="max-w-[1600px] mx-auto px-4 md:px-6 py-10">
+        <section className="space-y-8">
           {/* Category header */}
           <div
             className="relative overflow-hidden rounded-3xl border border-white/5 p-6 md:p-8"
@@ -163,18 +164,19 @@ function Index() {
                 </div>
                 <h2 className="mt-2 text-3xl md:text-4xl font-black tracking-tight">{group.description}</h2>
               </div>
-              <div className="relative w-full md:w-72">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <div className="relative w-full md:w-80">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Rechercher dans la catégorie…"
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-background/60 border border-border text-sm focus:outline-none focus:ring-2"
+                  className="w-full pl-11 pr-4 py-3 rounded-2xl bg-black/40 border border-white/10 text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all"
                   style={{ ["--tw-ring-color" as never]: group.color }}
                 />
+              </div>
             </div>
           </div>
-          </div>
+          
           {group.label === "Fortnite" && (
             <div className="bg-red-500/20 border border-red-500/50 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-center gap-3 text-red-500 font-bold text-center shadow-[0_0_20px_rgba(239,68,68,0.2)]">
               <span>Si vous voulez d'autres comptes spécifiques, n'hésitez pas à faire une demande sur notre discord !</span>
@@ -188,18 +190,19 @@ function Index() {
           {group.id === "steam" ? (
             <SteamMenu />
           ) : group.id === "fortnite" ? (
-            <div className="space-y-10">
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
             </div>
           ) : (
             <>
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                 {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
               </div>
               {filtered.length === 0 && (
-                <div className="text-center py-20 text-muted-foreground">Aucun produit ne correspond à "{query}"</div>
+                <div className="text-center py-24 text-muted-foreground bg-white/5 rounded-3xl border border-white/5">
+                  <span className="text-4xl block mb-2">😕</span>
+                  Aucun produit ne correspond à "{query}"
+                </div>
               )}
             </>
           )}
