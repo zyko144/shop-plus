@@ -111,33 +111,29 @@ function Index() {
       <CartDrawer />
 
       {/* HERO */}
-      <section className="relative overflow-hidden grid-bg border-b border-border">
-        <img src={heroBg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 animate-hero-zoom" />
-        <div className="absolute inset-0 hero-red-pulse pointer-events-none" />
-        <div className="absolute inset-0 hero-red-sweep pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-background" />
-        <div className="relative max-w-7xl mx-auto px-6 py-16 md:py-24">
-          <div className="max-w-3xl space-y-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-medium">
-              <Sparkles size={14} className="text-primary" /> Boutique premium — Livraison instantanée
-            </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.95]">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="shrink-0 w-16 h-16 md:w-20 md:h-20 bg-black rounded-2xl shadow-[0_0_30px_rgba(220,38,38,0.4)] border border-red-600/30 overflow-hidden p-1.5 flex items-center justify-center">
-                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                </div>
-                <div>
-                  <span className="text-foreground">SHOP</span>
-                  <span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(220,38,38,0.8)]">+</span>
-                </div>
-              </div>
-              <span className="text-2xl md:text-3xl font-bold text-muted-foreground block">Tout ce que vous voulez. À prix imbattable.</span>
-            </h1>
-            <div className="flex flex-wrap gap-5 pt-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2"><Zap size={16} className="text-primary" /> Livraison rapide</div>
-              <div className="flex items-center gap-2"><ShieldCheck size={16} className="text-accent" /> Comptes garantis</div>
-              <div className="flex items-center gap-2"><ShoppingBag size={16} className="text-primary" /> PayPal sécurisé</div>
-            </div>
+      <section className="relative overflow-hidden bg-black border-b border-border/40">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/10 via-black to-black pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
+        
+        <div className="relative max-w-5xl mx-auto px-6 py-20 md:py-32 flex flex-col items-center text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs font-medium mb-8 text-muted-foreground backdrop-blur-sm shadow-xl">
+             <Sparkles size={14} className="text-primary" /> Boutique premium — Livraison instantanée
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
+            L'excellence numérique.<br/>
+            <span className="bg-gradient-to-r from-red-500 via-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-sm">Sans compromis.</span>
+          </h1>
+          
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 font-medium">
+            Comptes streaming, gaming et VPN de la plus haute qualité. <br className="hidden md:block"/>
+            Accédez à vos plateformes préférées instantanément et au meilleur prix.
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-6 md:gap-10 text-sm text-muted-foreground font-semibold">
+            <div className="flex items-center gap-2.5"><Zap size={18} className="text-primary" /> Livraison immédiate</div>
+            <div className="flex items-center gap-2.5"><ShieldCheck size={18} className="text-primary" /> Comptes garantis</div>
+            <div className="flex items-center gap-2.5"><ShoppingBag size={18} className="text-primary" /> Paiement sécurisé</div>
           </div>
         </div>
       </section>
