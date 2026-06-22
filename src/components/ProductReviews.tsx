@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Star, MessageSquare, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -51,7 +52,7 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
 
   const avgRating = reviews.length ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : "0.0";
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-lg bg-black/90 border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col max-h-[85vh]">
@@ -126,4 +127,10 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
       </div>
     </div>
   );
+
+  if (typeof document !== "undefined") {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 }
