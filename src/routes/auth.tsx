@@ -1,10 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-
-const Turnstile = lazy(() => import('@marsidev/react-turnstile').then(m => ({ default: m.Turnstile })));
+import { CustomCaptcha } from "@/components/CustomCaptcha";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Connexion — ZYKO Store" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur ZYKO Store." }] }),
@@ -129,12 +128,8 @@ function AuthPage() {
             />
           </div>
 
-          <div className="flex justify-center py-2 min-h-[65px]">
-            {mounted && (
-              <Suspense fallback={<div className="animate-pulse bg-white/10 rounded-lg w-[300px] h-[65px]" />}>
-                <Turnstile siteKey="0x4AAAAAADpIT4eAsIwUn19H" onSuccess={setCaptchaToken} />
-              </Suspense>
-            )}
+          <div className="flex justify-center py-2">
+            {mounted && <CustomCaptcha onSuccess={() => setCaptchaToken("verified")} />}
           </div>
 
           <div className="pt-2">
