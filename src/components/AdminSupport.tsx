@@ -9,19 +9,42 @@ export function AdminSupport() {
   const [reply, setReply] = useState("");
 
   const loadConversations = async () => {
-    // We fetch all messages and group them
-    const { data } = await supabase
+    // 1. Fetch messages
+    const { data: messagesData, error } = await supabase
       .from("support_messages")
-      .select("*, profiles:user_id(email, username)")
+      .select("*")
       .order("created_at", { ascending: false });
       
-    if (data) {
-      const grouped = data.reduce((acc: any, msg: any) => {
+    if (error) {
+      console.error("Error fetching support messages:", error);
+      return;
+    }
+      
+    if (messagesData) {
+      // 2. Extract unique user IDs
+      const userIds = [...new Set(messagesData.map((m: any) => m.user_id))];
+      
+      // 3. Fetch profiles
+      let profilesMap: Record<string, any> = {};
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, email, username")
+          .in("id", userIds);
+          
+        profilesMap = (profilesData || []).reduce((acc: any, p: any) => {
+          acc[p.id] = p;
+          return acc;
+        }, {});
+      }
+
+      // 4. Group messages
+      const grouped = messagesData.reduce((acc: any, msg: any) => {
         if (!acc[msg.user_id]) {
           acc[msg.user_id] = {
             user_id: msg.user_id,
-            email: msg.profiles?.email || "Inconnu",
-            username: msg.profiles?.username || "Anonyme",
+            email: profilesMap[msg.user_id]?.email || "Inconnu",
+            username: profilesMap[msg.user_id]?.username || "Anonyme",
             unread: 0,
             lastMessageDate: msg.created_at
           };
