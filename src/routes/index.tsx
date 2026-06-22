@@ -26,16 +26,18 @@ export const Route = createFileRoute("/")({
 type Group = { id: string; label: string; emoji: string; color: string; items: Product[]; description: string };
 
 const GROUP_META: Record<string, Omit<Group, "items">> = {
+  // Apps & Services
   "Streaming": { id: "streaming", label: "Streaming", emoji: "📺", color: "#ff0033", description: "Films, séries, musique — vos plateformes préférées dès 1€." },
   "VPN": { id: "vpn", label: "VPN", emoji: "🛡", color: "#4687ff", description: "Navigation sécurisée, débridez tout le web." },
+  "Discord": { id: "discord", label: "Discord", emoji: "✦", color: "#5865f2", description: "Décorations de profil — grille tarifaire officielle." },
   "Twitch": { id: "twitch", label: "Twitch", emoji: "💜", color: "#9146ff", description: "Boostez votre chaîne avec de vrais followers." },
+  // Jeux
   "Fortnite": { id: "fortnite", label: "Fortnite", emoji: "🎯", color: "#00d2ff", description: "Comptes Fortnite aléatoires avec skins inclus." },
   "Fortnite Rare": { id: "rare", label: "Skins Rares", emoji: "👑", color: "#ffb800", description: "Pioches exclusives, skins légendaires, OG only." },
   "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", color: "#f0b400", description: "Comptes chargés en V-Bucks prêts à dépenser." },
-  "Steam": { id: "steam", label: "Steam", emoji: "🎮", color: "#1b9cff", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
-  "Discord": { id: "discord", label: "Discord", emoji: "✦", color: "#5865f2", description: "Décorations de profil — grille tarifaire officielle." },
-  "Robux": { id: "robux", label: "Robux", emoji: "💰", color: "#1bd96a", description: "Des milliers de Robux instantanément sur votre compte." },
   "Valorant EU": { id: "valorant", label: "Valorant EU", emoji: "🔫", color: "#ff4655", description: "Comptes Valorant région EU blindés de Valorant Points." },
+  "Robux": { id: "robux", label: "Robux", emoji: "💰", color: "#1bd96a", description: "Des milliers de Robux instantanément sur votre compte." },
+  "Steam": { id: "steam", label: "Steam", emoji: "🎮", color: "#1b9cff", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
   "Epic Games": { id: "epicgames", label: "Epic Games", emoji: "🎮", color: "#ffffff", description: "Des comptes avec des centaines de jeux premium." },
 };
 

@@ -5,8 +5,8 @@ export type Cat = { id: string; label: string; emoji: string; color: string; cou
 export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; active: string; onSelect: (id: string) => void }) {
   return (
     <aside className="w-full z-40 sticky top-16 bg-background/90 backdrop-blur-xl border-b border-white/5 py-4 mt-0 shadow-xl">
-      <div className="max-w-[1920px] mx-auto px-2 md:px-6">
-        <nav className="flex items-center justify-start xl:justify-center gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-1 px-2">
+      <div className="max-w-[1000px] mx-auto px-2 md:px-6">
+        <nav className="flex flex-wrap items-center justify-center gap-2 md:gap-3 pb-1 px-2">
           {cats.map((c) => {
             const isActive = c.id === active;
             return (
