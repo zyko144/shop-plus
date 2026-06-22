@@ -140,13 +140,14 @@ function AppContent() {
   return (
     <>
       {settings.banner_text && (
-        <div className="w-full bg-primary text-primary-foreground py-1.5 px-4 overflow-hidden relative">
+        <div className="w-full bg-primary text-primary-foreground py-1.5 px-4 overflow-hidden relative z-50">
           <div className="whitespace-nowrap animate-marquee text-xs font-bold tracking-wider">
             {settings.banner_text} &nbsp; ✨ &nbsp; {settings.banner_text} &nbsp; ✨ &nbsp; {settings.banner_text}
           </div>
         </div>
       )}
       
+      <div className="fixed inset-0 hero-red-pulse pointer-events-none -z-10" />
       <Outlet />
       <DiscordSupport link={settings.discord_link} />
       
@@ -163,6 +164,7 @@ function AppContent() {
         </div>
       )}
       
+      <DiscordSupport link={settings.discord_link} />
       <AudioPlayer />
       
       <Toaster theme="dark" position="top-right" richColors />
