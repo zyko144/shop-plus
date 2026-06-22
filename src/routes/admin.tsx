@@ -549,7 +549,7 @@ function AdminDashboard() {
                           </div>
                         </td>
                         <td className="p-4 text-muted-foreground text-sm">{p.category}</td>
-                        <td className="p-4 font-medium text-white/80">{p.price.toFixed(2)}€</td>
+                        <td className="p-4 font-medium text-white/80">{Number(p.price).toFixed(2)}€</td>
                         
                         <td className="p-4 text-center">
                           <select 

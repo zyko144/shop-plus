@@ -112,7 +112,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
           <div>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">À partir de</div>
             <div className="text-2xl font-black" style={{ color: isOutOfStock ? "#666" : product.color, textShadow: isOutOfStock ? "none" : `0 0 24px ${product.color}90` }}>
-              {product.price.toFixed(2)}€
+              {Number(product.price).toFixed(2)}€
             </div>
           </div>
           <button
