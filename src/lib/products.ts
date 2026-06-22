@@ -92,6 +92,13 @@ export async function getAllProducts(): Promise<Product[]> {
       if (p.category === 'Steam') {
         return { ...p, price: Number((p.price * 1.5).toFixed(2)) };
       }
+      if (p.category === 'Streaming') {
+        if (p.name.toLowerCase().includes('spotify')) {
+          return { ...p, price: 3.00 };
+        } else {
+          return { ...p, price: 2.20 };
+        }
+      }
       return p;
     });
   }

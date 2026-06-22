@@ -177,7 +177,7 @@ function Index() {
             </div>
           </div>
           
-          {["Fortnite", "Skins Rares", "Steam"].includes(group.label) && (
+          {["Fortnite", "Skins Rares", "Steam", "Streaming"].includes(group.label) && (
             <div className="bg-orange-500/20 border border-orange-500/50 rounded-2xl p-4 flex items-center justify-center gap-3 text-orange-400 font-bold text-center shadow-[0_0_20px_rgba(249,115,22,0.2)] mb-4">
               <Zap size={24} className="text-orange-400 animate-pulse" />
               <span>Dépêchez-vous ! Les prix de cette catégorie augmenteront demain à 12h00. Profitez-en maintenant !</span>
