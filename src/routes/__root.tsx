@@ -16,7 +16,6 @@ import { AuthProvider } from "@/lib/auth";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { Toaster } from "sonner";
 import { LiveSupportChat } from "@/components/LiveSupportChat";
-import { FakeReviewsCarousel } from "@/components/FakeReviewsCarousel";
 import { CursorGlow } from "@/components/CursorGlow";
 
 function NotFoundComponent() {
@@ -124,7 +123,6 @@ function RootShell({ children }: { children: ReactNode }) {
 import { SettingsProvider, useSettings } from "@/lib/settings";
 
 function AppContent() {
-  const [showReviews, setShowReviews] = useState(false);
   const settings = useSettings();
 
   if (settings.maintenance_mode === "true") {
@@ -152,19 +150,7 @@ function AppContent() {
       <Outlet />
       <LiveSupportChat />
       
-      {showReviews ? (
-        <FakeReviewsCarousel />
-      ) : (
-        <div className="flex justify-center py-8">
-          <button 
-            onClick={() => setShowReviews(true)}
-            className="px-6 py-2 rounded-full border border-border bg-background/50 hover:bg-muted text-sm font-medium transition-colors"
-          >
-            Afficher les avis clients
-          </button>
-        </div>
-      )}
-      
+
       <AudioPlayer />
       
       <Toaster theme="dark" position="top-right" richColors />
