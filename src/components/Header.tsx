@@ -23,6 +23,9 @@ export function Header() {
           <span className="flex items-center gap-1.5 text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"/> Livraison instantanée
           </span>
+          <Link to="/premium" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 transition-all hover:scale-105">
+            👑 Premium VIP
+          </Link>
           <a
             href="https://discord.gg/UUBFjjCp"
             target="_blank"
