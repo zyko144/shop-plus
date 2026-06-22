@@ -18,10 +18,12 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setMounted(true);
     if (user) navigate({ to: "/" });
   }, [user, navigate]);
 
@@ -128,7 +130,7 @@ function AuthPage() {
           </div>
 
           <div className="flex justify-center py-2">
-            <Turnstile siteKey="0x4AAAAAADpIT4eAsIwUn19H" onSuccess={setCaptchaToken} />
+            {mounted && <Turnstile siteKey="0x4AAAAAADpIT4eAsIwUn19H" onSuccess={setCaptchaToken} />}
           </div>
 
           <div className="pt-2">
