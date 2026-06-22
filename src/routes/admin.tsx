@@ -10,8 +10,31 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Dashboard Admin — SHOP+" }] }),
-  component: AdminDashboard,
+  component: AdminDashboardErrorBoundary,
 });
+
+import React from "react";
+class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
+  constructor(props: any) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-black text-white p-10 font-mono">
+          <h1 className="text-red-500 text-2xl font-bold mb-4">Erreur Interne du Dashboard</h1>
+          <p className="mb-4">Une erreur s'est produite lors du rendu du panel admin. Prenez une capture d'écran de ceci :</p>
+          <pre className="bg-red-900/30 p-4 rounded overflow-auto border border-red-500/50">{this.state.error?.message}</pre>
+          <pre className="bg-white/5 p-4 rounded overflow-auto border border-white/10 mt-4 text-xs text-white/50">{this.state.error?.stack}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function AdminDashboardErrorBoundary() {
+  return <LocalErrorBoundary><AdminDashboard /></LocalErrorBoundary>;
+}
 
 type AdminOrderRow = {
   id: string;
