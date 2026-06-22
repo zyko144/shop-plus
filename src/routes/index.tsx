@@ -178,7 +178,7 @@ function Index() {
                 />
             </div>
           </div>
-          
+          </div>
           {group.label === "Fortnite" && (
             <div className="bg-red-500/20 border border-red-500/50 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-center gap-3 text-red-500 font-bold text-center shadow-[0_0_20px_rgba(239,68,68,0.2)]">
               <span>Si vous voulez d'autres comptes spécifiques, n'hésitez pas à faire une demande sur notre discord !</span>
