@@ -77,9 +77,36 @@ function AdminDashboard() {
     const { data: productsData } = await supabase.from("products").select("*").order("category", { ascending: true });
     if (productsData) setAllProducts(productsData);
     
-    // Charger Commandes
-    const { data: ordersData } = await supabase.from("orders").select("*, profiles(email, username)").order("created_at", { ascending: false }).limit(50);
-    if (ordersData) setOrders(ordersData as AdminOrderRow[]);
+    // Charger Commandes avec jointure manuelle (pas de FK direct entre orders et profiles)
+    const { data: ordersData, error: ordersError } = await supabase
+      .from("orders")
+      .select("id,user_id,total,status,created_at,payment_ref,order_items(product_name,quantity,unit_price)")
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (!ordersError && ordersData) {
+      const userIds = [...new Set(ordersData.map(o => o.user_id))];
+      if (userIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id,email,username")
+          .in("id", userIds);
+          
+        const profilesMap = (profilesData || []).reduce((acc: any, p) => {
+          acc[p.id] = p;
+          return acc;
+        }, {});
+
+        const mergedOrders = ordersData.map(o => ({
+          ...o,
+          profiles: profilesMap[o.user_id] || null
+        }));
+        
+        setOrders(mergedOrders as AdminOrderRow[]);
+      } else {
+        setOrders(ordersData as AdminOrderRow[]);
+      }
+    }
 
     setLoading(false);
   };
