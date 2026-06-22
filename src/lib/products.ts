@@ -79,7 +79,24 @@ export async function getAllProducts(): Promise<Product[]> {
     console.error("Erreur chargement produits:", error);
     return [];
   }
-  return (data || []).filter(p => !['CDA', 'Polsat Box Go'].includes(p.name));
+  
+  let products = (data || []).filter(p => !['CDA', 'Polsat Box Go'].includes(p.name));
+  
+  // Modification automatique des prix programmée pour le 23 Juin 2026 à 12h00
+  const scheduledTime = new Date('2026-06-23T12:00:00+02:00').getTime();
+  if (Date.now() >= scheduledTime) {
+    products = products.map(p => {
+      if (p.category === 'Fortnite' || p.category === 'Fortnite Rare') {
+        return { ...p, price: Number((p.price * 2.5).toFixed(2)) };
+      }
+      if (p.category === 'Steam') {
+        return { ...p, price: Number((p.price * 1.5).toFixed(2)) };
+      }
+      return p;
+    });
+  }
+  
+  return products;
 }
 
 // Fonction pour l'admin (inclut les inactifs)
