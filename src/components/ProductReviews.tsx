@@ -11,11 +11,19 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
   const [loading, setLoading] = useState(true);
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchReviews();
-  }, [productId]);
+    if (user) {
+      supabase.from("profiles").select("username, email").eq("id", user.id).single().then(({ data }) => {
+        if (data) {
+          setDisplayName(data.username || (data.email ? data.email.split('@')[0] : ""));
+        }
+      });
+    }
+  }, [productId, user]);
 
   const fetchReviews = async () => {
     const { data } = await supabase
@@ -32,8 +40,15 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
       toast.error("Veuillez vous connecter pour laisser un avis.");
       return;
     }
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || !displayName.trim()) {
+      toast.error("Veuillez remplir tous les champs.");
+      return;
+    }
     setSubmitting(true);
+    
+    // Mettre à jour le pseudo de l'utilisateur
+    await supabase.from("profiles").update({ username: displayName.trim() }).eq("id", user.id);
+
     const { error } = await supabase.from("reviews").insert({
       product_id: productId,
       user_id: user.id,
@@ -99,6 +114,16 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
             </div>
           ) : (
             <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-1">Votre pseudo affiché</label>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-white/30 outline-none focus:border-white/30"
+                  placeholder="Comment voulez-vous être appelé ?"
+                />
+              </div>
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <button key={i} onClick={() => setNewRating(i + 1)} className="p-1 hover:scale-110 transition">

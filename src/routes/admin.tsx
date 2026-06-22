@@ -295,6 +295,17 @@ function AdminDashboard() {
     }
   };
 
+  const deleteAllReviews = async () => {
+    if (!window.confirm("SUPPRIMER TOUS LES AVIS ? Cette action est irréversible.")) return;
+    try {
+      const { error } = await supabase.from('reviews').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      toast.success("Tous les avis ont été supprimés !");
+    } catch (e: any) {
+      toast.error("Erreur: " + e.message);
+    }
+  };
+
   const saveStock = async (productId: string, newStock: number, isUnlimited: boolean) => {
     const { error } = await supabase.from("product_stock").upsert({
       product_id: productId,
@@ -591,7 +602,13 @@ function AdminDashboard() {
           <div className="glass rounded-2xl p-8 border border-border/50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2"><Layers size={20} className="text-primary" /> Catalogue Produits</h2>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <button 
+                  onClick={deleteAllReviews}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white text-sm font-bold transition-colors"
+                >
+                  🗑️ Vider tous les avis
+                </button>
                 <button 
                   onClick={injectNewProducts}
                   className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-white text-sm font-bold transition-colors"
