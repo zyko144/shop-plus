@@ -2,8 +2,21 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 
 export function AudioPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [sliderVolume, setSliderVolume] = useState(0.3); // Curseur à 30% par défaut
+  const [isPlaying, setIsPlaying] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("audio_playing") === "true";
+    }
+    return false;
+  });
+  
+  const [sliderVolume, setSliderVolume] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("audio_volume");
+      if (saved !== null) return parseFloat(saved);
+    }
+    return 0.3; // Curseur à 30% par défaut
+  });
+  
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -11,24 +24,31 @@ export function AudioPlayer() {
       // Courbe exponentielle (puissance 3) : rend les bas volumes VRAIMENT très bas.
       // 0.3 sur le curseur donne un volume réel de 0.027 (très doux)
       audioRef.current.volume = Math.pow(sliderVolume, 3);
+      localStorage.setItem("audio_volume", sliderVolume.toString());
     }
   }, [sliderVolume]);
 
-  // Autoplay logic with browser bypass
   useEffect(() => {
+    // Si l'utilisateur avait explicitement mis en pause, on ne force pas la lecture
+    if (typeof window !== "undefined" && localStorage.getItem("audio_playing") === "false") {
+      setIsPlaying(false);
+      return;
+    }
+
     const playAudio = async () => {
       if (!audioRef.current) return;
       try {
         await audioRef.current.play();
         setIsPlaying(true);
+        localStorage.setItem("audio_playing", "true");
       } catch (err) {
-        // Autoplay was blocked by the browser (normal behavior for unmuted audio)
-        // We wait for the first user interaction to play it
+        // Autoplay bloqué par le navigateur, on attend une interaction
         const onInteract = async () => {
-          if (audioRef.current && !isPlaying) {
+          if (audioRef.current && localStorage.getItem("audio_playing") !== "false") {
             try {
               await audioRef.current.play();
               setIsPlaying(true);
+              localStorage.setItem("audio_playing", "true");
             } catch (e) {
               console.error("Interaction play blocked", e);
             }
@@ -41,7 +61,7 @@ export function AudioPlayer() {
       }
     };
     
-    // Small timeout to ensure DOM is ready
+    // Petit délai pour laisser le DOM monter
     const timer = setTimeout(() => {
       playAudio();
     }, 500);
@@ -53,8 +73,10 @@ export function AudioPlayer() {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        localStorage.setItem("audio_playing", "false");
       } else {
         audioRef.current.play().catch(e => console.error("Play blocked:", e));
+        localStorage.setItem("audio_playing", "true");
       }
       setIsPlaying(!isPlaying);
     }
@@ -92,7 +114,7 @@ export function AudioPlayer() {
       </div>
       
       {/* Fichier audio/vidéo (.mp4) à placer dans le dossier public */}
-      <audio ref={audioRef} src="/music.mp4" loop autoPlay />
+      <audio ref={audioRef} src="/music.mp4" loop />
     </div>
   );
 }

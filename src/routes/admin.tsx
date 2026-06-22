@@ -345,7 +345,7 @@ function AdminDashboard() {
               </table>
             </div>
           </div>
-        ) : (
+        ) : activeTab === "stocks" ? (
           <div className="glass rounded-2xl overflow-hidden border border-border/50">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
