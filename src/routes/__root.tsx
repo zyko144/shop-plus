@@ -89,9 +89,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "SHOP+ — Boutique premium" },
       { property: "og:description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://shop-pluss.netlify.app/banner.png?v=2" },
+      { property: "og:image", content: "https://shop-plus-nu.vercel.app/banner.png?v=2" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://shop-pluss.netlify.app/banner.png?v=2" },
+      { name: "twitter:image", content: "https://shop-plus-nu.vercel.app/banner.png?v=2" },
     ],
     links: [
       {
