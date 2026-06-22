@@ -14,7 +14,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
   const [added, setAdded] = useState(false);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
   const logoUrl = product.logo
-    ? product.logo.startsWith("http")
+    ? product.logo.startsWith("http") || product.logo.startsWith("/")
       ? product.logo
       : `https://cdn.simpleicons.org/${product.logo}/${hex(product.color)}`
     : null;
