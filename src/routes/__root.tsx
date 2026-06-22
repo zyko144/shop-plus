@@ -120,35 +120,68 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import { SettingsProvider, useSettings } from "@/lib/settings";
+
+function AppContent() {
+  const [showReviews, setShowReviews] = useState(false);
+  const settings = useSettings();
+
+  if (settings.maintenance_mode === "true") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center">
+        <div>
+          <h1 className="text-4xl font-black text-primary mb-4">Maintenance</h1>
+          <p className="text-muted-foreground">La boutique revient très vite !</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {settings.banner_text && (
+        <div className="w-full bg-primary text-primary-foreground py-1.5 px-4 overflow-hidden relative">
+          <div className="whitespace-nowrap animate-marquee text-xs font-bold tracking-wider">
+            {settings.banner_text} &nbsp; ✨ &nbsp; {settings.banner_text} &nbsp; ✨ &nbsp; {settings.banner_text}
+          </div>
+        </div>
+      )}
+      
+      <Outlet />
+      <DiscordSupport link={settings.discord_link} />
+      
+      {showReviews ? (
+        <FakeReviewsCarousel />
+      ) : (
+        <div className="flex justify-center py-8">
+          <button 
+            onClick={() => setShowReviews(true)}
+            className="px-6 py-2 rounded-full border border-border bg-background/50 hover:bg-muted text-sm font-medium transition-colors"
+          >
+            Afficher les avis clients
+          </button>
+        </div>
+      )}
+      
+      <AudioPlayer />
+      
+      <Toaster theme="dark" position="top-right" richColors />
+    </>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [showReviews, setShowReviews] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <Outlet />
-          <DiscordSupport />
-          
-          {showReviews ? (
-            <FakeReviewsCarousel />
-          ) : (
-            <div className="flex justify-center py-8">
-              <button 
-                onClick={() => setShowReviews(true)}
-                className="px-6 py-2 rounded-full border border-border bg-background/50 hover:bg-muted text-sm font-medium transition-colors"
-              >
-                Afficher les avis clients
-              </button>
-            </div>
-          )}
-          
-          <AudioPlayer />
-          
-          <Toaster theme="dark" position="top-right" richColors />
-        </CartProvider>
-      </AuthProvider>
+      <SettingsProvider>
+        <AuthProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </AuthProvider>
+      </SettingsProvider>
     </QueryClientProvider>
   );
 }

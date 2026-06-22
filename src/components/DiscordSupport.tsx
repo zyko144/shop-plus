@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { MessageCircle, X, ExternalLink, Ticket } from "lucide-react";
 
-export const DISCORD_INVITE = "https://discord.gg/UUBFjjCp";
-
-export function DiscordSupport() {
+export function DiscordSupport({ link = "https://discord.gg/UUBFjjCp" }: { link?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -45,7 +43,7 @@ export function DiscordSupport() {
           </ol>
 
           <a
-            href={DISCORD_INVITE}
+            href={link}
             target="_blank"
             rel="noreferrer"
             className="mt-4 w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition hover:scale-[1.02]"

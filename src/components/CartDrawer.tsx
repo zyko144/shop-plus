@@ -13,6 +13,30 @@ export function CartDrawer() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoError, setPromoError] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [promoApplied, setPromoApplied] = useState("");
+
+  const finalTotal = total * (1 - discount);
+
+  const applyPromo = async () => {
+    if (!promoInput.trim()) return;
+    setLoading(true);
+    setPromoError("");
+    const { data, error } = await supabase.from("promo_codes").select("*").eq("code", promoInput.trim().toUpperCase()).single();
+    setLoading(false);
+    if (error || !data || !data.is_active || data.current_uses >= data.max_uses) {
+      setPromoError("Code invalide ou expiré");
+      setDiscount(0);
+      setPromoApplied("");
+    } else {
+      setDiscount(data.discount_percentage / 100);
+      setPromoApplied(data.code);
+      setPromoError("");
+      toast.success(`Code ${data.code} appliqué : -${data.discount_percentage}% !`);
+    }
+  };
 
   const checkout = async () => {
     if (!user) {
@@ -26,7 +50,7 @@ export function CartDrawer() {
     try {
       const { data: order, error } = await supabase
         .from("orders")
-        .insert({ user_id: user.id, total, status: "pending", payment_ref: "paypal:zyko921" })
+        .insert({ user_id: user.id, total: finalTotal, status: "pending", payment_ref: "paypal:zyko921" })
         .select()
         .single();
       if (error) throw error;
@@ -44,14 +68,19 @@ export function CartDrawer() {
 
       // Envoi de l'email au client
       if (user.email) {
-        sendOrderEmail({ data: { email: user.email, items, total } })
+        sendOrderEmail({ data: { email: user.email, items, total: finalTotal } })
           .catch(e => console.error("Email send error:", e));
+      }
+
+      // Incrémenter le nombre d'utilisations du code promo si utilisé
+      if (promoApplied) {
+        await supabase.rpc('increment_promo_use', { promo_code: promoApplied }).catch(() => {});
       }
 
       clear();
       setOpen(false);
       toast.success("Commande enregistrée ! Un email t'a été envoyé. PayPal s'ouvre — ensuite ouvre un ticket Discord pour ton produit.", { duration: 8000 });
-      window.open(`${PAYPAL_URL}/${total.toFixed(2)}EUR`, "_blank");
+      window.open(`${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`, "_blank");
       window.open("https://discord.gg/8RBgw6ykQK", "_blank");
       navigate({ to: "/orders" });
     } catch (e: any) {
@@ -92,9 +121,38 @@ export function CartDrawer() {
           ))}
         </div>
         <div className="p-4 border-t border-border space-y-3">
+          {items.length > 0 && (
+            <div className="mb-4">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Code promo"
+                  value={promoInput}
+                  onChange={e => setPromoInput(e.target.value)}
+                  className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 text-sm focus:border-primary outline-none"
+                  disabled={!!promoApplied}
+                />
+                {!promoApplied ? (
+                  <button onClick={applyPromo} disabled={loading || !promoInput.trim()} className="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition">
+                    Appliquer
+                  </button>
+                ) : (
+                  <button onClick={() => { setDiscount(0); setPromoApplied(""); setPromoInput(""); }} className="px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-lg text-sm font-bold transition">
+                    Retirer
+                  </button>
+                )}
+              </div>
+              {promoError && <div className="text-red-400 text-xs mt-1 font-medium">{promoError}</div>}
+              {promoApplied && <div className="text-green-400 text-xs mt-1 font-medium">Code {promoApplied} actif (-{(discount * 100).toFixed(0)}%)</div>}
+            </div>
+          )}
+
           <div className="flex items-center justify-between text-lg font-bold">
             <span>Total</span>
-            <span className="text-primary">{total.toFixed(2)}€</span>
+            <div className="text-right">
+              {discount > 0 && <div className="text-sm text-muted-foreground line-through decoration-red-500">{total.toFixed(2)}€</div>}
+              <span className="text-primary">{finalTotal.toFixed(2)}€</span>
+            </div>
           </div>
           <button
             onClick={checkout}
