@@ -202,6 +202,24 @@ function AdminDashboard() {
   const updateStatus = async (id: string, status: string) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
     await supabase.from("orders").update({ status }).eq("id", id);
+
+    // Activer l'abonnement Premium si la commande est marquée comme "Livré"
+    if (status === "completed") {
+      const order = orders.find(o => o.id === id);
+      if (order && order.order_items) {
+        const hasPremium = order.order_items.some(
+          item => item.product_name.toLowerCase().includes("premium") || 
+                  (item as any).category?.toLowerCase().includes("premium")
+        );
+        if (hasPremium) {
+          await supabase.from("profiles").update({ 
+            is_premium: true, 
+            premium_orders_left: 10 
+          }).eq("id", order.user_id);
+          toast.success("Abonnement Premium activé automatiquement pour ce client !");
+        }
+      }
+    }
   };
 
   const deleteOrder = async (id: string) => {

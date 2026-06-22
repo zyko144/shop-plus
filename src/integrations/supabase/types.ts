@@ -87,28 +87,34 @@ export type Database = {
       }
       profiles: {
         Row: {
-          created_at: string
           id: string
+          email: string | null
           username: string | null
           role: string | null
-          email: string | null
+          created_at: string | null
           plus_coins: number | null
+          is_premium: boolean | null
+          premium_orders_left: number | null
         }
         Insert: {
-          created_at?: string
           id: string
+          email?: string | null
           username?: string | null
           role?: string | null
-          email?: string | null
+          created_at?: string | null
           plus_coins?: number | null
+          is_premium?: boolean | null
+          premium_orders_left?: number | null
         }
         Update: {
-          created_at?: string
           id?: string
+          email?: string | null
           username?: string | null
           role?: string | null
-          email?: string | null
+          created_at?: string | null
           plus_coins?: number | null
+          is_premium?: boolean | null
+          premium_orders_left?: number | null
         }
         Relationships: []
       }
