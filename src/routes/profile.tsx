@@ -8,12 +8,14 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { PAYPAL_URL } from "@/lib/products";
 import { OrderReview } from "@/components/OrderReview";
 
+import { ProductReviewsModal } from "@/components/ProductReviews";
+
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Mon Compte — ZYKO Store" }] }),
   component: ProfilePage,
 });
 
-type OrderRow = { id: string; total: number; status: string; created_at: string; order_items: { product_name: string; quantity: number; unit_price: number; category: string }[] };
+type OrderRow = { id: string; total: number; status: string; created_at: string; order_items: { product_id?: string; product_name: string; quantity: number; unit_price: number; category: string }[] };
 
 function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
@@ -24,6 +26,7 @@ function ProfilePage() {
   const [premiumOrdersLeft, setPremiumOrdersLeft] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"coins" | "orders" | "settings">("coins");
+  const [reviewingProduct, setReviewingProduct] = useState<{ id: string; name: string; color: string } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
@@ -42,7 +45,7 @@ function ProfilePage() {
     });
 
     // Charger les commandes
-    supabase.from("orders").select("id,total,status,created_at,order_items(product_name,quantity,unit_price,category)").order("created_at", { ascending: false }).then(({ data }) => {
+    supabase.from("orders").select("id,total,status,created_at,order_items(product_id,product_name,quantity,unit_price,category)").order("created_at", { ascending: false }).then(({ data }) => {
       setOrders((data as any) ?? []);
       setLoading(false);
     });
@@ -218,9 +221,21 @@ function ProfilePage() {
                     </div>
                     <ul className="space-y-1 text-sm bg-black/40 p-4 rounded-2xl mb-4 border border-white/5">
                       {o.order_items.map((it, i) => (
-                        <li key={i} className="flex justify-between border-b border-white/5 last:border-0 pb-2 last:pb-0 pt-2 first:pt-0">
-                          <span className="font-medium text-white/90">{it.quantity}× {it.product_name} <span className="text-white/40 text-xs ml-1">({it.category})</span></span>
-                          <span className="font-bold text-white/70">{(it.quantity * Number(it.unit_price)).toFixed(2)}€</span>
+                        <li key={i} className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 last:border-0 pb-3 last:pb-0 pt-3 first:pt-0 gap-2">
+                          <div className="flex-1">
+                            <span className="font-medium text-white/90">{it.quantity}× {it.product_name} <span className="text-white/40 text-xs ml-1">({it.category})</span></span>
+                          </div>
+                          <div className="flex items-center justify-end gap-3">
+                            <span className="font-bold text-white/70">{(it.quantity * Number(it.unit_price)).toFixed(2)}€</span>
+                            {o.status === "completed" && it.product_id && (
+                              <button 
+                                onClick={() => setReviewingProduct({ id: it.product_id!, name: it.product_name, color: "#a855f7" })}
+                                className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-colors border border-white/10"
+                              >
+                                Laisser un avis
+                              </button>
+                            )}
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -236,9 +251,6 @@ function ProfilePage() {
                           Payer maintenant (PayPal)
                         </a>
                       </div>
-                    )}
-                    {o.status !== "pending" && (
-                      <OrderReview orderId={o.id} createdAt={o.created_at} />
                     )}
                   </div>
                 </div>
@@ -284,6 +296,15 @@ function ProfilePage() {
 
         </div>
       </div>
+      
+      {reviewingProduct && (
+        <ProductReviewsModal 
+          productId={reviewingProduct.id}
+          productName={reviewingProduct.name}
+          color={reviewingProduct.color}
+          onClose={() => setReviewingProduct(null)}
+        />
+      )}
       
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes shimmer {
