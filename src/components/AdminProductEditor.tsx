@@ -19,7 +19,6 @@ export function AdminProductEditor({ initialProduct, onSave, onCancel }: AdminPr
     color: "#ff0000",
     logo: "",
     emoji: "",
-    image: "",
     is_active: true,
     ...initialProduct,
   });
@@ -32,7 +31,10 @@ export function AdminProductEditor({ initialProduct, onSave, onCancel }: AdminPr
 
   const handleSave = async () => {
     setIsSaving(true);
-    await onSave(product);
+    // On retire 'image' car cette colonne n'existe pas dans la table products de Supabase
+    // (les images de catégorie sont gérées localement)
+    const { image, ...productToSave } = product;
+    await onSave(productToSave);
     setIsSaving(false);
   };
 
