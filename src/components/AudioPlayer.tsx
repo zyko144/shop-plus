@@ -83,7 +83,7 @@ export function AudioPlayer() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[100] bg-black/60 backdrop-blur-xl rounded-full px-4 py-2.5 flex items-center gap-3 border border-white/10 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
+    <div className="fixed bottom-4 left-4 z-[100] bg-black/60 backdrop-blur-xl rounded-full px-4 py-2.5 flex items-center gap-3 border border-white/10 shadow-[0_0_20px_rgba(220,38,38,0.2)]">
       <button 
         onClick={togglePlay} 
         className="w-8 h-8 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center transition-colors shrink-0 shadow-lg shadow-red-600/30"

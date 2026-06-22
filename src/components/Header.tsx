@@ -41,8 +41,8 @@ export function Header() {
                   <Shield size={16} /> <span className="hidden sm:inline">Admin</span>
                 </Link>
               )}
-              <Link to="/orders" className="text-sm px-3 py-2 rounded-lg hover:bg-muted flex items-center gap-2">
-                <User size={16} /> <span className="hidden sm:inline">Commandes</span>
+              <Link to="/profile" className="text-sm px-3 py-2 rounded-lg hover:bg-muted flex items-center gap-2">
+                <User size={16} /> <span className="hidden sm:inline">Espace Client</span>
               </Link>
               <button onClick={signOut} className="text-sm px-3 py-2 rounded-lg hover:bg-muted">
                 <LogOut size={16} />

@@ -31,7 +31,7 @@ export function CartDrawer() {
   }, [user, open]);
 
   const finalTotal = useCoins ? (total * (1 - discount)) * 0.5 : total * (1 - discount);
-  const coinsEarned = Math.floor(finalTotal * 10);
+  const coinsEarned = Math.floor(finalTotal * 100);
 
   const applyPromo = async () => {
     if (!promoInput.trim()) return;
@@ -102,7 +102,7 @@ export function CartDrawer() {
       toast.success(`Commande enregistrée ! Vous avez gagné ${coinsEarned} + Coins. PayPal s'ouvre — ensuite ouvre un ticket Discord.`, { duration: 8000 });
       window.open(`${PAYPAL_URL}/${finalTotal.toFixed(2)}EUR`, "_blank");
       window.open("https://discord.gg/8RBgw6ykQK", "_blank");
-      navigate({ to: "/orders" });
+      navigate({ to: "/profile" });
     } catch (e: any) {
       toast.error(e.message ?? "Erreur");
     } finally {
