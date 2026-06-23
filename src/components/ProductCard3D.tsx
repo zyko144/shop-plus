@@ -3,6 +3,7 @@ import { Plus, Check } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { CATEGORY_IMAGES } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { ProductReviewsModal } from "./ProductReviews";
 
 function hex(c: string) {
@@ -21,11 +22,16 @@ const RARE_SKIN_IMAGES: Record<string, string> = {
 
 export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
   const { add } = useCart();
+  const { profile } = useAuth();
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [imgError, setImgError] = useState(false);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
+
+  const hasPremiumDiscount = profile?.is_premium && (profile?.premium_orders_left || 0) > 0;
+  const isDiscord = product.category?.toLowerCase().includes("discord") || product.name.toLowerCase().includes("discord");
+  const displayPrice = hasPremiumDiscount && !isDiscord ? product.price * 0.7 : product.price;
   
   const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
 
@@ -142,9 +148,21 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">À partir de</div>
-            <div className="text-2xl font-black" style={{ color: isOutOfStock ? "#666" : product.color, textShadow: isOutOfStock ? "none" : `0 0 24px ${product.color}90` }}>
-              {Number(product.price).toFixed(2)}€
+            <div className="flex items-center gap-2">
+              {hasPremiumDiscount && !isDiscord && (
+                <div className="text-sm font-black text-white/40 line-through decoration-red-500/50">
+                  {Number(product.price).toFixed(2)}€
+                </div>
+              )}
+              <div className="text-2xl font-black" style={{ color: isOutOfStock ? "#666" : product.color, textShadow: isOutOfStock ? "none" : `0 0 24px ${product.color}90` }}>
+                {Number(displayPrice).toFixed(2)}€
+              </div>
             </div>
+            {hasPremiumDiscount && !isDiscord && (
+              <div className="text-[9px] font-bold text-purple-400 bg-purple-500/20 px-1.5 py-0.5 rounded-sm w-fit mt-0.5">
+                👑 -30% Premium
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <button

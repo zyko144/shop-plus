@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Profile = { id: string; username: string | null; role: string | null; email: string | null };
+type Profile = { id: string; username: string | null; role: string | null; email: string | null; is_premium?: boolean; premium_orders_left?: number };
 type AuthCtx = { user: User | null; session: Session | null; profile: Profile | null; loading: boolean; profileError: string | null; signOut: () => Promise<void> };
 const Ctx = createContext<AuthCtx>({ user: null, session: null, profile: null, loading: true, profileError: null, signOut: async () => {} });
 
