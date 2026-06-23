@@ -6,14 +6,35 @@ export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; activ
   return (
     <aside className="w-full z-40 sticky top-16 bg-background/90 backdrop-blur-xl border-b border-white/5 py-4 mt-0 shadow-xl">
       <div className="max-w-[1000px] mx-auto px-2 md:px-6">
-        <nav className="flex flex-wrap items-center justify-center gap-2 md:gap-3 pb-1 px-2">
+        {/* Mobile Dropdown */}
+        <div className="md:hidden px-2 pb-2">
+          <div className="relative">
+            <select
+              value={active}
+              onChange={(e) => onSelect(e.target.value)}
+              className="w-full appearance-none bg-black/50 border border-white/10 rounded-2xl py-3.5 pl-4 pr-10 text-white font-bold text-sm outline-none focus:ring-2 focus:ring-red-500/50 backdrop-blur-md"
+            >
+              {cats.map((c) => (
+                <option key={c.id} value={c.id} className="bg-black text-white">
+                  {c.emoji} {c.label} ({c.count})
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/50">
+              ▼
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Buttons */}
+        <nav className="hidden md:flex flex-wrap items-center justify-center gap-3 pb-1 px-2">
           {cats.map((c) => {
             const isActive = c.id === active;
             return (
               <button
                 key={c.id}
                 onClick={() => onSelect(c.id)}
-                className={`group shrink-0 relative flex items-center gap-2 md:gap-3 px-3 py-2 md:px-4 md:py-2.5 rounded-2xl text-xs md:text-sm font-medium transition-all ${
+                className={`group shrink-0 relative flex items-center gap-3 px-4 py-2.5 rounded-2xl text-sm font-medium transition-all ${
                   isActive ? "text-white" : "text-muted-foreground hover:text-foreground bg-white/5 hover:bg-white/10"
                 }`}
                 style={isActive ? { background: `linear-gradient(135deg, ${c.color}33, transparent)`, boxShadow: `inset 0 0 0 1px ${c.color}66` } : undefined}
