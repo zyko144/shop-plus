@@ -88,6 +88,26 @@ export async function getAllProducts(): Promise<Product[]> {
   
   let products = (data || []).filter(p => !['CDA', 'Polsat Box Go'].includes(p.name));
   
+  // Modification automatique des prix programmée pour le 23 Juin 2026 à 12h00
+  const scheduledTime = new Date('2026-06-23T12:00:00+02:00').getTime();
+  if (Date.now() >= scheduledTime) {
+    products = products.map(p => {
+      if (p.category === 'Fortnite' || p.category === 'Fortnite Rare') {
+        return { ...p, price: Number((p.price * 2.5).toFixed(2)) };
+      }
+      if (p.category === 'Steam') {
+        return { ...p, price: Number((p.price * 1.5).toFixed(2)) };
+      }
+      if (p.category === 'Streaming') {
+        if (p.name.toLowerCase().includes('spotify')) {
+          return { ...p, price: 3.00 };
+        } else {
+          return { ...p, price: 2.20 };
+        }
+      }
+      return p;
+    });
+  }
   
   return products;
 }
