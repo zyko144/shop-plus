@@ -68,7 +68,8 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a238ff', '#f47521'
 function AdminDashboard() {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "stocks" | "products" | "settings" | "support">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "stocks" | "products" | "settings" | "support" | "users">("overview");
+  const [usersList, setUsersList] = useState<any[]>([]);
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
   const [stocks, setStocks] = useState<Record<string, StockData>>({});
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
@@ -102,6 +103,10 @@ function AdminDashboard() {
     // Charger Produits Admin (tous, même inactifs)
     const { data: productsData } = await supabase.from("products").select("*").order("category", { ascending: true });
     if (productsData) setAllProducts(productsData);
+
+    // Charger Utilisateurs
+    const { data: profilesDataFetch } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+    if (profilesDataFetch) setUsersList(profilesDataFetch);
     
     // Charger Commandes avec jointure manuelle (pas de FK direct entre orders et profiles)
     const { data: ordersData, error: ordersError } = await supabase
@@ -267,6 +272,22 @@ function AdminDashboard() {
     }
   };
 
+  const grantPremium = async (userId: string) => {
+    if (!window.confirm("Accorder le statut Premium (-30%) pour 10 commandes à cet utilisateur ?")) return;
+    try {
+      const { error } = await supabase.from("profiles").update({ 
+        is_premium: true, 
+        premium_orders_left: 10 
+      }).eq("id", userId);
+      if (error) throw error;
+      
+      setUsersList(prev => prev.map(u => u.id === userId ? { ...u, is_premium: true, premium_orders_left: 10 } : u));
+      toast.success("Statut Premium accordé avec succès !");
+    } catch (e: any) {
+      toast.error("Erreur : " + e.message);
+    }
+  };
+
   const injectNewProducts = async () => {
     if (!window.confirm("Injecter les nouveaux produits (Robux, Valorant, Epic Games) ?")) return;
     const newProducts = [
@@ -402,6 +423,13 @@ function AdminDashboard() {
           >
             <Layers size={20} />
             Stocks
+          </button>
+          <button 
+            onClick={() => setActiveTab("users")}
+            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "users" ? "bg-teal-600 text-white shadow-[0_0_20px_rgba(13,148,136,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
+          >
+            <div className="text-xl">👥</div>
+            Utilisateurs
           </button>
           <button 
             onClick={() => setActiveTab("settings")}
@@ -780,6 +808,67 @@ function AdminDashboard() {
                       );
                     })
                   ])}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "users" && (
+          <div className="glass rounded-2xl overflow-hidden border border-border/50">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/40">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <div className="text-2xl">👥</div> Gestion des Utilisateurs
+              </h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
+                    <th className="p-4 font-semibold">Utilisateur</th>
+                    <th className="p-4 font-semibold">Coins</th>
+                    <th className="p-4 font-semibold">Statut Premium</th>
+                    <th className="p-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {usersList.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="p-8 text-center text-muted-foreground">Aucun utilisateur trouvé.</td>
+                    </tr>
+                  ) : usersList.map((u) => (
+                    <tr key={u.id} className="hover:bg-white/5 transition-colors">
+                      <td className="p-4">
+                        <div className="font-bold text-white/90">{u.email || 'Email introuvable'}</div>
+                        <div className="text-xs text-muted-foreground">{u.username || 'Anonyme'} (ID: {u.id.slice(0, 8)})</div>
+                      </td>
+                      <td className="p-4 font-bold text-yellow-500">
+                        {u.plus_coins || 0} Coins
+                      </td>
+                      <td className="p-4">
+                        {u.is_premium ? (
+                          <div className="flex flex-col gap-1">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-400 w-fit">
+                              👑 Premium Actif
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {u.premium_orders_left || 0} commande(s) remisée(s) restante(s)
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">Classique</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-right">
+                        <button 
+                          onClick={() => grantPremium(u.id)}
+                          className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg text-sm font-bold shadow-lg shadow-purple-500/25 transition-all active:scale-95"
+                        >
+                          Accorder Premium (-30%)
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
