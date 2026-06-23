@@ -125,12 +125,12 @@ function Index() {
              <Sparkles size={14} className="text-primary" /> Boutique premium — Livraison instantanée
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
             L'excellence numérique.<br/>
             <span className="bg-gradient-to-r from-red-500 via-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-sm">Sans compromis.</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 font-medium">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 font-medium">
             Comptes streaming, gaming et VPN de la plus haute qualité. <br className="hidden md:block"/>
             Accédez à vos plateformes préférées instantanément et au meilleur prix.
           </p>

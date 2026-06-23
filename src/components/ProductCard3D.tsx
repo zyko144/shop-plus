@@ -74,7 +74,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
     >
       {/* Visual */}
       <div
-        className="relative h-64 overflow-hidden"
+        className="relative h-48 sm:h-56 md:h-64 overflow-hidden"
         style={{
           background: `radial-gradient(circle at 50% 50%, ${product.color}33, #000 75%)`,
         }}
