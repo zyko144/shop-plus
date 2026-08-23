@@ -64,10 +64,12 @@ function resolveLogoUrl(logo?: string | null): string | undefined {
 
 type ReviewNotificationInput = {
   username: string;
+  avatarUrl?: string;
   productName: string;
   rating: number;
   comment: string;
   productLogo?: string | null;
+  screenshotUrl?: string;
 };
 
 export const notifyDiscordReview = createServerFn({ method: "POST" })
@@ -77,15 +79,17 @@ export const notifyDiscordReview = createServerFn({ method: "POST" })
     const logoUrl = resolveLogoUrl(data.productLogo);
 
     const embed = {
-      title: `⭐ Nouvel avis — ${data.username}`,
+      title: "⭐ Nouvel avis vérifié",
       color: 0xffffff,
+      author: { name: data.username, icon_url: data.avatarUrl },
       fields: [
         { name: "Produit", value: data.productName, inline: true },
         { name: "Note", value: stars, inline: true },
         { name: "Avis", value: data.comment.slice(0, 1024) || "—" },
       ],
       ...(logoUrl ? { thumbnail: { url: logoUrl } } : {}),
-      footer: { text: "Vercell — avis client vérifié" },
+      ...(data.screenshotUrl ? { image: { url: data.screenshotUrl } } : {}),
+      footer: { text: "Vercell — avis client vérifié (compte Discord lié)" },
       timestamp: new Date().toISOString(),
     };
 

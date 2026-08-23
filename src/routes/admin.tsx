@@ -50,6 +50,7 @@ function AdminDashboard() {
   const [usersList, setUsersList] = useState<any[]>([]);
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
   const [stocks, setStocks] = useState<Record<string, StockData>>({});
+  const [originalStocks, setOriginalStocks] = useState<Record<string, StockData>>({});
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [newPromo, setNewPromo] = useState({ code: "", discount: 10, max_uses: 100 });
@@ -76,6 +77,7 @@ function AdminDashboard() {
       const map: Record<string, StockData> = {};
       stocksData.forEach(s => map[s.product_id] = { product_id: s.product_id, is_unlimited: s.is_unlimited, stock: s.stock });
       setStocks(map);
+      setOriginalStocks(map);
     }
 
     // Charger Produits Admin (tous, même inactifs)
@@ -329,7 +331,10 @@ function AdminDashboard() {
   };
 
   const saveStock = async (productId: string, newStock: number, isUnlimited: boolean) => {
-    const previous = stocks[productId];
+    // Compare contre l'instantane charge au demarrage (originalStocks), jamais contre
+    // `stocks` qui est deja mute en direct par les onChange du formulaire avant meme
+    // le clic sur Enregistrer -- sinon on compare toujours la nouvelle valeur a elle-meme.
+    const previous = originalStocks[productId];
     const wasAvailable = previous ? previous.is_unlimited || previous.stock > 0 : true;
     const isAvailable = isUnlimited || newStock > 0;
 
@@ -340,7 +345,9 @@ function AdminDashboard() {
     }, { onConflict: "product_id" });
 
     if (!error) {
-      setStocks(prev => ({ ...prev, [productId]: { product_id: productId, stock: newStock, is_unlimited: isUnlimited } }));
+      const updated = { product_id: productId, stock: newStock, is_unlimited: isUnlimited };
+      setStocks(prev => ({ ...prev, [productId]: updated }));
+      setOriginalStocks(prev => ({ ...prev, [productId]: updated }));
       toast.success("Stock mis à jour pour " + productId);
       if (wasAvailable !== isAvailable) {
         const product = allProducts.find(p => p.id === productId);

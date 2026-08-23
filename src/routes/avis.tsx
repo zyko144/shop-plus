@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Star, MessageSquare } from "lucide-react";
+import { Star, MessageSquare, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAllProducts, Product } from "@/lib/products";
 import { Header } from "@/components/Header";
 import { CartDrawer } from "@/components/CartDrawer";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/avis")({
   component: AvisPage,
@@ -18,6 +20,7 @@ type Review = {
   rating: number;
   comment: string;
   created_at: string;
+  screenshot_url: string | null;
   profiles: { username: string } | null;
 };
 
@@ -32,6 +35,8 @@ function StarsRow({ value }: { value: number }) {
 }
 
 function AvisPage() {
+  const { profile } = useAuth();
+  const isAdmin = profile?.role === "admin";
   const [reviews, setReviews] = useState<Review[]>([]);
   const [products, setProducts] = useState<Record<string, Product>>({});
   const [loading, setLoading] = useState(true);
@@ -47,6 +52,17 @@ function AvisPage() {
       setLoading(false);
     })();
   }, []);
+
+  const deleteReview = async (id: string) => {
+    if (!window.confirm("Supprimer cet avis définitivement ?")) return;
+    const { error } = await supabase.from("reviews").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur : " + error.message);
+    } else {
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+      toast.success("Avis supprimé");
+    }
+  };
 
   const avg = reviews.length ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : "0.0";
 
@@ -85,9 +101,23 @@ function AvisPage() {
                   <div key={r.id} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <div className="font-bold text-sm">{r.profiles?.username || "Client Vercell"}</div>
-                      <StarsRow value={r.rating} />
+                      <div className="flex items-center gap-2">
+                        <StarsRow value={r.rating} />
+                        {isAdmin && (
+                          <button
+                            onClick={() => deleteReview(r.id)}
+                            className="p-1 rounded-lg text-white/30 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                            title="Supprimer cet avis"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     {r.comment && <p className="text-sm text-white/70 flex-1">« {r.comment} »</p>}
+                    {r.screenshot_url && (
+                      <img src={r.screenshot_url} alt="Preuve" className="rounded-xl border border-white/10 max-h-48 object-cover" />
+                    )}
                     <div className="flex items-center justify-between text-[11px] text-white/35 pt-2 border-t border-white/5">
                       <span>{product?.name || "Produit Vercell"}</span>
                       <span>{new Date(r.created_at).toLocaleDateString("fr-FR")}</span>
