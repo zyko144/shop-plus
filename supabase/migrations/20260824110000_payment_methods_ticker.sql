@@ -3,6 +3,13 @@
 -- part et pas stocke dans cette table).
 alter table public.payment_methods add column if not exists ticker text;
 
+-- Nettoie les doublons de nom laisses par les tentatives d'insertion
+-- precedentes (avant l'ajout du "on conflict" ci-dessous), sinon l'index
+-- unique ne peut pas se creer.
+delete from public.payment_methods a
+using public.payment_methods b
+where a.name = b.name and a.id < b.id;
+
 create unique index if not exists payment_methods_name_key on public.payment_methods (name);
 
 insert into public.payment_methods (name, details, icon, ticker) values
