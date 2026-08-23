@@ -438,13 +438,13 @@ function AdminDashboard() {
     }
   };
 
-  const createPaymentMethod = async (name: string, details: string) => {
-    const { error } = await supabase.from("payment_methods").insert({ name, details: details || null });
+  const createPaymentMethod = async (name: string, details: string, icon: string) => {
+    const { error } = await supabase.from("payment_methods").insert({ name, details: details || null, icon: icon || null });
     if (error) {
       toast.error("Erreur moyen de paiement: " + error.message);
     } else {
       toast.success("Moyen de paiement ajouté !");
-      notifyDiscordStoreEvent({ data: { type: "payment_method_added", name, details: details || undefined } })
+      notifyDiscordStoreEvent({ data: { type: "payment_method_added", name, details: details || undefined, icon: icon || undefined } })
         .catch((e) => console.error("Annonce Discord (paiement) échouée:", e));
       loadData();
     }

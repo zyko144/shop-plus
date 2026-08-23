@@ -24,11 +24,12 @@ export function SettingsTab({
   onCreatePromo: () => void;
   onDeletePromo: (code: string) => void;
   paymentMethods: PaymentMethod[];
-  onCreatePaymentMethod: (name: string, details: string) => void;
+  onCreatePaymentMethod: (name: string, details: string, icon: string) => void;
   onDeletePaymentMethod: (id: string) => void;
 }) {
   const [newMethodName, setNewMethodName] = useState("");
   const [newMethodDetails, setNewMethodDetails] = useState("");
+  const [newMethodIcon, setNewMethodIcon] = useState("");
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       {/* Paramètres globaux */}
@@ -181,12 +182,23 @@ export function SettingsTab({
               className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-gray-500 outline-none"
             />
           </div>
+          <div className="w-40 shrink-0">
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Icône (slug Simple Icons)</label>
+            <input
+              type="text"
+              value={newMethodIcon}
+              onChange={e => setNewMethodIcon(e.target.value)}
+              placeholder="ex: litecoin"
+              className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-gray-500 outline-none"
+            />
+          </div>
           <button
             onClick={() => {
               if (!newMethodName.trim()) return;
-              onCreatePaymentMethod(newMethodName.trim(), newMethodDetails.trim());
+              onCreatePaymentMethod(newMethodName.trim(), newMethodDetails.trim(), newMethodIcon.trim());
               setNewMethodName("");
               setNewMethodDetails("");
+              setNewMethodIcon("");
             }}
             className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-bold text-sm h-[38px] transition"
           >
@@ -199,13 +211,18 @@ export function SettingsTab({
             <p className="text-sm text-muted-foreground text-center py-4">Aucun moyen de paiement enregistré.</p>
           ) : paymentMethods.map(method => (
             <div key={method.id} className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/10">
-              <div>
-                <div className="font-bold text-lg text-primary">{method.name}</div>
-                {method.details && <div className="text-xs text-muted-foreground mt-1">{method.details}</div>}
+              <div className="flex items-center gap-3">
+                {method.icon && (
+                  <img src={`https://cdn.simpleicons.org/${method.icon}/ffffff`} alt="" className="w-6 h-6 object-contain shrink-0" />
+                )}
+                <div>
+                  <div className="font-bold text-lg text-primary">{method.name}</div>
+                  {method.details && <div className="text-xs text-muted-foreground mt-1 break-all">{method.details}</div>}
+                </div>
               </div>
               <button
                 onClick={() => onDeletePaymentMethod(method.id)}
-                className="p-2 bg-gray-500/20 text-gray-500 hover:bg-gray-500/40 rounded-lg transition"
+                className="p-2 bg-gray-500/20 text-gray-500 hover:bg-gray-500/40 rounded-lg transition shrink-0"
                 title="Supprimer"
               >
                 <Trash2 size={16} />

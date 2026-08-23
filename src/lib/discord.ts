@@ -250,13 +250,15 @@ type StoreEventInput =
   | { type: "promo_created"; code: string; discount: number; maxUses: number }
   | { type: "maintenance_on" }
   | { type: "maintenance_off" }
-  | { type: "payment_method_added"; name: string; details?: string };
+  | { type: "payment_method_added"; name: string; details?: string; icon?: string };
 
 function buildStoreEventEmbed(data: StoreEventInput) {
+  const iconUrl = data.type === "payment_method_added" ? resolveLogoUrl(data.icon) : undefined;
   const base = {
     color: 0xffffff,
     footer: { text: "Vercell — annonce automatique · shop-plus-nu.vercel.app" },
     timestamp: new Date().toISOString(),
+    ...(iconUrl ? { thumbnail: { url: iconUrl } } : {}),
   };
   switch (data.type) {
     case "promo_created":
