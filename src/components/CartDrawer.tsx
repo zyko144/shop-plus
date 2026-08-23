@@ -102,12 +102,14 @@ export function CartDrawer() {
       );
       if (itemsErr) throw itemsErr;
 
-      // Envoi de l'email au client
+      // Envoi de l'email + notif Discord. On attend qu'ils soient partis (sans
+      // bloquer si l'un échoue) car window.location.href juste après annule
+      // toute requête encore en vol au moment de la navigation.
       if (user.email) {
-        sendOrderEmail({ data: { email: user.email, items, total: finalTotal } })
-          .catch(e => console.error("Email send error:", e));
-        notifyDiscordOrder({ data: { email: user.email, items, total: finalTotal } })
-          .catch(e => console.error("Discord notify error:", e));
+        await Promise.allSettled([
+          sendOrderEmail({ data: { email: user.email, items, total: finalTotal } }),
+          notifyDiscordOrder({ data: { email: user.email, items, total: finalTotal } }),
+        ]);
       }
 
       if (promoApplied) {
