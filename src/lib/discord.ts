@@ -9,6 +9,7 @@ type OrderNotificationInput = {
   email: string;
   items: { name: string; quantity: number; price: number; subtitle?: string }[];
   total: number;
+  paymentMethod?: string; // ex: "PayPal" ou "Litecoin (LTC) — 0.1112 LTC"
 };
 
 async function postWebhook(url: string | undefined, payload: unknown, label: string) {
@@ -69,6 +70,7 @@ export const notifyDiscordOrder = createServerFn({ method: "POST" })
       fields: [
         { name: "Client", value: data.email, inline: true },
         { name: "Total", value: `${data.total.toFixed(2)}€`, inline: true },
+        { name: "Paiement", value: data.paymentMethod || "PayPal", inline: true },
         { name: "Produits", value: lines.join("\n").slice(0, 1024) || "—" },
       ],
       timestamp: new Date().toISOString(),

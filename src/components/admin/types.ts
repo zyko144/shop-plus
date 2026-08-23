@@ -28,6 +28,7 @@ export type PaymentMethod = {
   name: string;
   details: string | null;
   icon: string | null;
+  ticker: string | null;
   is_active: boolean;
   created_at: string;
 };
