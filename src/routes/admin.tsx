@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { getAllProducts, Product } from "@/lib/products";
+import { notifyDiscordAnnouncement } from "@/lib/discord";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { AdminSupport } from "@/components/AdminSupport";
 import { AdminLayout, type AdminTab } from "@/components/admin/AdminLayout";
@@ -219,15 +220,36 @@ function AdminDashboard() {
 
   const saveProduct = async (productData: Partial<Product>) => {
     try {
-      const isNew = !allProducts.find(p => p.id === productData.id);
+      const previous = allProducts.find(p => p.id === productData.id);
+      const isNew = !previous;
       if (isNew) {
         const { error } = await supabase.from("products").insert(productData);
         if (error) throw error;
         toast.success("Produit ajouté avec succès");
+        notifyDiscordAnnouncement({
+          data: {
+            type: "new_product",
+            name: productData.name || "Nouveau produit",
+            price: Number(productData.price) || 0,
+            category: productData.category || "—",
+            logo: productData.logo,
+          },
+        }).catch(() => {});
       } else {
         const { error } = await supabase.from("products").update(productData).eq("id", productData.id);
         if (error) throw error;
         toast.success("Produit mis à jour");
+        if (typeof productData.price === "number" && productData.price !== previous.price) {
+          notifyDiscordAnnouncement({
+            data: {
+              type: "price_change",
+              name: productData.name || previous.name,
+              oldPrice: previous.price,
+              newPrice: productData.price,
+              logo: productData.logo ?? previous.logo,
+            },
+          }).catch(() => {});
+        }
       }
       setEditingProduct(null);
       loadData(); // refresh products
@@ -238,12 +260,16 @@ function AdminDashboard() {
 
   const deleteProduct = async (id: string) => {
     if (!window.confirm("Supprimer ce produit définitivement ?")) return;
+    const product = allProducts.find(p => p.id === id);
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) {
       toast.error("Erreur: " + error.message);
     } else {
       toast.success("Produit supprimé");
       setAllProducts(prev => prev.filter(p => p.id !== id));
+      if (product) {
+        notifyDiscordAnnouncement({ data: { type: "product_removed", name: product.name, logo: product.logo } }).catch(() => {});
+      }
     }
   };
 
@@ -303,6 +329,10 @@ function AdminDashboard() {
   };
 
   const saveStock = async (productId: string, newStock: number, isUnlimited: boolean) => {
+    const previous = stocks[productId];
+    const wasAvailable = previous ? previous.is_unlimited || previous.stock > 0 : true;
+    const isAvailable = isUnlimited || newStock > 0;
+
     const { error } = await supabase.from("product_stock").upsert({
       product_id: productId,
       stock: newStock,
@@ -312,6 +342,12 @@ function AdminDashboard() {
     if (!error) {
       setStocks(prev => ({ ...prev, [productId]: { product_id: productId, stock: newStock, is_unlimited: isUnlimited } }));
       toast.success("Stock mis à jour pour " + productId);
+      if (wasAvailable !== isAvailable) {
+        const product = allProducts.find(p => p.id === productId);
+        notifyDiscordAnnouncement({
+          data: { type: isAvailable ? "back_in_stock" : "out_of_stock", name: product?.name || productId, logo: product?.logo },
+        }).catch(() => {});
+      }
     } else {
       toast.error("Erreur: " + error.message);
     }

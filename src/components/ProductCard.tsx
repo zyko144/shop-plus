@@ -229,6 +229,7 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
           productId={product.id}
           productName={product.name}
           color={product.color}
+          logo={product.logo}
           onClose={() => setShowReviews(false)}
         />
       )}

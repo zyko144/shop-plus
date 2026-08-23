@@ -4,8 +4,9 @@ import { Star, MessageSquare, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { notifyDiscordReview } from "@/lib/discord";
 
-export function ProductReviewsModal({ productId, productName, color, onClose }: { productId: string, productName: string, color: string, onClose: () => void }) {
+export function ProductReviewsModal({ productId, productName, color, logo, onClose }: { productId: string, productName: string, color: string, logo?: string | null, onClose: () => void }) {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,6 +61,9 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
       toast.error(error.message);
     } else {
       toast.success("Votre avis a été publié !");
+      notifyDiscordReview({
+        data: { username: displayName.trim(), productName, rating: newRating, comment: newComment.trim(), productLogo: logo },
+      }).catch(() => {});
       setNewComment("");
       fetchReviews();
     }

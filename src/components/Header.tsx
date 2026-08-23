@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingCart, User, LogOut, Shield, MessageSquare } from "lucide-react";
+import { ShoppingCart, User, LogOut, Shield, MessageSquare, Star } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useState, useEffect } from "react";
@@ -52,6 +52,9 @@ export function Header() {
         <div className="hidden md:flex flex-1 items-center justify-center gap-4 text-sm">
           <Link to="/premium" className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-gray-500/10 hover:text-gray-400 hover:border-gray-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md">
             👑 Premium
+          </Link>
+          <Link to="/avis" className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-gray-500/10 hover:text-gray-400 hover:border-gray-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md">
+            <Star size={16} /> Avis
           </Link>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("open-support-chat"))}
