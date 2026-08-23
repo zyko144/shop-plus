@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { getAllProducts, Product, CATEGORY_IMAGES, SITE_LOGO_URL, resolveProductLogoUrl } from "@/lib/products";
-import { notifyDiscordAnnouncement } from "@/lib/discord";
+import { notifyDiscordAnnouncement, notifyDiscordStoreEvent } from "@/lib/discord";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { AdminSupport } from "@/components/AdminSupport";
 import { AdminLayout, type AdminTab } from "@/components/admin/AdminLayout";
@@ -13,7 +13,7 @@ import { StocksTab } from "@/components/admin/StocksTab";
 import { ProductsTab } from "@/components/admin/ProductsTab";
 import { UsersTab } from "@/components/admin/UsersTab";
 import { SettingsTab } from "@/components/admin/SettingsTab";
-import type { AdminOrderRow, PromoCode, StockData } from "@/components/admin/types";
+import type { AdminOrderRow, PromoCode, StockData, PaymentMethod } from "@/components/admin/types";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -65,8 +65,10 @@ function AdminDashboard() {
   const [stocks, setStocks] = useState<Record<string, StockData>>({});
   const [originalStocks, setOriginalStocks] = useState<Record<string, StockData>>({});
   const [storeSettings, setStoreSettings] = useState<Record<string, string>>({});
+  const [originalSettings, setOriginalSettings] = useState<Record<string, string>>({});
   const [promos, setPromos] = useState<PromoCode[]>([]);
   const [newPromo, setNewPromo] = useState({ code: "", discount: 10, max_uses: 100 });
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
@@ -80,9 +82,13 @@ function AdminDashboard() {
       const map: Record<string, string> = {};
       storeData.forEach(s => map[s.key] = s.value);
       setStoreSettings(map);
+      setOriginalSettings(map);
     }
     const { data: promoData } = await supabase.from("promo_codes").select("*").order("created_at", { ascending: false });
     if (promoData) setPromos(promoData);
+
+    const { data: paymentMethodsData } = await supabase.from("payment_methods").select("*").order("created_at", { ascending: false });
+    if (paymentMethodsData) setPaymentMethods(paymentMethodsData);
 
     // Charger Stocks
     const { data: stocksData } = await supabase.from("product_stock").select("*");
@@ -393,12 +399,23 @@ function AdminDashboard() {
   };
 
   const saveSettings = async () => {
+    // Compare contre originalSettings (fige au chargement), jamais contre
+    // storeSettings deja mute en direct par les champs du formulaire -- meme
+    // piege que pour le stock : sinon on compare toujours la nouvelle valeur a elle-meme.
+    const maintenanceChanged = originalSettings.maintenance_mode !== storeSettings.maintenance_mode;
+    const enteringMaintenance = storeSettings.maintenance_mode === "true";
+
     const entries = Object.entries(storeSettings).map(([key, value]) => ({ key, value }));
     const { error } = await supabase.from("store_settings").upsert(entries);
     if (error) {
       toast.error("Erreur de sauvegarde: " + error.message);
     } else {
       toast.success("Paramètres enregistrés avec succès !");
+      setOriginalSettings(storeSettings);
+      if (maintenanceChanged) {
+        notifyDiscordStoreEvent({ data: { type: enteringMaintenance ? "maintenance_on" : "maintenance_off" } })
+          .catch((e) => console.error("Annonce Discord (maintenance) échouée:", e));
+      }
     }
   };
 
@@ -413,8 +430,33 @@ function AdminDashboard() {
       toast.error("Erreur promo: " + error.message);
     } else {
       toast.success("Code promo créé !");
+      notifyDiscordStoreEvent({
+        data: { type: "promo_created", code: newPromo.code.trim().toUpperCase(), discount: newPromo.discount, maxUses: newPromo.max_uses },
+      }).catch((e) => console.error("Annonce Discord (promo) échouée:", e));
       setNewPromo({ code: "", discount: 10, max_uses: 100 });
       loadData();
+    }
+  };
+
+  const createPaymentMethod = async (name: string, details: string) => {
+    const { error } = await supabase.from("payment_methods").insert({ name, details: details || null });
+    if (error) {
+      toast.error("Erreur moyen de paiement: " + error.message);
+    } else {
+      toast.success("Moyen de paiement ajouté !");
+      notifyDiscordStoreEvent({ data: { type: "payment_method_added", name, details: details || undefined } })
+        .catch((e) => console.error("Annonce Discord (paiement) échouée:", e));
+      loadData();
+    }
+  };
+
+  const deletePaymentMethod = async (id: string) => {
+    const { error } = await supabase.from("payment_methods").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur: " + error.message);
+    } else {
+      toast.success("Moyen de paiement supprimé");
+      setPaymentMethods(prev => prev.filter(m => m.id !== id));
     }
   };
 
@@ -478,6 +520,9 @@ function AdminDashboard() {
           onNewPromoChange={(patch) => setNewPromo(prev => ({ ...prev, ...patch }))}
           onCreatePromo={createPromo}
           onDeletePromo={deletePromo}
+          paymentMethods={paymentMethods}
+          onCreatePaymentMethod={createPaymentMethod}
+          onDeletePaymentMethod={deletePaymentMethod}
         />
       )}
     </AdminLayout>

@@ -22,3 +22,12 @@ export type StockData = {
   stock: number;
   is_unlimited: boolean;
 };
+
+export type PaymentMethod = {
+  id: string;
+  name: string;
+  details: string | null;
+  icon: string | null;
+  is_active: boolean;
+  created_at: string;
+};

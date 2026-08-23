@@ -1,5 +1,6 @@
-import { Save, Trash2 } from "lucide-react";
-import type { PromoCode } from "./types";
+import { useState } from "react";
+import { Save, Trash2, CreditCard } from "lucide-react";
+import type { PromoCode, PaymentMethod } from "./types";
 
 export function SettingsTab({
   storeSettings,
@@ -10,6 +11,9 @@ export function SettingsTab({
   onNewPromoChange,
   onCreatePromo,
   onDeletePromo,
+  paymentMethods,
+  onCreatePaymentMethod,
+  onDeletePaymentMethod,
 }: {
   storeSettings: Record<string, string>;
   onSettingsChange: (patch: Record<string, string>) => void;
@@ -19,7 +23,12 @@ export function SettingsTab({
   onNewPromoChange: (patch: Partial<{ code: string; discount: number; max_uses: number }>) => void;
   onCreatePromo: () => void;
   onDeletePromo: (code: string) => void;
+  paymentMethods: PaymentMethod[];
+  onCreatePaymentMethod: (name: string, details: string) => void;
+  onDeletePaymentMethod: (id: string) => void;
 }) {
+  const [newMethodName, setNewMethodName] = useState("");
+  const [newMethodDetails, setNewMethodDetails] = useState("");
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       {/* Paramètres globaux */}
@@ -145,6 +154,68 @@ export function SettingsTab({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Moyens de paiement */}
+      <div className="glass rounded-2xl p-8 border border-border/50 lg:col-span-2">
+        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><CreditCard size={22} /> Moyens de Paiement</h2>
+
+        <div className="flex flex-wrap items-end gap-4 mb-8 bg-black/30 p-4 rounded-xl border border-white/5">
+          <div className="flex-1 min-w-[160px]">
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Nom</label>
+            <input
+              type="text"
+              value={newMethodName}
+              onChange={e => setNewMethodName(e.target.value)}
+              placeholder="ex: PayPal, Bitcoin..."
+              className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-gray-500 outline-none"
+            />
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs font-medium text-muted-foreground mb-1">Détails (lien, adresse...)</label>
+            <input
+              type="text"
+              value={newMethodDetails}
+              onChange={e => setNewMethodDetails(e.target.value)}
+              placeholder="ex: paypal.me/steamapp"
+              className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-gray-500 outline-none"
+            />
+          </div>
+          <button
+            onClick={() => {
+              if (!newMethodName.trim()) return;
+              onCreatePaymentMethod(newMethodName.trim(), newMethodDetails.trim());
+              setNewMethodName("");
+              setNewMethodDetails("");
+            }}
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-bold text-sm h-[38px] transition"
+          >
+            Ajouter
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {paymentMethods.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">Aucun moyen de paiement enregistré.</p>
+          ) : paymentMethods.map(method => (
+            <div key={method.id} className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/10">
+              <div>
+                <div className="font-bold text-lg text-primary">{method.name}</div>
+                {method.details && <div className="text-xs text-muted-foreground mt-1">{method.details}</div>}
+              </div>
+              <button
+                onClick={() => onDeletePaymentMethod(method.id)}
+                className="p-2 bg-gray-500/20 text-gray-500 hover:bg-gray-500/40 rounded-lg transition"
+                title="Supprimer"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-white/30 mt-4">
+          ⚠️ Ceci gère la liste affichée des moyens acceptés — le paiement effectif au checkout reste PayPal uniquement pour l'instant.
+        </p>
       </div>
     </div>
   );

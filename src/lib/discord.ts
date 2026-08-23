@@ -242,3 +242,46 @@ export const notifyDiscordAnnouncement = createServerFn({ method: "POST" })
       return postWebhook(annoncesWebhookUrl, { embeds: [buildAnnouncementEmbed(data)] }, "annonces");
     }
   });
+
+/** Annonces boutique qui ne concernent pas un produit precis (pas de carte
+ * PNG ici, ca n'aurait pas de logo/image a montrer) : promo, maintenance,
+ * moyens de paiement. */
+type StoreEventInput =
+  | { type: "promo_created"; code: string; discount: number; maxUses: number }
+  | { type: "maintenance_on" }
+  | { type: "maintenance_off" }
+  | { type: "payment_method_added"; name: string; details?: string };
+
+function buildStoreEventEmbed(data: StoreEventInput) {
+  const base = {
+    color: 0xffffff,
+    footer: { text: "Vercell — annonce automatique · shop-plus-nu.vercel.app" },
+    timestamp: new Date().toISOString(),
+  };
+  switch (data.type) {
+    case "promo_created":
+      return {
+        ...base,
+        title: "🎟️ Nouveau code promo !",
+        description: `Utilise le code **${data.code}** pour **-${data.discount}%** sur ta commande !`,
+        fields: [{ name: "Utilisations max", value: `${data.maxUses}`, inline: true }, SHOP_LINK_FIELD],
+      };
+    case "maintenance_on":
+      return { ...base, title: "🛠️ Boutique en maintenance", description: "Le site est temporairement fermé pour maintenance. On revient vite !" };
+    case "maintenance_off":
+      return { ...base, title: "✅ Boutique de nouveau ouverte !", description: "La maintenance est terminée, la boutique est de nouveau accessible.", fields: [SHOP_LINK_FIELD] };
+    case "payment_method_added":
+      return {
+        ...base,
+        title: "💳 Nouveau moyen de paiement disponible !",
+        description: `**${data.name}** est maintenant accepté sur la boutique.`,
+        fields: [...(data.details ? [{ name: "Détails", value: data.details }] : []), SHOP_LINK_FIELD],
+      };
+  }
+}
+
+export const notifyDiscordStoreEvent = createServerFn({ method: "POST" })
+  .validator((data: StoreEventInput) => data)
+  .handler(async ({ data }) => {
+    return postWebhook(annoncesWebhookUrl, { embeds: [buildStoreEventEmbed(data)] }, "annonces");
+  });
