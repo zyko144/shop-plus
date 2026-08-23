@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PAYPAL_URL } from "@/lib/products";
 import { toast } from "sonner";
 import { sendOrderEmail } from "@/lib/email";
+import { notifyDiscordOrder } from "@/lib/discord";
 
 export function CartDrawer() {
   const { items, open, setOpen, setQty, remove, total, clear } = useCart();
@@ -85,7 +86,7 @@ export function CartDrawer() {
     try {
       const { data: order, error } = await supabase
         .from("orders")
-        .insert({ user_id: user.id, total: finalTotal, status: "pending", payment_ref: "paypal:zyko921" })
+        .insert({ user_id: user.id, total: finalTotal, status: "pending", payment_ref: "paypal:steamapp" })
         .select()
         .single();
       if (error) throw error;
@@ -105,6 +106,8 @@ export function CartDrawer() {
       if (user.email) {
         sendOrderEmail({ data: { email: user.email, items, total: finalTotal } })
           .catch(e => console.error("Email send error:", e));
+        notifyDiscordOrder({ data: { email: user.email, items, total: finalTotal } })
+          .catch(e => console.error("Discord notify error:", e));
       }
 
       if (promoApplied) {
