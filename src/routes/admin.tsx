@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { getAllProducts, Product, CATEGORY_IMAGES } from "@/lib/products";
+import { getAllProducts, Product, CATEGORY_IMAGES, resolveProductLogoUrl } from "@/lib/products";
 import { notifyDiscordAnnouncement } from "@/lib/discord";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { AdminSupport } from "@/components/AdminSupport";
@@ -21,10 +21,16 @@ export const Route = createFileRoute("/admin")({
   component: AdminDashboardErrorBoundary,
 });
 
-// Image la plus parlante possible pour une annonce Discord : l'image propre au
-// produit si l'admin en a mis une, sinon l'illustration de sa categorie.
+// Image la plus parlante possible pour une annonce Discord : le logo/visuel
+// propre AU PRODUIT (meme resolution que la card du site, forcee en blanc
+// pour coller au theme du bot) plutot que la photo generique de categorie,
+// qui ne sert que de tout dernier recours si le produit n'a vraiment rien.
 function resolveProductImage(product?: Partial<Product> | null): string | undefined {
   if (!product) return undefined;
+  const specific = product.name && product.category && product.color
+    ? resolveProductLogoUrl({ name: product.name, category: product.category, color: product.color, logo: product.logo }, "ffffff")
+    : undefined;
+  if (specific) return specific.startsWith("/") ? `https://shop-plus-nu.vercel.app${specific}` : specific;
   return product.image || (product.category ? CATEGORY_IMAGES[product.category] : undefined);
 }
 

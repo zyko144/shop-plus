@@ -38,6 +38,32 @@ export type Product = {
   is_active?: boolean;
 };
 
+export const RARE_SKIN_IMAGES: Record<string, string> = {
+  "Black Knight": "https://fortnite-api.com/images/cosmetics/br/cid_035_athena_commando_m_medieval/icon.png",
+  "Galaxy": "https://fortnite-api.com/images/cosmetics/br/cid_175_athena_commando_m_celestial/icon.png",
+  "Travis Scott": "https://fortnite-api.com/images/cosmetics/br/cid_703_athena_commando_m_cyclone/icon.png",
+  "The Reaper": "https://fortnite-api.com/images/cosmetics/br/cid_084_athena_commando_m_assassin/icon.png",
+  "Take The L": "https://fortnite-api.com/images/cosmetics/br/eid_takethel/icon.png",
+  "Minty Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_294_candycane/icon.png",
+  "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_508_historianmale_6bqsw/icon.png",
+};
+
+/** Image/logo specifique a un produit (pas la photo generique de categorie) :
+ * skin Fortnite Rare > logo produit (URL directe, chemin site, ou slug Simple
+ * Icons) > override par categorie (Fortnite/V-Bucks/Discord ont toujours la
+ * meme icone). `colorHex` (sans #) surcharge la couleur du produit -- utile
+ * pour forcer du blanc sur les embeds Discord sans toucher au theme du site. */
+export function resolveProductLogoUrl(product: Pick<Product, "name" | "category" | "color" | "logo">, colorHex?: string): string | undefined {
+  const color = colorHex ?? product.color.replace("#", "");
+  if (product.category === "Fortnite Rare" && RARE_SKIN_IMAGES[product.name]) return RARE_SKIN_IMAGES[product.name];
+  if (product.category === "Fortnite") return `https://cdn.simpleicons.org/fortnite/${color}`;
+  if (product.category === "V-Bucks") return `https://cdn.simpleicons.org/epicgames/${color}`;
+  if (product.category === "Discord") return `https://cdn.simpleicons.org/discord/${color}`;
+  if (!product.logo) return undefined;
+  if (product.logo.startsWith("http") || product.logo.startsWith("/")) return product.logo;
+  return `https://cdn.simpleicons.org/${product.logo}/${color}`;
+}
+
 export type SteamCategory = {
   name: string;
   color: string;

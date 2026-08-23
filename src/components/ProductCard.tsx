@@ -1,26 +1,12 @@
 import { useRef, useState } from "react";
 import { Plus, Check, X } from "lucide-react";
 import type { Product } from "@/lib/products";
-import { CATEGORY_IMAGES } from "@/lib/products";
+import { CATEGORY_IMAGES, resolveProductLogoUrl } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import { ProductReviewsModal } from "./ProductReviews";
-
-function hex(c: string) {
-  return c.replace("#", "");
-}
-
-const RARE_SKIN_IMAGES: Record<string, string> = {
-  "Black Knight": "https://fortnite-api.com/images/cosmetics/br/cid_035_athena_commando_m_medieval/icon.png",
-  "Galaxy": "https://fortnite-api.com/images/cosmetics/br/cid_175_athena_commando_m_celestial/icon.png",
-  "Travis Scott": "https://fortnite-api.com/images/cosmetics/br/cid_703_athena_commando_m_cyclone/icon.png",
-  "The Reaper": "https://fortnite-api.com/images/cosmetics/br/cid_084_athena_commando_m_assassin/icon.png",
-  "Take The L": "https://fortnite-api.com/images/cosmetics/br/eid_takethel/icon.png",
-  "Minty Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_294_candycane/icon.png",
-  "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_508_historianmale_6bqsw/icon.png"
-};
 
 export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
   const { add } = useCart();
@@ -37,27 +23,15 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
   const isDiscord = product.category?.toLowerCase().includes("discord") || product.name.toLowerCase().includes("discord");
   const displayPrice = hasPremiumDiscount && !isDiscord ? product.price * 0.7 : product.price;
 
-  const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
-
-  let logoUrl = skinImg || (product.logo
-    ? product.logo.startsWith("http") || product.logo.startsWith("/")
-      ? product.logo
-      : `https://cdn.simpleicons.org/${product.logo}/${hex(product.color)}`
-    : null);
+  const logoUrl = resolveProductLogoUrl(product) ?? null;
 
   let displayEmoji = product.emoji;
   let finalBgImg = bgImg;
 
-  if (product.category === "Fortnite") {
-    logoUrl = `https://cdn.simpleicons.org/fortnite/${hex(product.color)}`;
-    displayEmoji = undefined;
-  }
-  if (product.category === "V-Bucks") {
-    logoUrl = `https://cdn.simpleicons.org/epicgames/${hex(product.color)}`;
+  if (["Fortnite", "V-Bucks"].includes(product.category)) {
     displayEmoji = undefined;
   }
   if (product.category === "Discord") {
-    logoUrl = `https://cdn.simpleicons.org/discord/${hex(product.color)}`;
     displayEmoji = undefined;
     finalBgImg = undefined; // Hide the abstract background that has the star
   }
@@ -145,7 +119,7 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
               src={logoUrl}
               alt={product.name}
               loading="lazy"
-              className={`${skinImg ? 'max-h-48 max-w-[90%]' : 'max-h-28 max-w-[75%]'} object-contain transition-transform duration-500 group-hover:scale-110`}
+              className={`${product.category === "Fortnite Rare" ? 'max-h-48 max-w-[90%]' : 'max-h-28 max-w-[75%]'} object-contain transition-transform duration-500 group-hover:scale-110`}
               style={{ filter: `drop-shadow(0 0 24px ${product.color}cc)` }}
               onError={() => setImgError(true)}
             />
