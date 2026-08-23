@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { getAllProducts, Product, CATEGORY_IMAGES, resolveProductLogoUrl } from "@/lib/products";
+import { getAllProducts, Product, CATEGORY_IMAGES, SITE_LOGO_URL, resolveProductLogoUrl } from "@/lib/products";
 import { notifyDiscordAnnouncement } from "@/lib/discord";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { AdminSupport } from "@/components/AdminSupport";
@@ -31,7 +31,7 @@ function resolveProductImage(product?: Partial<Product> | null): string | undefi
     ? resolveProductLogoUrl({ name: product.name, category: product.category, color: product.color, logo: product.logo }, "ffffff")
     : undefined;
   if (specific) return specific.startsWith("/") ? `https://shop-plus-nu.vercel.app${specific}` : specific;
-  return product.image || (product.category ? CATEGORY_IMAGES[product.category] : undefined);
+  return product.image || (product.category ? CATEGORY_IMAGES[product.category] : undefined) || SITE_LOGO_URL;
 }
 
 import React from "react";
@@ -286,7 +286,14 @@ function AdminDashboard() {
       setAllProducts(prev => prev.filter(p => p.id !== id));
       if (product) {
         notifyDiscordAnnouncement({
-          data: { type: "product_removed", name: product.name, logo: product.logo, imageUrl: resolveProductImage(product) },
+          data: {
+            type: "product_removed",
+            name: product.name,
+            category: product.category,
+            price: product.price,
+            logo: product.logo,
+            imageUrl: resolveProductImage(product),
+          },
         }).catch((e) => console.error("Annonce Discord (suppression) échouée:", e));
       }
     }
@@ -372,6 +379,9 @@ function AdminDashboard() {
           data: {
             type: isAvailable ? "back_in_stock" : "out_of_stock",
             name: product?.name || productId,
+            category: product?.category,
+            price: product?.price,
+            stock: isUnlimited ? "Illimité ♾️" : `${newStock} en stock`,
             logo: product?.logo,
             imageUrl: resolveProductImage(product),
           },

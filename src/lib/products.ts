@@ -10,6 +10,9 @@ import discordImg from "@/assets/cat-discord.jpg";
 import robuxImg from "@/assets/cat-robux.png";
 import valorantImg from "@/assets/cat-valorant.png";
 import epicGamesImg from "@/assets/cat-epicgames.png";
+import siteLogoImg from "@/assets/logo.png";
+
+export const SITE_LOGO_URL = siteLogoImg;
 
 export const CATEGORY_IMAGES: Record<string, string> = {
   Streaming: streamingImg,

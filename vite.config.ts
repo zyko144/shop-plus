@@ -17,6 +17,12 @@ export default defineConfig({
     server: {
       port: 5175,
       strictPort: true,
-    }
+    },
+    ssr: {
+      // Binaire natif (rendu des cartes d'annonce) : ne doit jamais etre
+      // bundle par Rollup/Rolldown, uniquement resolu via require() a
+      // l'execution comme un module Node normal.
+      external: ["@napi-rs/canvas"],
+    },
   }
 });
