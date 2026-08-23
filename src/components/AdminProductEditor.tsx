@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Product } from "@/lib/products";
-import { ProductCard3D } from "./ProductCard3D";
+import { ProductCard } from "./ProductCard";
 import { Save, X } from "lucide-react";
 
 type AdminProductEditorProps = {
@@ -191,7 +191,7 @@ export function AdminProductEditor({ initialProduct, onSave, onCancel }: AdminPr
             Aperçu en Direct
           </div>
           <div className="w-full max-w-[320px] pointer-events-none mt-6">
-            <ProductCard3D product={product as Product} />
+            <ProductCard product={product as Product} />
           </div>
         </div>
 

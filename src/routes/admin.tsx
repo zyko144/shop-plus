@@ -1,17 +1,22 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { Header } from "@/components/Header";
-import { Package, DollarSign, Clock, CheckCircle, XCircle, Trash2, Layers, Save, Settings, ShoppingCart, BarChart3, Plus, Edit, LogOut, MessageSquare } from "lucide-react";
 import { getAllProducts, Product } from "@/lib/products";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { AdminSupport } from "@/components/AdminSupport";
+import { AdminLayout, type AdminTab } from "@/components/admin/AdminLayout";
+import { OverviewTab } from "@/components/admin/OverviewTab";
+import { OrdersTab } from "@/components/admin/OrdersTab";
+import { StocksTab } from "@/components/admin/StocksTab";
+import { ProductsTab } from "@/components/admin/ProductsTab";
+import { UsersTab } from "@/components/admin/UsersTab";
+import { SettingsTab } from "@/components/admin/SettingsTab";
+import type { AdminOrderRow, PromoCode, StockData } from "@/components/admin/types";
 import { toast } from "sonner";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Dashboard Admin — SHOP+" }] }),
+  head: () => ({ meta: [{ title: "Dashboard Admin — streamIN" }] }),
   component: AdminDashboardErrorBoundary,
 });
 
@@ -38,37 +43,9 @@ function AdminDashboardErrorBoundary() {
   return <LocalErrorBoundary><AdminDashboard /></LocalErrorBoundary>;
 }
 
-type AdminOrderRow = {
-  id: string;
-  user_id: string;
-  total: number;
-  status: string;
-  created_at: string;
-  payment_ref: string;
-  profiles: { email: string; username: string } | null;
-  order_items: { product_name: string; quantity: number; unit_price: number }[];
-};
-
-type PromoCode = {
-  code: string;
-  discount_percentage: number;
-  max_uses: number;
-  current_uses: number;
-  is_active: boolean;
-};
-
-type StockData = {
-  product_id: string;
-  stock: number;
-  is_unlimited: boolean;
-};
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a238ff', '#f47521'];
-
 function AdminDashboard() {
-  const { user, profile, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"overview" | "orders" | "stocks" | "products" | "settings" | "support" | "users">("overview");
+  const { user, profile, loading: authLoading, profileError } = useAuth();
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [usersList, setUsersList] = useState<any[]>([]);
   const [orders, setOrders] = useState<AdminOrderRow[]>([]);
   const [stocks, setStocks] = useState<Record<string, StockData>>({});
@@ -81,7 +58,7 @@ function AdminDashboard() {
 
   const loadData = async () => {
     setLoading(true);
-    
+
     // Charger Paramètres et Promos
     const { data: storeData } = await supabase.from("store_settings").select("*");
     if (storeData) {
@@ -107,7 +84,7 @@ function AdminDashboard() {
     // Charger Utilisateurs
     const { data: profilesDataFetch } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
     if (profilesDataFetch) setUsersList(profilesDataFetch);
-    
+
     // Charger Commandes avec jointure manuelle (pas de FK direct entre orders et profiles)
     const { data: ordersData, error: ordersError } = await supabase
       .from("orders")
@@ -122,7 +99,7 @@ function AdminDashboard() {
           .from("profiles")
           .select("id,email,username")
           .in("id", userIds);
-          
+
         const profilesMap = (profilesData || []).reduce((acc: any, p) => {
           acc[p.id] = p;
           return acc;
@@ -132,7 +109,7 @@ function AdminDashboard() {
           ...o,
           profiles: profilesMap[o.user_id] || null
         }));
-        
+
         setOrders(mergedOrders as AdminOrderRow[]);
       } else {
         setOrders(ordersData as AdminOrderRow[]);
@@ -158,7 +135,7 @@ function AdminDashboard() {
       d.setDate(d.getDate() - i);
       days[d.toLocaleDateString('fr-FR', { weekday: 'short' })] = 0;
     }
-    
+
     orders.forEach(o => {
       if (!o.created_at) return;
       const d = new Date(o.created_at).toLocaleDateString('fr-FR', { weekday: 'short' });
@@ -166,7 +143,7 @@ function AdminDashboard() {
         days[d] += Number(o.total || 0);
       }
     });
-    
+
     return Object.entries(days).map(([name, total]) => ({ name, total }));
   }, [orders]);
 
@@ -187,8 +164,6 @@ function AdminDashboard() {
 
   // Security check: only admin can access
   if (!authLoading && (!user || profile?.role !== "admin")) {
-    // @ts-ignore
-    const err = (useAuth() as any).profileError;
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-2xl font-bold text-red-500 mb-4">Accès Refusé</h1>
@@ -196,7 +171,7 @@ function AdminDashboard() {
         <div className="p-4 bg-black/50 rounded-lg text-sm font-mono mt-4 text-left">
           <p>Connecté en tant que : {user ? user.email : "Non connecté"}</p>
           <p>Rôle détecté dans la base : {profile?.role ? `"${profile.role}"` : "Aucun profil/rôle trouvé"}</p>
-          {err && <p className="text-red-400 mt-2">Erreur Supabase Profile : {err}</p>}
+          {profileError && <p className="text-red-400 mt-2">Erreur Supabase Profile : {profileError}</p>}
         </div>
         <button onClick={() => window.location.reload()} className="mt-6 px-4 py-2 bg-primary rounded-lg text-primary-foreground">
           Rafraîchir la page
@@ -217,14 +192,14 @@ function AdminDashboard() {
         const { data: profileData } = await supabase.from("profiles").select("plus_coins").eq("id", order.user_id).single();
         const currentCoins = profileData?.plus_coins || 0;
         const coinsEarned = Math.floor(Number(order.total) * 100);
-        
+
         const updatePayload: any = { plus_coins: currentCoins + coinsEarned };
 
         const hasPremium = order.order_items && order.order_items.some(
-          item => item.product_name.toLowerCase().includes("premium") || 
+          item => item.product_name.toLowerCase().includes("premium") ||
                   (item as any).category?.toLowerCase().includes("premium")
         );
-        
+
         if (hasPremium) {
           updatePayload.is_premium = true;
           updatePayload.premium_orders_left = 10;
@@ -275,12 +250,12 @@ function AdminDashboard() {
   const grantPremium = async (userId: string) => {
     if (!window.confirm("Accorder le statut Premium (-30%) pour 10 commandes à cet utilisateur ?")) return;
     try {
-      const { error } = await supabase.from("profiles").update({ 
-        is_premium: true, 
-        premium_orders_left: 10 
+      const { error } = await supabase.from("profiles").update({
+        is_premium: true,
+        premium_orders_left: 10
       }).eq("id", userId);
       if (error) throw error;
-      
+
       setUsersList(prev => prev.map(u => u.id === userId ? { ...u, is_premium: true, premium_orders_left: 10 } : u));
       toast.success("Statut Premium accordé avec succès !");
     } catch (e: any) {
@@ -333,7 +308,7 @@ function AdminDashboard() {
       stock: newStock,
       is_unlimited: isUnlimited
     }, { onConflict: "product_id" });
-    
+
     if (!error) {
       setStocks(prev => ({ ...prev, [productId]: { product_id: productId, stock: newStock, is_unlimited: isUnlimited } }));
       toast.success("Stock mis à jour pour " + productId);
@@ -382,628 +357,54 @@ function AdminDashboard() {
   const pendingCount = orders.filter(o => o.status === "pending").length;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">
-            Panel Administrateur
-          </h1>
-          <div className="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-sm">
-            Mode Super Admin
-          </div>
-        </div>
-
-        {/* Tab Switcher */}
-        <div className="flex flex-wrap items-center gap-4 mb-8">
-          <button 
-            onClick={() => setActiveTab("overview")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "overview" ? "bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <BarChart3 size={20} />
-            Vue d'ensemble
-          </button>
-          <button 
-            onClick={() => setActiveTab("products")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "products" ? "bg-orange-600 text-white shadow-[0_0_20px_rgba(234,88,12,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <ShoppingCart size={20} />
-            Produits
-          </button>
-          <button 
-            onClick={() => setActiveTab("orders")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "orders" ? "bg-yellow-600 text-white shadow-[0_0_20px_rgba(202,138,4,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <Package size={20} />
-            Commandes
-          </button>
-          <button 
-            onClick={() => setActiveTab("stocks")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "stocks" ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <Layers size={20} />
-            Stocks
-          </button>
-          <button 
-            onClick={() => setActiveTab("users")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "users" ? "bg-teal-600 text-white shadow-[0_0_20px_rgba(13,148,136,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <div className="text-xl">👥</div>
-            Utilisateurs
-          </button>
-          <button 
-            onClick={() => setActiveTab("settings")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "settings" ? "bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <Settings size={20} />
-            Paramètres
-          </button>
-          <button 
-            onClick={() => setActiveTab("support")}
-            className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all ${activeTab === "support" ? "bg-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]" : "bg-white/5 text-muted-foreground hover:bg-white/10 hover:text-white"}`}
-          >
-            <MessageSquare size={20} />
-            Support En Direct
-          </button>
-        </div>
-
-        {/* Main Content Area */}
-        {activeTab === "support" && <AdminSupport />}
-        {activeTab === "overview" && (
-          <div className="space-y-8">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="glass rounded-2xl p-6 border-t-4 border-red-500 flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground font-medium mb-1">Chiffre d'affaires</p>
-                  <h2 className="text-3xl font-black">{totalRevenue.toFixed(2)}€</h2>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
-                  <DollarSign size={24} />
-                </div>
-              </div>
-              <div className="glass rounded-2xl p-6 border-t-4 border-orange-500 flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground font-medium mb-1">Commandes totales</p>
-                  <h2 className="text-3xl font-black">{orders.length}</h2>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
-                  <Package size={24} />
-                </div>
-              </div>
-              <div className="glass rounded-2xl p-6 border-t-4 border-yellow-500 flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground font-medium mb-1">En attente</p>
-                  <h2 className="text-3xl font-black">{pendingCount}</h2>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500">
-                  <Clock size={24} />
-                </div>
-              </div>
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="glass rounded-2xl p-6 border border-border/50">
-                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                  <BarChart3 size={18} className="text-red-500" />
-                  Ventes des 7 derniers jours
-                </h3>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={salesByDay}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                      <XAxis dataKey="name" stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}€`} />
-                      <RechartsTooltip 
-                        contentStyle={{ backgroundColor: '#000000dd', border: '1px solid #333', borderRadius: '8px' }}
-                        itemStyle={{ color: '#ff0033' }}
-                      />
-                      <Line type="monotone" dataKey="total" stroke="#ff0033" strokeWidth={3} dot={{ fill: '#ff0033', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="glass rounded-2xl p-6 border border-border/50">
-                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                  <Package size={18} className="text-orange-500" />
-                  Top 5 Produits Vendus
-                </h3>
-                <div className="h-[300px] w-full flex items-center justify-center">
-                  {topProducts.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={topProducts}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {topProducts.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <RechartsTooltip 
-                          contentStyle={{ backgroundColor: '#000000dd', border: '1px solid #333', borderRadius: '8px' }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-muted-foreground text-sm">Pas assez de données pour le moment.</p>
-                  )}
-                </div>
-                {topProducts.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-3 mt-2">
-                    {topProducts.map((entry, index) => (
-                      <div key={entry.name} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                        {entry.name} ({entry.value})
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "orders" && (
-          <div className="glass rounded-2xl overflow-hidden border border-border/50">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
-                    <th className="p-4 font-semibold">Date & ID</th>
-                    <th className="p-4 font-semibold">Client (E-mail)</th>
-                    <th className="p-4 font-semibold">Produits</th>
-                    <th className="p-4 font-semibold">Total</th>
-                    <th className="p-4 font-semibold">Statut</th>
-                    <th className="p-4 font-semibold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {orders.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="p-8 text-center text-muted-foreground">Aucune commande trouvée.</td>
-                    </tr>
-                  ) : orders.map((o) => (
-                    <tr key={o.id} className="hover:bg-white/5 transition-colors group">
-                      <td className="p-4">
-                        <div className="font-medium">{o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Date inconnue'}</div>
-                        <div className="text-xs text-muted-foreground mt-1">#{o.id ? o.id.slice(0, 8) : 'N/A'}</div>
-                      </td>
-                      <td className="p-4">
-                        <div className="font-bold text-white/90">{o.profiles?.email || 'Email introuvable'}</div>
-                        <div className="text-xs text-muted-foreground">{o.profiles?.username || 'Anonyme'}</div>
-                      </td>
-                      <td className="p-4">
-                        <ul className="space-y-1 text-sm text-muted-foreground">
-                          {o.order_items && Array.isArray(o.order_items) ? o.order_items.map((it, idx) => (
-                            <li key={idx}><span className="text-white/70">{it.quantity}x</span> {it.product_name}</li>
-                          )) : <li className="text-red-400">Erreur produits</li>}
-                        </ul>
-                      </td>
-                      <td className="p-4 font-bold text-primary">
-                        {Number(o.total || 0).toFixed(2)}€
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                          o.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
-                          o.status === 'completed' ? 'bg-green-500/20 text-green-400' : 
-                          'bg-red-500/20 text-red-400'
-                        }`}>
-                          {o.status === 'pending' && 'En attente'}
-                          {o.status === 'completed' && 'Livré'}
-                          {o.status === 'cancelled' && 'Annulé'}
-                        </span>
-                      </td>
-                      <td className="p-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {o.status === 'pending' && (
-                            <button onClick={() => updateStatus(o.id, 'completed')} title="Marquer comme livré" className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/40 transition">
-                              <CheckCircle size={16} />
-                            </button>
-                          )}
-                          {o.status !== 'cancelled' && (
-                            <button onClick={() => updateStatus(o.id, 'cancelled')} title="Annuler la commande" className="p-1.5 rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition">
-                              <XCircle size={16} />
-                            </button>
-                          )}
-                          <button onClick={() => deleteOrder(o.id)} title="Supprimer définitivement" className="p-1.5 rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/40 transition">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "products" && (
-          <div className="glass rounded-2xl p-8 border border-border/50">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold flex items-center gap-2"><Layers size={20} className="text-primary" /> Catalogue Produits</h2>
-              <div className="flex flex-wrap items-center gap-3">
-                <button 
-                  onClick={deleteAllReviews}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white text-sm font-bold transition-colors"
-                >
-                  🗑️ Vider tous les avis
-                </button>
-                <button 
-                  onClick={injectNewProducts}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-white text-sm font-bold transition-colors"
-                >
-                  🚀 Injecter Nouveaux Produits
-                </button>
-                <button 
-                  onClick={() => setEditingProduct({})}
-                  className="px-4 py-2 bg-primary rounded-lg text-primary-foreground text-sm font-bold flex items-center gap-2"
-                >
-                  <Plus size={16} /> Ajouter un produit
-                </button>
-              </div>
-            </div>
-            
-            <div className="space-y-8">
-              {Object.entries(
-                allProducts.reduce((acc, p) => {
-                  acc[p.category] = acc[p.category] || [];
-                  acc[p.category].push(p);
-                  return acc;
-                }, {} as Record<string, Product[]>)
-              ).map(([category, products]) => (
-                <div key={category}>
-                  <h3 className="text-lg font-bold text-white/70 mb-4 pb-2 border-b border-white/10 uppercase tracking-widest">
-                    {category} <span className="text-sm font-normal text-white/40 ml-2">({products.length})</span>
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {products.map(p => (
-                      <div key={p.id} className="p-4 rounded-xl border bg-black/40 border-white/10 hover:border-orange-500/50 transition-colors group relative overflow-hidden">
-                        {/* Color strip */}
-                        <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: p.color || '#fff' }}></div>
-                        
-                        <div className="flex justify-between items-start mb-3 pl-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg">
-                              {p.emoji || (p.logo && !p.logo.includes('.') ? <i className={`si si-${p.logo}`}></i> : '📦')}
-                            </div>
-                            <div>
-                              <div className="font-bold text-sm truncate w-32" title={p.name}>{p.name}</div>
-                              <div className="text-xs text-muted-foreground">{p.category}</div>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-end justify-between mt-4 pl-3">
-                          <div className="font-black text-lg text-primary">{p.price}€</div>
-                          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button 
-                              onClick={() => setEditingProduct(p)}
-                              className="p-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 rounded-md transition" title="Modifier"
-                            >
-                              <Edit size={14} />
-                            </button>
-                            <button 
-                              onClick={() => deleteProduct(p.id)}
-                              className="p-1.5 bg-red-500/20 text-red-500 hover:bg-red-500/40 rounded-md transition" title="Supprimer"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </div>
-                        {!p.is_active && (
-                          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-500">Inactif</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Modal d'édition */}
-        {editingProduct && (
-          <AdminProductEditor
-            initialProduct={editingProduct}
-            onSave={saveProduct}
-            onCancel={() => setEditingProduct(null)}
-          />
-        )}
-
-        {activeTab === "stocks" && (
-          <div className="glass rounded-2xl overflow-hidden border border-border/50">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
-                    <th className="p-4 font-semibold">Produit</th>
-                    <th className="p-4 font-semibold">Catégorie</th>
-                    <th className="p-4 font-semibold">Prix</th>
-                    <th className="p-4 font-semibold text-center">Type de Stock</th>
-                    <th className="p-4 font-semibold text-center">Quantité</th>
-                    <th className="p-4 font-semibold text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {Object.entries(
-                    allProducts.reduce((acc, p) => {
-                      acc[p.category] = acc[p.category] || [];
-                      acc[p.category].push(p);
-                      return acc;
-                    }, {} as Record<string, Product[]>)
-                  ).flatMap(([category, products]) => [
-                    <tr key={`cat-${category}`} className="bg-black/60 border-t border-b border-border/50">
-                      <td colSpan={6} className="p-3 text-sm font-bold text-primary uppercase tracking-widest pl-4">
-                        {category} <span className="text-muted-foreground ml-2">({products.length})</span>
-                      </td>
-                    </tr>,
-                    ...products.map((p) => {
-                      const stockInfo = stocks[p.id] || { is_unlimited: true, stock: 0 };
-                      return (
-                        <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                          <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center text-lg shadow-sm" style={{ backgroundColor: p.color }}>
-                                {p.emoji || (p.logo && !p.logo.includes('.') ? <i className={`si si-${p.logo}`}></i> : '📦')}
-                              </div>
-                              <div>
-                                <div className="font-bold text-white/90">{p.name}</div>
-                                {p.subtitle && <div className="text-xs text-muted-foreground">{p.subtitle}</div>}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-4 text-muted-foreground text-sm">{p.category}</td>
-                          <td className="p-4 font-medium text-white/80">{Number(p.price).toFixed(2)}€</td>
-                          
-                          <td className="p-4 text-center">
-                            <select 
-                              className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-medium focus:border-blue-500 outline-none"
-                              value={stockInfo.is_unlimited ? "unlimited" : "limited"}
-                              onChange={(e) => {
-                                const isUnlim = e.target.value === "unlimited";
-                                setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: isUnlim, stock: stockInfo.stock }}));
-                              }}
-                            >
-                              <option value="unlimited">Illimité ♾️</option>
-                              <option value="limited">Limité (Chiffre)</option>
-                            </select>
-                          </td>
-                          
-                          <td className="p-4 text-center">
-                            {!stockInfo.is_unlimited ? (
-                              <input 
-                                type="number" 
-                                min="0"
-                                className="w-20 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center focus:border-blue-500 outline-none"
-                                value={stockInfo.stock}
-                                onChange={(e) => {
-                                  setStocks(prev => ({ ...prev, [p.id]: { product_id: p.id, is_unlimited: false, stock: parseInt(e.target.value) || 0 }}));
-                                }}
-                              />
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </td>
-                          
-                          <td className="p-4 text-right">
-                            <button 
-                              onClick={() => saveStock(p.id, stockInfo.stock, stockInfo.is_unlimited)}
-                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-colors"
-                            >
-                              <Save size={14} />
-                              Enregistrer
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ])}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "users" && (
-          <div className="glass rounded-2xl overflow-hidden border border-border/50">
-            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-black/40">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <div className="text-2xl">👥</div> Gestion des Utilisateurs
-              </h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-black/40 text-muted-foreground text-sm uppercase tracking-wider">
-                    <th className="p-4 font-semibold">Utilisateur</th>
-                    <th className="p-4 font-semibold">Coins</th>
-                    <th className="p-4 font-semibold">Statut Premium</th>
-                    <th className="p-4 font-semibold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {usersList.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="p-8 text-center text-muted-foreground">Aucun utilisateur trouvé.</td>
-                    </tr>
-                  ) : usersList.map((u) => (
-                    <tr key={u.id} className="hover:bg-white/5 transition-colors">
-                      <td className="p-4">
-                        <div className="font-bold text-white/90">{u.email || 'Email introuvable'}</div>
-                        <div className="text-xs text-muted-foreground">{u.username || 'Anonyme'} (ID: {u.id.slice(0, 8)})</div>
-                      </td>
-                      <td className="p-4 font-bold text-yellow-500">
-                        {u.plus_coins || 0} Coins
-                      </td>
-                      <td className="p-4">
-                        {u.is_premium ? (
-                          <div className="flex flex-col gap-1">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-400 w-fit">
-                              👑 Premium Actif
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {u.premium_orders_left || 0} commande(s) remisée(s) restante(s)
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">Classique</span>
-                        )}
-                      </td>
-                      <td className="p-4 text-right">
-                        <button 
-                          onClick={() => grantPremium(u.id)}
-                          className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg text-sm font-bold shadow-lg shadow-purple-500/25 transition-all active:scale-95"
-                        >
-                          Accorder Premium (-30%)
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "settings" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {/* Paramètres globaux */}
-            <div className="glass rounded-2xl p-8 border border-border/50">
-              <h2 className="text-2xl font-bold mb-6">Paramètres de la Boutique</h2>
-              
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Lien du Serveur Discord (Bouton Support)
-                  </label>
-                  <input
-                    type="text"
-                    value={storeSettings.discord_link || ""}
-                    onChange={e => setStoreSettings({ ...storeSettings, discord_link: e.target.value })}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-red-500 outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Bandeau d'Annonce (laisser vide pour cacher)
-                  </label>
-                  <input
-                    type="text"
-                    value={storeSettings.banner_text || ""}
-                    onChange={e => setStoreSettings({ ...storeSettings, banner_text: e.target.value })}
-                    placeholder="EX: SOLDES EXCEPTIONNELLES : -20%..."
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-red-500 outline-none transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
-                    Mode Maintenance
-                  </label>
-                  <select
-                    value={storeSettings.maintenance_mode || "false"}
-                    onChange={e => setStoreSettings({ ...storeSettings, maintenance_mode: e.target.value })}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2.5 focus:border-red-500 outline-none transition-colors"
-                  >
-                    <option value="false">Désactivé (Boutique ouverte)</option>
-                    <option value="true">Activé (Boutique fermée)</option>
-                  </select>
-                  {storeSettings.maintenance_mode === "true" && (
-                    <p className="text-red-400 text-xs mt-2 font-medium">⚠️ Attention : le site sera complètement inaccessible pour les clients !</p>
-                  )}
-                </div>
-
-                <button
-                  onClick={saveSettings}
-                  className="mt-8 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold transition-all flex items-center gap-2 w-full justify-center shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]"
-                >
-                  <Save size={18} />
-                  Enregistrer les Paramètres
-                </button>
-              </div>
-            </div>
-
-            {/* Codes Promo */}
-            <div className="glass rounded-2xl p-8 border border-border/50">
-              <h2 className="text-2xl font-bold mb-6">Codes Promo</h2>
-              
-              {/* Formulaire Création Promo */}
-              <div className="flex flex-wrap items-end gap-4 mb-8 bg-black/30 p-4 rounded-xl border border-white/5">
-                <div className="flex-1 min-w-[120px]">
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Code Promo</label>
-                  <input
-                    type="text"
-                    value={newPromo.code}
-                    onChange={e => setNewPromo({ ...newPromo, code: e.target.value })}
-                    placeholder="ex: SOLDES20"
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-red-500 outline-none uppercase"
-                  />
-                </div>
-                <div className="w-24 shrink-0">
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Réduc (%)</label>
-                  <input
-                    type="number"
-                    min="1" max="100"
-                    value={newPromo.discount}
-                    onChange={e => setNewPromo({ ...newPromo, discount: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-red-500 outline-none"
-                  />
-                </div>
-                <div className="w-24 shrink-0">
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">Util. max</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={newPromo.max_uses}
-                    onChange={e => setNewPromo({ ...newPromo, max_uses: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-red-500 outline-none"
-                  />
-                </div>
-                <button
-                  onClick={createPromo}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold text-sm h-[38px] transition"
-                >
-                  Créer
-                </button>
-              </div>
-
-              {/* Liste des codes */}
-              <div className="space-y-3">
-                {promos.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">Aucun code promo actif.</p>
-                ) : promos.map(promo => (
-                  <div key={promo.code} className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/10">
-                    <div>
-                      <div className="font-bold text-lg text-primary">{promo.code} <span className="text-sm text-white/50 bg-white/10 px-2 py-0.5 rounded ml-2">-{promo.discount_percentage}%</span></div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Utilisations : {promo.current_uses} / {promo.max_uses}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => deletePromo(promo.code)}
-                      className="p-2 bg-red-500/20 text-red-500 hover:bg-red-500/40 rounded-lg transition"
-                      title="Supprimer"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      {activeTab === "support" && <AdminSupport />}
+      {activeTab === "overview" && (
+        <OverviewTab totalRevenue={totalRevenue} orderCount={orders.length} pendingCount={pendingCount} salesByDay={salesByDay} topProducts={topProducts} />
+      )}
+      {activeTab === "orders" && (
+        <OrdersTab orders={orders} onUpdateStatus={updateStatus} onDelete={deleteOrder} />
+      )}
+      {activeTab === "products" && (
+        <ProductsTab
+          allProducts={allProducts}
+          onAdd={() => setEditingProduct({})}
+          onEdit={(p) => setEditingProduct(p)}
+          onDelete={deleteProduct}
+          onDeleteAllReviews={deleteAllReviews}
+          onInjectNewProducts={injectNewProducts}
+        />
+      )}
+      {editingProduct && (
+        <AdminProductEditor
+          initialProduct={editingProduct}
+          onSave={saveProduct}
+          onCancel={() => setEditingProduct(null)}
+        />
+      )}
+      {activeTab === "stocks" && (
+        <StocksTab
+          allProducts={allProducts}
+          stocks={stocks}
+          onStockChange={(id, patch) => setStocks(prev => ({ ...prev, [id]: { product_id: id, is_unlimited: prev[id]?.is_unlimited ?? true, stock: prev[id]?.stock ?? 0, ...patch } }))}
+          onSave={saveStock}
+        />
+      )}
+      {activeTab === "users" && (
+        <UsersTab usersList={usersList} onGrantPremium={grantPremium} />
+      )}
+      {activeTab === "settings" && (
+        <SettingsTab
+          storeSettings={storeSettings}
+          onSettingsChange={(patch) => setStoreSettings(prev => ({ ...prev, ...patch }))}
+          onSaveSettings={saveSettings}
+          promos={promos}
+          newPromo={newPromo}
+          onNewPromoChange={(patch) => setNewPromo(prev => ({ ...prev, ...patch }))}
+          onCreatePromo={createPromo}
+          onDeletePromo={deletePromo}
+        />
+      )}
+    </AdminLayout>
   );
 }

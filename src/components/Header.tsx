@@ -4,7 +4,7 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logoImg from "@/assets/logo.png";
+import logoImg from "@/assets/logo.svg";
 
 export function Header() {
   const { count, setOpen } = useCart();
@@ -42,9 +42,9 @@ export function Header() {
         
         {/* Left: Logo */}
         <div className="flex-1 flex items-center">
-          <Link to="/" className="flex items-center gap-2.5 font-black text-lg">
-            <img src={logoImg} alt="SHOP+" className="w-9 h-9 rounded-xl shadow-[0_0_24px_rgba(220,38,38,.6)]" />
-            <span className="tracking-tight">SHOP<span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent">+</span></span>
+          <Link to="/" className="flex items-center gap-2.5 font-display font-black text-lg">
+            <img src={logoImg} alt="streamIN" className="w-9 h-9 rounded-xl shadow-[0_0_24px_rgba(220,38,38,.6)]" />
+            <span className="tracking-tight">stream<span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent">IN</span></span>
           </Link>
         </div>
 

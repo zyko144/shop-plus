@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plus, Check } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { CATEGORY_IMAGES } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "@/lib/gsap";
 import { ProductReviewsModal } from "./ProductReviews";
 
 function hex(c: string) {
@@ -20,19 +22,21 @@ const RARE_SKIN_IMAGES: Record<string, string> = {
   "Leviathan Axe": "https://fortnite-api.com/images/cosmetics/br/pickaxe_id_508_historianmale_6bqsw/icon.png"
 };
 
-export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
+export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 0 } }: { product: Product, stockInfo?: { is_unlimited: boolean, stock: number } }) {
   const { add } = useCart();
   const { profile } = useAuth();
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<{ x: (value: number) => void; y: (value: number) => void } | null>(null);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
 
   const hasPremiumDiscount = profile?.is_premium && (profile?.premium_orders_left || 0) > 0;
   const isDiscord = product.category?.toLowerCase().includes("discord") || product.name.toLowerCase().includes("discord");
   const displayPrice = hasPremiumDiscount && !isDiscord ? product.price * 0.7 : product.price;
-  
+
   const skinImg = product.category === "Fortnite Rare" ? RARE_SKIN_IMAGES[product.name] : null;
 
   let logoUrl = skinImg || (product.logo
@@ -40,7 +44,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
       ? product.logo
       : `https://cdn.simpleicons.org/${product.logo}/${hex(product.color)}`
     : null);
-    
+
   let displayEmoji = product.emoji;
   let finalBgImg = bgImg;
 
@@ -60,6 +64,30 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
 
   const isOutOfStock = !stockInfo.is_unlimited && stockInfo.stock <= 0;
 
+  useGSAP(() => {
+    if (!cardRef.current) return;
+    tiltRef.current = {
+      x: gsap.quickTo(cardRef.current, "rotationY", { duration: 0.5, ease: "power3.out" }),
+      y: gsap.quickTo(cardRef.current, "rotationX", { duration: 0.5, ease: "power3.out" }),
+    };
+    gsap.set(cardRef.current, { transformPerspective: 800, transformStyle: "preserve3d" });
+  }, { scope: cardRef });
+
+  function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (isOutOfStock || !cardRef.current || !tiltRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    tiltRef.current.x(px * 10);
+    tiltRef.current.y(py * -10);
+  }
+
+  function handlePointerLeave() {
+    setHover(false);
+    tiltRef.current?.x(0);
+    tiltRef.current?.y(0);
+  }
+
   function handleAdd() {
     if (isOutOfStock) return;
     add(product);
@@ -69,13 +97,16 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
 
   return (
     <div
+      ref={cardRef}
       onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className={`group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 bg-card border border-white/5 ${isOutOfStock ? "opacity-75 grayscale" : ""}`}
+      onMouseLeave={handlePointerLeave}
+      onPointerMove={handlePointerMove}
+      className={`group relative rounded-3xl overflow-hidden bg-card border border-white/5 will-change-transform ${isOutOfStock ? "opacity-75 grayscale" : ""}`}
       style={{
         boxShadow: hover && !isOutOfStock
           ? `0 30px 80px -20px ${product.color}80, 0 0 0 1px ${product.color}55 inset`
           : `0 10px 40px -15px #000`,
+        transition: "box-shadow 400ms ease",
       }}
     >
       {/* Visual */}
@@ -102,6 +133,11 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
             opacity: hover && !isOutOfStock ? 0.9 : 0.55,
           }}
         />
+        {/* sweep shimmer on hover */}
+        <div
+          className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms] ease-out pointer-events-none"
+          style={{ background: `linear-gradient(115deg, transparent 40%, ${product.color}30 50%, transparent 60%)` }}
+        />
         {/* logo */}
         <div className="absolute inset-0 grid place-items-center p-8 text-center">
           {logoUrl && !imgError ? (
@@ -115,7 +151,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
             />
           ) : (
             <div
-              className="text-4xl md:text-5xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-110 px-4"
+              className="font-display text-4xl md:text-5xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-110 px-4"
               style={{ color: product.color, textShadow: `0 0 40px ${product.color}`, wordBreak: "break-word", lineHeight: "1.1" }}
             >
               {displayEmoji || product.name}
@@ -130,7 +166,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
         >
           {product.category}
         </div>
-        
+
         {/* Stock Badge */}
         {!stockInfo.is_unlimited && stockInfo.stock > 0 && stockInfo.stock <= 5 && (
           <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-orange-500 text-white shadow-lg shadow-orange-500/50">
@@ -142,7 +178,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
       {/* Content */}
       <div className="p-5 space-y-4">
         <div>
-          <div className="font-bold text-lg leading-tight">{product.name}</div>
+          <div className="font-display font-bold text-lg leading-tight">{product.name}</div>
           {product.subtitle && <div className="text-xs text-muted-foreground mt-1">{product.subtitle}</div>}
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -154,7 +190,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
                   {Number(product.price).toFixed(2)}€
                 </div>
               )}
-              <div className="text-2xl font-black" style={{ color: isOutOfStock ? "#666" : product.color, textShadow: isOutOfStock ? "none" : `0 0 24px ${product.color}90` }}>
+              <div className="font-display text-2xl font-black" style={{ color: isOutOfStock ? "#666" : product.color, textShadow: isOutOfStock ? "none" : `0 0 24px ${product.color}90` }}>
                 {Number(displayPrice).toFixed(2)}€
               </div>
             </div>
@@ -175,10 +211,10 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
               onClick={handleAdd}
               disabled={isOutOfStock}
               className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-1.5 ${isOutOfStock ? "cursor-not-allowed" : "hover:scale-105 active:scale-95"}`}
-              style={{ 
-                background: isOutOfStock ? "#333" : product.color, 
-                color: isOutOfStock ? "#888" : "#000", 
-                boxShadow: isOutOfStock ? "none" : `0 8px 24px ${product.color}66` 
+              style={{
+                background: isOutOfStock ? "#333" : product.color,
+                color: isOutOfStock ? "#888" : "#000",
+                boxShadow: isOutOfStock ? "none" : `0 8px 24px ${product.color}66`
               }}
               aria-label="Ajouter au panier"
             >
@@ -187,7 +223,7 @@ export function ProductCard3D({ product, stockInfo = { is_unlimited: true, stock
           </div>
         </div>
       </div>
-      
+
       {showReviews && (
         <ProductReviewsModal
           productId={product.id}

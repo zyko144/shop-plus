@@ -141,7 +141,7 @@ export function CartDrawer() {
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setOpen(false)} />
       <aside className="absolute right-0 top-0 h-full w-full max-w-md glass border-l border-border flex flex-col">
         <div className="p-4 flex items-center justify-between border-b border-border">
-          <h3 className="font-bold text-lg flex items-center gap-2">
+          <h3 className="font-display font-bold text-lg flex items-center gap-2">
             Panier <span className="bg-white/10 px-2 py-0.5 rounded-full text-sm">{items.length}</span>
           </h3>
           <button onClick={() => setOpen(false)} className="p-2 rounded hover:bg-white/10 transition-colors"><X size={18} /></button>

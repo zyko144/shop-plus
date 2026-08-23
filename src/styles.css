@@ -59,6 +59,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -144,6 +145,8 @@
   }
 
   html { scroll-behavior: smooth; }
+
+  h1, h2, h3, h4, .font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
 }
 
 @layer utilities {
@@ -164,6 +167,53 @@
   .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background: color-mix(in oklab, white 10%, transparent); border-radius: 6px; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Subtle film-grain overlay for premium/depth feel on large sections */
+  .noise-overlay {
+    position: relative;
+    isolation: isolate;
+  }
+  .noise-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Animated gradient border ring, used for premium/featured cards */
+  .gradient-ring {
+    position: relative;
+  }
+  .gradient-ring::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--ring-angle, 0deg), transparent 0%, var(--ring-color, #dc2626) 15%, transparent 30%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: ring-spin 4s linear infinite;
+    pointer-events: none;
+  }
+  @property --ring-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+  @keyframes ring-spin {
+    to { --ring-angle: 360deg; }
+  }
+
+  .stat-card {
+    background: color-mix(in oklab, var(--card) 80%, transparent);
+    border: 1px solid color-mix(in oklab, white 8%, transparent);
+    backdrop-filter: blur(12px);
+  }
 }
 
 @layer utilities {

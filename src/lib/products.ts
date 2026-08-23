@@ -72,7 +72,7 @@ export const STEAM_CATEGORIES: SteamCategory[] = [
   },
 ];
 
-export const PAYPAL_URL = "https://paypal.me/zyko921";
+export const PAYPAL_URL = "https://paypal.me/steamapp";
 
 // Fonction dynamique pour charger les produits depuis la DB
 export async function getAllProducts(): Promise<Product[]> {

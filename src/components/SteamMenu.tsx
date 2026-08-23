@@ -3,6 +3,7 @@ import { Plus, Check, Search } from "lucide-react";
 import { STEAM_CATEGORIES } from "@/lib/products";
 import type { Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import { ScrollReveal } from "./ScrollReveal";
 
 function slug(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -41,7 +42,7 @@ function GameCard({ game, color, emoji, category }: { game: string; color: strin
           <div className="text-[10px] uppercase tracking-wider font-semibold" style={{ color }}>
             {emoji} Jeu Steam
           </div>
-          <div className="font-bold text-base leading-tight mt-1 truncate">{game}</div>
+          <div className="font-display font-bold text-base leading-tight mt-1 truncate">{game}</div>
         </div>
         <div
           className="text-3xl shrink-0 transition-transform group-hover:scale-110"
@@ -53,7 +54,7 @@ function GameCard({ game, color, emoji, category }: { game: string; color: strin
       <div className="flex items-center justify-between gap-2">
         <div>
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Prix</div>
-          <div className="text-xl font-black" style={{ color, textShadow: `0 0 16px ${color}90` }}>
+          <div className="font-display text-xl font-black" style={{ color, textShadow: `0 0 16px ${color}90` }}>
             1,00€
           </div>
         </div>
@@ -132,11 +133,11 @@ export function SteamMenu() {
       </div>
 
       {/* Games grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <ScrollReveal as="div" stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" key={cat.name}>
         {filtered.map((g) => (
           <GameCard key={g} game={g} color={cat.color} emoji={cat.emoji} category={cat.name} />
         ))}
-      </div>
+      </ScrollReveal>
       {filtered.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">Aucun jeu trouvé pour "{query}"</div>
       )}

@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { CustomCaptcha } from "@/components/CustomCaptcha";
+import logoImg from "@/assets/logo.svg";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Connexion — ZYKO Store" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur ZYKO Store." }] }),
+  head: () => ({ meta: [{ title: "Connexion — streamIN" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur streamIN." }] }),
   component: AuthPage,
 });
 
@@ -94,11 +95,11 @@ function AuthPage() {
       <div className="w-full max-w-md relative z-10 p-8 space-y-8 rounded-[2rem] border border-red-500/20 bg-black/40 backdrop-blur-2xl" style={{ boxShadow: "0 0 80px -20px rgba(220,38,38,0.3), inset 0 0 20px -10px rgba(220,38,38,0.2)" }}>
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-black shadow-[0_0_40px_rgba(220,38,38,0.4)] border border-red-600/30 mb-4 overflow-hidden p-2">
-            <img src="/logo.png" alt="SHOP+ Logo" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]" />
+            <img src={logoImg} alt="streamIN Logo" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]" />
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-white flex items-center justify-center gap-2">
+          <h1 className="font-display text-3xl font-black tracking-tight text-white flex items-center justify-center gap-2">
             {mode === "login" ? "Connexion" : "Rejoindre"}
-            <span className="bg-gradient-to-r from-red-500 to-red-800 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">SHOP+</span>
+            <span className="bg-gradient-to-r from-red-500 to-red-800 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">streamIN</span>
           </h1>
           <p className="text-sm text-red-200/60 font-medium">L'accès premium à vos plateformes préférées.</p>
         </div>
@@ -190,7 +191,7 @@ function AuthPage() {
         </div>
 
         <p className="text-center text-sm text-white/50 pt-2">
-          {mode === "login" ? "Nouveau sur SHOP+ ?" : "Vous avez déjà un compte ?"}{" "}
+          {mode === "login" ? "Nouveau sur streamIN ?" : "Vous avez déjà un compte ?"}{" "}
           <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-red-400 font-bold hover:text-red-300 transition-colors">
             {mode === "login" ? "Créer un compte" : "Se connecter"}
           </button>

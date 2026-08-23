@@ -22,7 +22,7 @@ export const sendOrderEmail = createServerFn({ method: "POST" })
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
         <h1 style="color: #ff0033;">Merci pour votre commande ! 🎉</h1>
         <p>Bonjour,</p>
-        <p>Nous avons bien reçu votre commande sur <strong>SHOP+</strong> pour un montant total de <strong>${data.total.toFixed(2)}€</strong>.</p>
+        <p>Nous avons bien reçu votre commande sur <strong>streamIN</strong> pour un montant total de <strong>${data.total.toFixed(2)}€</strong>.</p>
         
         <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <h3>Récapitulatif de vos achats :</h3>
@@ -39,15 +39,15 @@ export const sendOrderEmail = createServerFn({ method: "POST" })
           </a>
         </div>
 
-        <p>À très vite,<br>L'équipe SHOP+</p>
+        <p>À très vite,<br>L'équipe streamIN</p>
       </div>
     `;
 
     try {
       const { data: responseData, error } = await resend.emails.send({
-        from: "SHOP+ <onboarding@resend.dev>", // Resend requires 'onboarding@resend.dev' for free unverified accounts
+        from: "streamIN <onboarding@resend.dev>", // Resend requires 'onboarding@resend.dev' for free unverified accounts
         to: data.email,
-        subject: "Votre commande SHOP+ - Récupérez votre produit !",
+        subject: "Votre commande streamIN - Récupérez votre produit !",
         html: htmlBody,
       });
 

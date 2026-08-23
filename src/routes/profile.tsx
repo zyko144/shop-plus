@@ -11,7 +11,7 @@ import { OrderReview } from "@/components/OrderReview";
 import { ProductReviewsModal } from "@/components/ProductReviews";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Mon Compte — ZYKO Store" }] }),
+  head: () => ({ meta: [{ title: "Mon Compte — streamIN" }] }),
   component: ProfilePage,
 });
 
@@ -83,7 +83,7 @@ function ProfilePage() {
             </div>
           </div>
           <div className="text-center md:text-left">
-            <h1 className="text-4xl font-black flex items-center justify-center md:justify-start gap-3">
+            <h1 className="font-display text-4xl font-black flex items-center justify-center md:justify-start gap-3">
               Espace Client
               {isPremium && <span className="text-sm px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full font-bold flex items-center gap-1"><Crown size={14}/> Premium</span>}
             </h1>

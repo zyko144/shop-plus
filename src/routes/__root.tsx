@@ -83,10 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SHOP+ — Boutique premium" },
+      { title: "streamIN — Boutique premium" },
       { name: "description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
       { name: "theme-color", content: "#dc2626" },
-      { property: "og:title", content: "SHOP+ — Boutique premium" },
+      { property: "og:title", content: "streamIN — Boutique premium" },
       { property: "og:description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://shop-plus-nu.vercel.app/banner.png?v=2" },
@@ -94,6 +94,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://shop-plus-nu.vercel.app/banner.png?v=2" },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: "/logo.svg" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,

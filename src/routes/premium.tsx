@@ -3,11 +3,12 @@ import { Crown, CheckCircle, Star, Shield, ArrowRight } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { Header } from "@/components/Header";
 import { CartDrawer } from "@/components/CartDrawer";
+import { ScrollReveal } from "@/components/ScrollReveal";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/premium")({
   component: PremiumPage,
-  head: () => ({ meta: [{ title: "Devenir VIP Premium — SHOP+" }] })
+  head: () => ({ meta: [{ title: "Devenir VIP Premium — streamIN" }] })
 });
 
 function PremiumPage() {
@@ -44,15 +45,15 @@ function PremiumPage() {
               <Star size={16} className="fill-purple-500" /> Le club le plus fermé
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-black leading-tight">
+            <h1 className="font-display text-5xl md:text-6xl font-black leading-tight">
               Passez au niveau supérieur avec <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">Premium VIP</span>.
             </h1>
-            
+
             <p className="text-xl text-white/60 leading-relaxed">
               Ne payez plus jamais le prix fort. Rejoignez l'élite et bénéficiez de réductions massives automatiques sur vos achats, et d'un accès direct à notre équipe sur Discord.
             </p>
-            
-            <div className="space-y-4 pt-4">
+
+            <ScrollReveal as="div" stagger className="space-y-4 pt-4">
               <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-purple-500/30 transition-colors">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 mt-1">
                   <Crown size={20} />
@@ -82,11 +83,11 @@ function PremiumPage() {
                   <p className="text-sm text-white/60">Affichez fièrement votre badge de Couronne VIP sur votre espace client.</p>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
-          
+
           {/* Carte de Prix / Achat */}
-          <div className="lg:justify-self-end w-full max-w-md animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150">
+          <ScrollReveal as="div" y={40} className="lg:justify-self-end w-full max-w-md">
             <div className="glass rounded-[2.5rem] p-8 border-2 border-purple-500/50 relative overflow-hidden group hover:border-purple-400 transition-colors shadow-[0_0_50px_rgba(168,85,247,0.2)]">
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 blur-[60px] rounded-full group-hover:scale-110 transition-transform"></div>
               
@@ -133,8 +134,8 @@ function PremiumPage() {
                 </p>
               </div>
             </div>
-          </div>
-          
+          </ScrollReveal>
+
         </div>
       </main>
     </div>

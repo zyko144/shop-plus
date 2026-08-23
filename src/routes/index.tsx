@@ -1,22 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { CartDrawer } from "@/components/CartDrawer";
-import { ProductCard3D } from "@/components/ProductCard3D";
+import { ProductCard } from "@/components/ProductCard";
 import { SteamMenu } from "@/components/SteamMenu";
 import { CategorySidebar, type Cat } from "@/components/CategorySidebar";
-import { CATEGORY_IMAGES, getAllProducts } from "@/lib/products";
+import { ScrollReveal } from "@/components/ScrollReveal";
+import { CATEGORY_IMAGES, getAllProducts, PAYPAL_URL } from "@/lib/products";
 import type { Product } from "@/lib/products";
 import { Sparkles, Zap, ShieldCheck, ShoppingBag, Search } from "lucide-react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "@/lib/gsap";
 import heroBg from "@/assets/hero-bg.jpg";
+import logoImg from "@/assets/logo.svg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SHOP+ — Comptes Streaming, Fortnite, Steam, VPN & Discord" },
-      { name: "description", content: "SHOP+ : boutique premium 3D — YouTube, Netflix, Deezer, Crunchyroll, Fortnite, Steam, VPN, V-Bucks, décorations Discord. Paiement PayPal sécurisé." },
-      { property: "og:title", content: "SHOP+ — Boutique premium" },
+      { title: "streamIN — Comptes Streaming, Fortnite, Steam, VPN & Discord" },
+      { name: "description", content: "streamIN : boutique premium 3D — YouTube, Netflix, Deezer, Crunchyroll, Fortnite, Steam, VPN, V-Bucks, décorations Discord. Paiement PayPal sécurisé." },
+      { property: "og:title", content: "streamIN — Boutique premium" },
       { property: "og:description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
     ],
   }),
@@ -47,6 +51,22 @@ function Index() {
   const [stocks, setStocks] = useState<Record<string, { is_unlimited: boolean, stock: number }>>({});
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (!heroRef.current) return;
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    tl.from(".hero-badge", { opacity: 0, y: -16, duration: 0.6 })
+      .from(".hero-title", { opacity: 0, y: 30, duration: 0.8 }, "-=0.3")
+      .from(".hero-sub", { opacity: 0, y: 20, duration: 0.7 }, "-=0.5")
+      .from(".hero-stats > *", { opacity: 0, y: 16, duration: 0.5, stagger: 0.1 }, "-=0.4");
+
+    gsap.to(".hero-parallax", {
+      yPercent: 15,
+      ease: "none",
+      scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: true },
+    });
+  }, { scope: heroRef });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,26 +136,26 @@ function Index() {
       <CartDrawer />
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-transparent border-b border-border/40">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/10 via-black to-black pointer-events-none" />
+      <section ref={heroRef} className="relative overflow-hidden bg-transparent border-b border-border/40 noise-overlay">
+        <div className="hero-parallax absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/10 via-black to-black pointer-events-none" />
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
-        
+
         <div className="relative max-w-5xl mx-auto px-6 py-20 md:py-32 flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs font-medium mb-8 text-muted-foreground backdrop-blur-sm shadow-xl">
+          <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs font-medium mb-8 text-muted-foreground backdrop-blur-sm shadow-xl">
              <Sparkles size={14} className="text-primary" /> Boutique premium — Livraison instantanée
           </div>
-          
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
+
+          <h1 className="hero-title font-display text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
             L'excellence numérique.<br/>
             <span className="bg-gradient-to-r from-red-500 via-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-sm">Sans compromis.</span>
           </h1>
-          
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 font-medium">
+
+          <p className="hero-sub text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 font-medium">
             Comptes streaming, gaming et VPN de la plus haute qualité. <br className="hidden md:block"/>
             Accédez à vos plateformes préférées instantanément et au meilleur prix.
           </p>
-          
-          <div className="flex flex-wrap justify-center gap-6 md:gap-10 text-sm text-muted-foreground font-semibold">
+
+          <div className="hero-stats flex flex-wrap justify-center gap-6 md:gap-10 text-sm text-muted-foreground font-semibold">
             <div className="flex items-center gap-2.5"><Zap size={18} className="text-primary" /> Livraison immédiate</div>
             <div className="flex items-center gap-2.5"><ShieldCheck size={18} className="text-primary" /> Comptes garantis</div>
             <div className="flex items-center gap-2.5"><ShoppingBag size={18} className="text-primary" /> Paiement sécurisé</div>
@@ -195,22 +215,26 @@ function Index() {
           {/* Grid */}
           {group.id === "steam" ? (
             <SteamMenu />
-          ) : group.id === "fortnite" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-              {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
+          ) : filtered.length > 0 ? (
+            <ScrollReveal
+              key={group.id}
+              as="div"
+              stagger
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
+            >
+              {filtered.map((p) => <ProductCard key={p.id} product={p} stockInfo={stocks[p.id]} />)}
+            </ScrollReveal>
+          ) : query.trim() ? (
+            <div className="text-center py-24 text-muted-foreground bg-white/5 rounded-3xl border border-white/5">
+              <span className="text-4xl block mb-2">😕</span>
+              Aucun produit ne correspond à "{query}"
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                {filtered.map((p) => <ProductCard3D key={p.id} product={p} stockInfo={stocks[p.id]} />)}
-              </div>
-              {filtered.length === 0 && (
-                <div className="text-center py-24 text-muted-foreground bg-white/5 rounded-3xl border border-white/5">
-                  <span className="text-4xl block mb-2">😕</span>
-                  Aucun produit ne correspond à "{query}"
-                </div>
-              )}
-            </>
+            <div className="text-center py-24 text-muted-foreground bg-white/5 rounded-3xl border border-white/5">
+              <span className="text-4xl block mb-2">{group.emoji}</span>
+              <div className="font-display font-bold text-foreground text-lg mb-1">Bientôt disponible</div>
+              Cette catégorie revient très vite en stock — repassez plus tard ou demandez sur Discord.
+            </div>
           )}
         </section>
       </main>
@@ -218,12 +242,12 @@ function Index() {
       <footer className="border-t border-border py-10 px-6 text-center text-sm text-muted-foreground mt-10">
         <div className="flex justify-center mb-4">
           <div className="w-12 h-12 bg-black rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.3)] border border-red-600/30 overflow-hidden p-1 flex items-center justify-center">
-            <img src="/logo.png" alt="SHOP+" className="w-full h-full object-contain" />
+            <img src={logoImg} alt="streamIN" className="w-full h-full object-contain" />
           </div>
         </div>
-        <p className="font-black text-foreground mb-2 text-lg flex justify-center items-center gap-1">SHOP<span className="text-primary">+</span></p>
-        <p>Paiement sécurisé via PayPal — <a href="https://paypal.me/zyko921" target="_blank" rel="noreferrer" className="text-primary hover:underline">paypal.me/zyko921</a></p>
-        <p className="mt-2 text-xs">© {new Date().getFullYear()} SHOP+. Tous droits réservés.</p>
+        <p className="font-display font-black text-foreground mb-2 text-lg flex justify-center items-center gap-1">stream<span className="text-primary">IN</span></p>
+        <p>Paiement sécurisé via PayPal — <a href={PAYPAL_URL} target="_blank" rel="noreferrer" className="text-primary hover:underline">{PAYPAL_URL.replace("https://", "")}</a></p>
+        <p className="mt-2 text-xs">© {new Date().getFullYear()} streamIN. Tous droits réservés.</p>
       </footer>
     </div>
   );
