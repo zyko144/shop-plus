@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { renderAnnouncementCard } from "./announcementCard";
+import siteLogoImg from "@/assets/logo.png";
 
 const webhookUrl = process.env.DISCORD_ORDERS_WEBHOOK_URL;
 const avisWebhookUrl = process.env.DISCORD_AVIS_WEBHOOK_URL;
@@ -196,12 +197,12 @@ function buildAnnouncementEmbed(data: AnnouncementInput) {
   }
 }
 
-const ANNOUNCEMENT_TITLES: Record<AnnouncementInput["type"], string> = {
-  new_product: "🆕 Nouveau produit disponible !",
-  price_change: "💰 Prix mis à jour",
-  product_removed: "🗑️ Produit retiré de la boutique",
-  out_of_stock: "❌ Rupture de stock",
-  back_in_stock: "✅ De nouveau en stock !",
+const ANNOUNCEMENT_HEADLINES: Record<AnnouncementInput["type"], (data: AnnouncementInput) => string> = {
+  new_product: (d) => `# 🆕 Nouveau produit : ${d.name} !`,
+  price_change: (d) => `# 💰 Prix mis à jour : ${d.name}`,
+  product_removed: (d) => `# 🗑️ Produit retiré : ${d.name}`,
+  out_of_stock: (d) => `# ❌ Rupture de stock : ${d.name}`,
+  back_in_stock: (d) => `# ✅ De nouveau en stock : ${d.name} !`,
 };
 const ANNOUNCEMENT_BADGES: Record<AnnouncementInput["type"], string> = {
   new_product: "NOUVEAU PRODUIT",
@@ -219,6 +220,7 @@ function cardPrice(data: AnnouncementInput): string | undefined {
 export const notifyDiscordAnnouncement = createServerFn({ method: "POST" })
   .validator((data: AnnouncementInput) => data)
   .handler(async ({ data }) => {
+    const content = ANNOUNCEMENT_HEADLINES[data.type](data);
     try {
       const png = await renderAnnouncementCard({
         badge: ANNOUNCEMENT_BADGES[data.type],
@@ -228,31 +230,47 @@ export const notifyDiscordAnnouncement = createServerFn({ method: "POST" })
         stock: data.stock,
         imageUrl: data.imageUrl,
       });
-      const embed = {
-        title: ANNOUNCEMENT_TITLES[data.type],
-        color: 0xffffff,
-        image: { url: "attachment://annonce.png" },
-        footer: { text: "Vercell — annonce automatique · shop-plus-nu.vercel.app" },
-        timestamp: new Date().toISOString(),
-      };
-      return postWebhookWithFile(annoncesWebhookUrl, { embeds: [embed] }, png, "annonce.png", "annonces");
+      // Gros titre en texte (markdown "#") au-dessus de l'image, envoyee en
+      // piece jointe brute plutot qu'en embed -- Discord l'affiche en grand.
+      return postWebhookWithFile(annoncesWebhookUrl, { content }, png, "annonce.png", "annonces");
     } catch (e) {
       // La carte PNG est un bonus visuel : si son rendu echoue pour une raison
       // quelconque (police, image produit inaccessible...), l'annonce part
       // quand meme sous forme d'embed texte classique plutot que de ne rien envoyer.
       console.error("Rendu carte annonce echoue, repli sur embed texte:", e);
-      return postWebhook(annoncesWebhookUrl, { embeds: [buildAnnouncementEmbed(data)] }, "annonces");
+      return postWebhook(annoncesWebhookUrl, { content, embeds: [buildAnnouncementEmbed(data)] }, "annonces");
     }
   });
 
-/** Annonces boutique qui ne concernent pas un produit precis (pas de carte
- * PNG ici, ca n'aurait pas de logo/image a montrer) : promo, maintenance,
- * moyens de paiement. */
+/** Annonces boutique qui ne concernent pas un produit precis : promo,
+ * maintenance, moyens de paiement. Meme traitement carte PNG + gros titre
+ * que les annonces produit, avec le logo Vercell comme image par defaut
+ * quand il n'y a rien de plus specifique (ex: icone de la crypto ajoutee). */
 type StoreEventInput =
   | { type: "promo_created"; code: string; discount: number; maxUses: number }
   | { type: "maintenance_on" }
   | { type: "maintenance_off" }
   | { type: "payment_method_added"; name: string; details?: string; icon?: string };
+
+const STORE_EVENT_HEADLINES: Record<StoreEventInput["type"], (data: StoreEventInput) => string> = {
+  promo_created: (d) => (d.type === "promo_created" ? `# 🎟️ Nouveau code promo : ${d.code} (-${d.discount}%) !` : ""),
+  maintenance_on: () => "# 🛠️ Boutique en maintenance",
+  maintenance_off: () => "# ✅ Boutique de nouveau ouverte !",
+  payment_method_added: (d) => (d.type === "payment_method_added" ? `# 💳 Nouveau moyen de paiement : ${d.name} !` : ""),
+};
+
+function storeEventCardData(data: StoreEventInput) {
+  switch (data.type) {
+    case "promo_created":
+      return { badge: "CODE PROMO", name: data.code, price: `-${data.discount}%`, stock: `Max ${data.maxUses} utilisations`, imageUrl: siteLogoImg };
+    case "maintenance_on":
+      return { badge: "MAINTENANCE ACTIVÉE", name: "Boutique Vercell", imageUrl: siteLogoImg };
+    case "maintenance_off":
+      return { badge: "DE NOUVEAU OUVERTE", name: "Boutique Vercell", imageUrl: siteLogoImg };
+    case "payment_method_added":
+      return { badge: "NOUVEAU MOYEN DE PAIEMENT", name: data.name, stock: data.details, imageUrl: resolveLogoUrl(data.icon) ?? siteLogoImg };
+  }
+}
 
 function buildStoreEventEmbed(data: StoreEventInput) {
   const iconUrl = data.type === "payment_method_added" ? resolveLogoUrl(data.icon) : undefined;
@@ -264,28 +282,25 @@ function buildStoreEventEmbed(data: StoreEventInput) {
   };
   switch (data.type) {
     case "promo_created":
-      return {
-        ...base,
-        title: "🎟️ Nouveau code promo !",
-        description: `Utilise le code **${data.code}** pour **-${data.discount}%** sur ta commande !`,
-        fields: [{ name: "Utilisations max", value: `${data.maxUses}`, inline: true }, SHOP_LINK_FIELD],
-      };
+      return { ...base, fields: [{ name: "Utilisations max", value: `${data.maxUses}`, inline: true }, SHOP_LINK_FIELD] };
     case "maintenance_on":
-      return { ...base, title: "🛠️ Boutique en maintenance", description: "Le site est temporairement fermé pour maintenance. On revient vite !" };
+      return { ...base, description: "Le site est temporairement fermé pour maintenance. On revient vite !" };
     case "maintenance_off":
-      return { ...base, title: "✅ Boutique de nouveau ouverte !", description: "La maintenance est terminée, la boutique est de nouveau accessible.", fields: [SHOP_LINK_FIELD] };
+      return { ...base, description: "La maintenance est terminée, la boutique est de nouveau accessible.", fields: [SHOP_LINK_FIELD] };
     case "payment_method_added":
-      return {
-        ...base,
-        title: "💳 Nouveau moyen de paiement disponible !",
-        description: `**${data.name}** est maintenant accepté sur la boutique.`,
-        fields: [...(data.details ? [{ name: "Détails", value: data.details }] : []), SHOP_LINK_FIELD],
-      };
+      return { ...base, fields: [...(data.details ? [{ name: "Détails", value: data.details }] : []), SHOP_LINK_FIELD] };
   }
 }
 
 export const notifyDiscordStoreEvent = createServerFn({ method: "POST" })
   .validator((data: StoreEventInput) => data)
   .handler(async ({ data }) => {
-    return postWebhook(annoncesWebhookUrl, { embeds: [buildStoreEventEmbed(data)] }, "annonces");
+    const content = STORE_EVENT_HEADLINES[data.type](data);
+    try {
+      const png = await renderAnnouncementCard(storeEventCardData(data));
+      return postWebhookWithFile(annoncesWebhookUrl, { content }, png, "annonce.png", "annonces");
+    } catch (e) {
+      console.error("Rendu carte annonce (boutique) echoue, repli sur embed texte:", e);
+      return postWebhook(annoncesWebhookUrl, { content, embeds: [buildStoreEventEmbed(data)] }, "annonces");
+    }
   });

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MessageCircle, X, ExternalLink, Ticket } from "lucide-react";
 
-export function DiscordSupport({ link = "https://discord.gg/UUBFjjCp" }: { link?: string }) {
+export function DiscordSupport({ link = "https://discord.gg/HwvBBnX3Wc" }: { link?: string }) {
   const [open, setOpen] = useState(false);
 
   return (

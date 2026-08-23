@@ -34,7 +34,7 @@ export const sendOrderEmail = createServerFn({ method: "POST" })
         <div style="border-left: 4px solid #000000; padding-left: 15px; margin: 30px 0;">
           <h2 style="color: #000000; margin-top: 0;">Comment récupérer votre commande ?</h2>
           <p>Pour recevoir vos accès ou votre produit, veuillez ouvrir un ticket sur notre serveur Discord en cliquant sur le lien ci-dessous :</p>
-          <a href="https://discord.gg/8RBgw6ykQK" style="display: inline-block; background-color: #000000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
+          <a href="https://discord.gg/HwvBBnX3Wc" style="display: inline-block; background-color: #000000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
             Ouvrir un ticket Discord
           </a>
         </div>

@@ -206,7 +206,7 @@ export function CartDrawer() {
                 Envoie le montant exact à l'adresse indiquée juste avant, puis ouvre un ticket Discord avec une preuve de la transaction (capture d'écran ou lien de l'explorateur blockchain). Le staff valide manuellement, comme pour PayPal.
               </p>
               <a
-                href="https://discord.gg/UUBFjjCp"
+                href="https://discord.gg/HwvBBnX3Wc"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold bg-white/10 hover:bg-white/20 border border-white/10 transition"
@@ -412,7 +412,7 @@ export function CartDrawer() {
             {loading ? "Chargement..." : selectedCrypto ? `Valider ma commande (${selectedCrypto.ticker})` : "Payer via PayPal"}
           </button>
           <a
-            href="https://discord.gg/UUBFjjCp"
+            href="https://discord.gg/HwvBBnX3Wc"
             target="_blank"
             rel="noreferrer"
             className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition hover:bg-white/5 border border-white/10"
