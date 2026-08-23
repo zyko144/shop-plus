@@ -13,7 +13,7 @@ import { Sparkles, Zap, ShieldCheck, ShoppingBag, Search } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import heroBg from "@/assets/hero-bg.jpg";
-import logoImg from "@/assets/logo.svg";
+import logoImg from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({

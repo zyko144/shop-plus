@@ -4,7 +4,7 @@ import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logoImg from "@/assets/logo.svg";
+import logoImg from "@/assets/logo.png";
 
 export function Header() {
   const { count, setOpen } = useCart();
