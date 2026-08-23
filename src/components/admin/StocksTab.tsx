@@ -60,7 +60,7 @@ export function StocksTab({
 
                     <td className="p-4 text-center">
                       <select
-                        className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-medium focus:border-blue-500 outline-none"
+                        className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm font-medium focus:border-gray-500 outline-none"
                         value={stockInfo.is_unlimited ? "unlimited" : "limited"}
                         onChange={(e) => onStockChange(p.id, { is_unlimited: e.target.value === "unlimited", stock: stockInfo.stock })}
                       >
@@ -74,7 +74,7 @@ export function StocksTab({
                         <input
                           type="number"
                           min="0"
-                          className="w-20 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center focus:border-blue-500 outline-none"
+                          className="w-20 bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-center focus:border-gray-500 outline-none"
                           value={stockInfo.stock}
                           onChange={(e) => onStockChange(p.id, { is_unlimited: false, stock: parseInt(e.target.value) || 0 })}
                         />
@@ -86,7 +86,7 @@ export function StocksTab({
                     <td className="p-4 text-right">
                       <button
                         onClick={() => onSave(p.id, stockInfo.stock, stockInfo.is_unlimited)}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-colors"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm font-bold transition-colors"
                       >
                         <Save size={14} />
                         Enregistrer

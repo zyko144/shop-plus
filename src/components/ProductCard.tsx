@@ -169,7 +169,7 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
 
         {/* Stock Badge */}
         {!stockInfo.is_unlimited && stockInfo.stock > 0 && stockInfo.stock <= 5 && (
-          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-orange-500 text-white shadow-lg shadow-orange-500/50">
+          <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-500 text-white shadow-lg shadow-gray-500/50">
             Plus que {stockInfo.stock} !
           </div>
         )}
@@ -186,7 +186,7 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
             <div className="text-[10px] uppercase tracking-wider text-muted-foreground">À partir de</div>
             <div className="flex items-center gap-2">
               {hasPremiumDiscount && !isDiscord && (
-                <div className="text-sm font-black text-white/40 line-through decoration-red-500/50">
+                <div className="text-sm font-black text-white/40 line-through decoration-gray-500/50">
                   {Number(product.price).toFixed(2)}€
                 </div>
               )}
@@ -195,7 +195,7 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
               </div>
             </div>
             {hasPremiumDiscount && !isDiscord && (
-              <div className="text-[9px] font-bold text-purple-400 bg-purple-500/20 px-1.5 py-0.5 rounded-sm w-fit mt-0.5">
+              <div className="text-[9px] font-bold text-gray-400 bg-gray-500/20 px-1.5 py-0.5 rounded-sm w-fit mt-0.5">
                 👑 -30% Premium
               </div>
             )}

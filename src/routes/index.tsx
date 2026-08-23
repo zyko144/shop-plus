@@ -18,31 +18,31 @@ import logoImg from "@/assets/logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "streamIN — Comptes Streaming, Fortnite, Steam, VPN & Discord" },
-      { name: "description", content: "streamIN : boutique premium 3D — YouTube, Netflix, Deezer, Crunchyroll, Fortnite, Steam, VPN, V-Bucks, décorations Discord. Paiement PayPal sécurisé." },
-      { property: "og:title", content: "streamIN — Boutique premium" },
+      { title: "Vercell — Comptes Streaming, Fortnite, Steam, VPN & Discord" },
+      { name: "description", content: "Vercell : boutique premium 3D — YouTube, Netflix, Deezer, Crunchyroll, Fortnite, Steam, VPN, V-Bucks, décorations Discord. Paiement PayPal sécurisé." },
+      { property: "og:title", content: "Vercell — Boutique premium" },
       { property: "og:description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
     ],
   }),
   component: Index,
 });
 
-type Group = { id: string; label: string; emoji: string; color: string; items: Product[]; description: string };
+type Group = { id: string; label: string; emoji: string; iconSlug?: string; color: string; items: Product[]; description: string };
 
 const GROUP_META: Record<string, Omit<Group, "items">> = {
   // Apps & Services
-  "Streaming": { id: "streaming", label: "Streaming", emoji: "📺", color: "#ff0033", description: "Films, séries, musique — vos plateformes préférées dès 1€." },
-  "VPN": { id: "vpn", label: "VPN", emoji: "🛡", color: "#4687ff", description: "Navigation sécurisée, débridez tout le web." },
-  "Discord": { id: "discord", label: "Discord", emoji: "✦", color: "#5865f2", description: "Décorations de profil — grille tarifaire officielle." },
-  "Twitch": { id: "twitch", label: "Twitch", emoji: "💜", color: "#9146ff", description: "Boostez votre chaîne avec de vrais followers." },
+  "Streaming": { id: "streaming", label: "Streaming", emoji: "📺", iconSlug: "netflix", color: "#f5f5f5", description: "Films, séries, musique — vos plateformes préférées dès 1€." },
+  "VPN": { id: "vpn", label: "VPN", emoji: "🛡", iconSlug: "nordvpn", color: "#d4d4d4", description: "Navigation sécurisée, débridez tout le web." },
+  "Discord": { id: "discord", label: "Discord", emoji: "✦", iconSlug: "discord", color: "#a3a3a3", description: "Décorations de profil — grille tarifaire officielle." },
+  "Twitch": { id: "twitch", label: "Twitch", emoji: "💜", iconSlug: "twitch", color: "#8a8a8a", description: "Boostez votre chaîne avec de vrais followers." },
   // Jeux
-  "Fortnite": { id: "fortnite", label: "Fortnite", emoji: "🎯", color: "#00d2ff", description: "Comptes Fortnite aléatoires avec skins inclus." },
-  "Fortnite Rare": { id: "rare", label: "Skins Rares", emoji: "👑", color: "#ffb800", description: "Pioches exclusives, skins légendaires, OG only." },
-  "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", color: "#f0b400", description: "Comptes chargés en V-Bucks prêts à dépenser." },
-  "Valorant EU": { id: "valorant", label: "Valorant EU", emoji: "🔫", color: "#ff4655", description: "Comptes Valorant région EU blindés de Valorant Points." },
-  "Robux": { id: "robux", label: "Robux", emoji: "💰", color: "#1bd96a", description: "Des milliers de Robux instantanément sur votre compte." },
-  "Steam": { id: "steam", label: "Steam", emoji: "🎮", color: "#1b9cff", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
-  "Epic Games": { id: "epicgames", label: "Epic Games", emoji: "🎮", color: "#ffffff", description: "Des comptes avec des centaines de jeux premium." },
+  "Fortnite": { id: "fortnite", label: "Fortnite", emoji: "🎯", iconSlug: "fortnite", color: "#f5f5f5", description: "Comptes Fortnite aléatoires avec skins inclus." },
+  "Fortnite Rare": { id: "rare", label: "Skins Rares", emoji: "👑", iconSlug: "fortnite", color: "#e5e5e5", description: "Pioches exclusives, skins légendaires, OG only." },
+  "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", iconSlug: "epicgames", color: "#d4d4d4", description: "Comptes chargés en V-Bucks prêts à dépenser." },
+  "Valorant EU": { id: "valorant", label: "Valorant EU", emoji: "🔫", iconSlug: "valorant", color: "#a3a3a3", description: "Comptes Valorant région EU blindés de Valorant Points." },
+  "Robux": { id: "robux", label: "Robux", emoji: "💰", iconSlug: "roblox", color: "#8a8a8a", description: "Des milliers de Robux instantanément sur votre compte." },
+  "Steam": { id: "steam", label: "Steam", emoji: "🎮", iconSlug: "steam", color: "#737373", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
+  "Epic Games": { id: "epicgames", label: "Epic Games", emoji: "🎮", iconSlug: "epicgames", color: "#ffffff", description: "Des comptes avec des centaines de jeux premium." },
 };
 
 function Index() {
@@ -112,7 +112,7 @@ function Index() {
   }, [allProducts]);
 
   const cats: Cat[] = useMemo(
-    () => GROUPS.map((g) => ({ id: g.id, label: g.label, emoji: g.emoji, color: g.color, count: g.items.length || (g.id === "steam" ? 40 : 0) })),
+    () => GROUPS.map((g) => ({ id: g.id, label: g.label, emoji: g.emoji, iconSlug: g.iconSlug, color: g.color, count: g.items.length || (g.id === "steam" ? 40 : 0) })),
     [GROUPS]
   );
 
@@ -137,8 +137,8 @@ function Index() {
 
       {/* HERO */}
       <section ref={heroRef} className="relative overflow-hidden bg-transparent border-b border-border/40 noise-overlay">
-        <div className="hero-parallax absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/10 via-black to-black pointer-events-none" />
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent" />
+        <div className="hero-parallax absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900/10 via-black to-black pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-gray-500/20 to-transparent" />
 
         <div className="relative max-w-5xl mx-auto px-6 py-20 md:py-32 flex flex-col items-center text-center">
           <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-xs font-medium mb-8 text-muted-foreground backdrop-blur-sm shadow-xl">
@@ -147,7 +147,7 @@ function Index() {
 
           <h1 className="hero-title font-display text-4xl sm:text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
             L'excellence numérique.<br/>
-            <span className="bg-gradient-to-r from-red-500 via-red-400 to-red-600 bg-clip-text text-transparent drop-shadow-sm">Sans compromis.</span>
+            <span className="bg-gradient-to-r from-gray-500 via-gray-400 to-gray-600 bg-clip-text text-transparent drop-shadow-sm">Sans compromis.</span>
           </h1>
 
           <p className="hero-sub text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-12 font-medium">
@@ -204,9 +204,9 @@ function Index() {
           
           
           {group.label === "Fortnite" && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-center gap-3 text-red-500 font-bold text-center shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+            <div className="bg-gray-500/20 border border-gray-500/50 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-center gap-3 text-gray-500 font-bold text-center shadow-[0_0_20px_rgba(255,255,255,0.2)]">
               <span>Si vous voulez d'autres comptes spécifiques, n'hésitez pas à faire une demande sur notre discord !</span>
-              <a href="https://discord.gg/UUBFjjCp" className="px-4 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors" target="_blank" rel="noreferrer">
+              <a href="https://discord.gg/UUBFjjCp" className="px-4 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors" target="_blank" rel="noreferrer">
                 Rejoindre le Discord
               </a>
             </div>
@@ -241,13 +241,13 @@ function Index() {
 
       <footer className="border-t border-border py-10 px-6 text-center text-sm text-muted-foreground mt-10">
         <div className="flex justify-center mb-4">
-          <div className="w-12 h-12 bg-black rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.3)] border border-red-600/30 overflow-hidden p-1 flex items-center justify-center">
-            <img src={logoImg} alt="streamIN" className="w-full h-full object-contain" />
+          <div className="w-12 h-12 bg-black rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.15)] border border-white/20 overflow-hidden p-1 flex items-center justify-center">
+            <img src={logoImg} alt="Vercell" className="w-full h-full object-contain" />
           </div>
         </div>
-        <p className="font-display font-black text-foreground mb-2 text-lg flex justify-center items-center gap-1">stream<span className="text-primary">IN</span></p>
+        <p className="font-display font-black text-foreground mb-2 text-lg flex justify-center items-center gap-1">Vercell</p>
         <p>Paiement sécurisé via PayPal — <a href={PAYPAL_URL} target="_blank" rel="noreferrer" className="text-primary hover:underline">{PAYPAL_URL.replace("https://", "")}</a></p>
-        <p className="mt-2 text-xs">© {new Date().getFullYear()} streamIN. Tous droits réservés.</p>
+        <p className="mt-2 text-xs">© {new Date().getFullYear()} Vercell. Tous droits réservés.</p>
       </footer>
     </div>
   );

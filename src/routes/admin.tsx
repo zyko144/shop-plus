@@ -16,7 +16,7 @@ import type { AdminOrderRow, PromoCode, StockData } from "@/components/admin/typ
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Dashboard Admin — streamIN" }] }),
+  head: () => ({ meta: [{ title: "Dashboard Admin — Vercell" }] }),
   component: AdminDashboardErrorBoundary,
 });
 
@@ -28,9 +28,9 @@ class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {h
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-black text-white p-10 font-mono">
-          <h1 className="text-red-500 text-2xl font-bold mb-4">Erreur Interne du Dashboard</h1>
+          <h1 className="text-gray-500 text-2xl font-bold mb-4">Erreur Interne du Dashboard</h1>
           <p className="mb-4">Une erreur s'est produite lors du rendu du panel admin. Prenez une capture d'écran de ceci :</p>
-          <pre className="bg-red-900/30 p-4 rounded overflow-auto border border-red-500/50">{this.state.error?.message}</pre>
+          <pre className="bg-gray-900/30 p-4 rounded overflow-auto border border-gray-500/50">{this.state.error?.message}</pre>
           <pre className="bg-white/5 p-4 rounded overflow-auto border border-white/10 mt-4 text-xs text-white/50">{this.state.error?.stack}</pre>
         </div>
       );
@@ -166,12 +166,12 @@ function AdminDashboard() {
   if (!authLoading && (!user || profile?.role !== "admin")) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-        <h1 className="text-2xl font-bold text-red-500 mb-4">Accès Refusé</h1>
+        <h1 className="text-2xl font-bold text-gray-500 mb-4">Accès Refusé</h1>
         <p className="text-muted-foreground mb-2">Vous n'avez pas les droits d'administrateur.</p>
         <div className="p-4 bg-black/50 rounded-lg text-sm font-mono mt-4 text-left">
           <p>Connecté en tant que : {user ? user.email : "Non connecté"}</p>
           <p>Rôle détecté dans la base : {profile?.role ? `"${profile.role}"` : "Aucun profil/rôle trouvé"}</p>
-          {profileError && <p className="text-red-400 mt-2">Erreur Supabase Profile : {profileError}</p>}
+          {profileError && <p className="text-gray-400 mt-2">Erreur Supabase Profile : {profileError}</p>}
         </div>
         <button onClick={() => window.location.reload()} className="mt-6 px-4 py-2 bg-primary rounded-lg text-primary-foreground">
           Rafraîchir la page
@@ -271,11 +271,11 @@ function AdminDashboard() {
       { id: 'robux-5000', name: 'Robux 5000-10.000', category: 'Robux', price: 20.00, logo: 'roblox', color: '#ffffff', is_active: true },
       { id: 'robux-10000', name: 'Robux 10.000-15.000', category: 'Robux', price: 31.25, logo: 'roblox', color: '#ffffff', is_active: true },
       { id: 'robux-50000', name: 'Robux 50.000+', category: 'Robux', price: 75.00, logo: 'roblox', color: '#ffffff', is_active: true },
-      { id: 'val-1000', name: 'Valorant EU [1000-3000VP Inventory]', category: 'Valorant EU', price: 30.00, logo: 'valorant', color: '#ff4655', is_active: true },
-      { id: 'val-3000', name: 'Valorant EU [3000-5000VP Inventory]', category: 'Valorant EU', price: 42.50, logo: 'valorant', color: '#ff4655', is_active: true },
-      { id: 'val-5000', name: 'Valorant EU [5000-7000VP Inventory]', category: 'Valorant EU', price: 62.50, logo: 'valorant', color: '#ff4655', is_active: true },
-      { id: 'val-7000', name: 'Valorant EU [7000-12.000VP Inventory]', category: 'Valorant EU', price: 87.50, logo: 'valorant', color: '#ff4655', is_active: true },
-      { id: 'val-15000', name: 'Valorant EU [15.000-25.000VP Inventory]', category: 'Valorant EU', price: 105.00, logo: 'valorant', color: '#ff4655', is_active: true },
+      { id: 'val-1000', name: 'Valorant EU [1000-3000VP Inventory]', category: 'Valorant EU', price: 30.00, logo: 'valorant', color: '#ffffff', is_active: true },
+      { id: 'val-3000', name: 'Valorant EU [3000-5000VP Inventory]', category: 'Valorant EU', price: 42.50, logo: 'valorant', color: '#ffffff', is_active: true },
+      { id: 'val-5000', name: 'Valorant EU [5000-7000VP Inventory]', category: 'Valorant EU', price: 62.50, logo: 'valorant', color: '#ffffff', is_active: true },
+      { id: 'val-7000', name: 'Valorant EU [7000-12.000VP Inventory]', category: 'Valorant EU', price: 87.50, logo: 'valorant', color: '#ffffff', is_active: true },
+      { id: 'val-15000', name: 'Valorant EU [15.000-25.000VP Inventory]', category: 'Valorant EU', price: 105.00, logo: 'valorant', color: '#ffffff', is_active: true },
       { id: 'epic-50', name: 'Epic Games [50-100 Games] FA', category: 'Epic Games', price: 0.75, logo: 'epicgames', color: '#ffffff', is_active: true },
       { id: 'epic-100', name: 'Epic Games [100-200 Games] FA', category: 'Epic Games', price: 2.50, logo: 'epicgames', color: '#ffffff', is_active: true },
       { id: 'epic-200', name: 'Epic Games [200-350 Games] FA', category: 'Epic Games', price: 5.00, logo: 'epicgames', color: '#ffffff', is_active: true },

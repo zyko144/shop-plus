@@ -7,7 +7,7 @@ import { CustomCaptcha } from "@/components/CustomCaptcha";
 import logoImg from "@/assets/logo.png";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Connexion — streamIN" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur streamIN." }] }),
+  head: () => ({ meta: [{ title: "Connexion — Vercell" }, { name: "description", content: "Connectez-vous ou créez un compte pour commander sur Vercell." }] }),
   component: AuthPage,
 });
 
@@ -63,9 +63,9 @@ function AuthPage() {
     <div className="min-h-screen relative overflow-hidden bg-black grid place-items-center px-6">
       {/* Animated 3D-like floating background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-red-600/30 rounded-full mix-blend-screen filter blur-[50px] animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-orange-600/20 rounded-full mix-blend-screen filter blur-[60px] animate-pulse" style={{ animationDuration: '6s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-900/40 rounded-full mix-blend-screen filter blur-[100px]" />
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gray-600/30 rounded-full mix-blend-screen filter blur-[50px] animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-gray-600/20 rounded-full mix-blend-screen filter blur-[60px] animate-pulse" style={{ animationDuration: '6s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gray-900/40 rounded-full mix-blend-screen filter blur-[100px]" />
         
         {/* Floating abstract shapes mimicking 3D platform logos */}
         {/* Ligne du haut */}
@@ -92,16 +92,16 @@ function AuthPage() {
         <img src="https://cdn.jsdelivr.net/npm/simple-icons@11.0.0/icons/appletv.svg" alt="Apple TV" className="absolute bottom-[15%] left-[60%] w-14 h-8 opacity-30 filter blur-[2.5px] invert" style={{ animation: 'float 6s ease-in-out infinite 2s' }} />
       </div>
 
-      <div className="w-full max-w-md relative z-10 p-8 space-y-8 rounded-[2rem] border border-red-500/20 bg-black/40 backdrop-blur-2xl" style={{ boxShadow: "0 0 80px -20px rgba(220,38,38,0.3), inset 0 0 20px -10px rgba(220,38,38,0.2)" }}>
+      <div className="w-full max-w-md relative z-10 p-8 space-y-8 rounded-[2rem] border border-white/15 bg-black/40 backdrop-blur-2xl" style={{ boxShadow: "0 0 80px -20px rgba(255,255,255,0.15), inset 0 0 20px -10px rgba(255,255,255,0.1)" }}>
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-black shadow-[0_0_40px_rgba(220,38,38,0.4)] border border-red-600/30 mb-4 overflow-hidden p-2">
-            <img src={logoImg} alt="streamIN Logo" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]" />
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-black shadow-[0_0_40px_rgba(255,255,255,0.2)] border border-white/20 mb-4 overflow-hidden p-2">
+            <img src={logoImg} alt="Vercell Logo" className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
           </div>
           <h1 className="font-display text-3xl font-black tracking-tight text-white flex items-center justify-center gap-2">
             {mode === "login" ? "Connexion" : "Rejoindre"}
-            <span className="bg-gradient-to-r from-red-500 to-red-800 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">streamIN</span>
+            <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">Vercell</span>
           </h1>
-          <p className="text-sm text-red-200/60 font-medium">L'accès premium à vos plateformes préférées.</p>
+          <p className="text-sm text-white/50 font-medium">L'accès premium à vos plateformes préférées.</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
@@ -112,7 +112,7 @@ function AuthPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Votre pseudo"
-                className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 outline-none transition-all"
+                className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-gray-500/50 focus:ring-1 focus:ring-gray-500/50 outline-none transition-all"
               />
             </div>
           )}
@@ -122,7 +122,7 @@ function AuthPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Adresse email"
-              className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 outline-none transition-all"
+              className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-gray-500/50 focus:ring-1 focus:ring-gray-500/50 outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
@@ -131,7 +131,7 @@ function AuthPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mot de passe"
-              className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-red-500/50 focus:ring-1 focus:ring-red-500/50 outline-none transition-all"
+              className="w-full px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 focus:border-gray-500/50 focus:ring-1 focus:ring-gray-500/50 outline-none transition-all"
             />
           </div>
 
@@ -142,7 +142,7 @@ function AuthPage() {
           <div className="pt-2">
             <button
               disabled={loading || !captchaToken}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 to-red-800 text-white font-bold tracking-wide disabled:opacity-50 hover:shadow-[0_0_30px_-5px_rgba(220,38,38,0.6)] hover:-translate-y-0.5 transition-all duration-300"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-gray-600 to-gray-800 text-white font-bold tracking-wide disabled:opacity-50 hover:shadow-[0_0_30px_-5px_rgba(255,255,255,0.6)] hover:-translate-y-0.5 transition-all duration-300"
             >
               {loading ? "Chargement..." : mode === "login" ? "Accéder à mon compte" : "Créer mon compte"}
             </button>
@@ -163,7 +163,7 @@ function AuthPage() {
               if (error) { toast.error(error.message); setLoading(false); }
             }}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#5865F2] font-semibold transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold transition-all disabled:opacity-50"
           >
             <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
               <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
@@ -191,8 +191,8 @@ function AuthPage() {
         </div>
 
         <p className="text-center text-sm text-white/50 pt-2">
-          {mode === "login" ? "Nouveau sur streamIN ?" : "Vous avez déjà un compte ?"}{" "}
-          <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-red-400 font-bold hover:text-red-300 transition-colors">
+          {mode === "login" ? "Nouveau sur Vercell ?" : "Vous avez déjà un compte ?"}{" "}
+          <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="text-gray-400 font-bold hover:text-gray-300 transition-colors">
             {mode === "login" ? "Créer un compte" : "Se connecter"}
           </button>
         </p>

@@ -29,13 +29,13 @@ export function ProductsTab({
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={onDeleteAllReviews}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white text-sm font-bold transition-colors"
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg text-white text-sm font-bold transition-colors"
           >
             🗑️ Vider tous les avis
           </button>
           <button
             onClick={onInjectNewProducts}
-            className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-white text-sm font-bold transition-colors"
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg text-white text-sm font-bold transition-colors"
           >
             🚀 Injecter Nouveaux Produits
           </button>
@@ -56,7 +56,7 @@ export function ProductsTab({
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {products.map(p => (
-                <div key={p.id} className="p-4 rounded-xl border bg-black/40 border-white/10 hover:border-orange-500/50 transition-colors group relative overflow-hidden">
+                <div key={p.id} className="p-4 rounded-xl border bg-black/40 border-white/10 hover:border-gray-500/50 transition-colors group relative overflow-hidden">
                   {/* Color strip */}
                   <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: p.color || '#fff' }}></div>
 
@@ -77,20 +77,20 @@ export function ProductsTab({
                     <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => onEdit(p)}
-                        className="p-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500/40 rounded-md transition" title="Modifier"
+                        className="p-1.5 bg-gray-500/20 text-gray-400 hover:bg-gray-500/40 rounded-md transition" title="Modifier"
                       >
                         <Edit size={14} />
                       </button>
                       <button
                         onClick={() => onDelete(p.id)}
-                        className="p-1.5 bg-red-500/20 text-red-500 hover:bg-red-500/40 rounded-md transition" title="Supprimer"
+                        className="p-1.5 bg-gray-500/20 text-gray-500 hover:bg-gray-500/40 rounded-md transition" title="Supprimer"
                       >
                         <Trash2 size={14} />
                       </button>
                     </div>
                   </div>
                   {!p.is_active && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-500">Inactif</div>
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-500/20 text-gray-500">Inactif</div>
                   )}
                 </div>
               ))}

@@ -77,7 +77,7 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
               <MessageSquare size={20} style={{ color }} /> Avis sur {productName}
             </h2>
             <div className="flex items-center gap-2 text-sm text-white/50 mt-1">
-              <Star size={14} className="fill-yellow-500 text-yellow-500" />
+              <Star size={14} className="fill-gray-500 text-gray-500" />
               <span>{avgRating} ({reviews.length} avis)</span>
             </div>
           </div>
@@ -94,9 +94,9 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
               <div key={r.id} className="bg-white/5 p-4 rounded-2xl border border-white/5">
                 <div className="flex justify-between items-center mb-2">
                   <div className="font-bold text-sm text-white/90">{r.profiles?.username || "Utilisateur"}</div>
-                  <div className="flex text-yellow-500">
+                  <div className="flex text-gray-500">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} size={12} className={i < r.rating ? "fill-yellow-500" : "opacity-30"} />
+                      <Star key={i} size={12} className={i < r.rating ? "fill-gray-500" : "opacity-30"} />
                     ))}
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export function ProductReviewsModal({ productId, productName, color, onClose }: 
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <button key={i} onClick={() => setNewRating(i + 1)} className="p-1 hover:scale-110 transition">
-                    <Star size={20} className={i < newRating ? "fill-yellow-500 text-yellow-500" : "text-white/30"} />
+                    <Star size={20} className={i < newRating ? "fill-gray-500 text-gray-500" : "text-white/30"} />
                   </button>
                 ))}
               </div>

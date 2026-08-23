@@ -16,7 +16,7 @@ export function AdminProductEditor({ initialProduct, onSave, onCancel }: AdminPr
     subtitle: "",
     price: 0,
     category: "Streaming",
-    color: "#ff0000",
+    color: "#ffffff",
     logo: "",
     emoji: "",
     is_active: true,
@@ -119,7 +119,7 @@ export function AdminProductEditor({ initialProduct, onSave, onCancel }: AdminPr
                 <div className="flex gap-2">
                   <input 
                     type="color" 
-                    value={product.color || "#ff0000"} 
+                    value={product.color || "#ffffff"}
                     onChange={(e) => handleChange("color", e.target.value)}
                     className="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0"
                   />

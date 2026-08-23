@@ -136,19 +136,19 @@ export function CustomCaptcha({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <div className={`p-5 rounded-2xl border transition-all duration-300 w-full select-none ${
-      status === "success" ? "bg-green-500/10 border-green-500/50" : 
-      status === "error" ? "bg-red-500/10 border-red-500/50" : 
+      status === "success" ? "bg-gray-500/10 border-gray-500/50" : 
+      status === "error" ? "bg-gray-500/10 border-gray-500/50" : 
       "bg-black/40 border-white/10"
     }`}>
       {status === "success" ? (
-        <div className="flex flex-col items-center justify-center gap-2 text-green-500 py-2 animate-in zoom-in duration-300">
+        <div className="flex flex-col items-center justify-center gap-2 text-gray-500 py-2 animate-in zoom-in duration-300">
           <CheckCircle2 className="w-8 h-8" />
           <span className="font-bold text-lg">Vérification réussie !</span>
         </div>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-white/90 text-sm font-medium justify-center flex-wrap text-center">
-            <ShieldAlert className="w-5 h-5 text-orange-500 shrink-0" />
+            <ShieldAlert className="w-5 h-5 text-gray-500 shrink-0" />
             <span>
               Sécurité Anti-Robot : {" "}
               {testType === "logos" ? (

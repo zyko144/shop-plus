@@ -43,7 +43,7 @@ export function OrdersTab({
                   <ul className="space-y-1 text-sm text-muted-foreground">
                     {o.order_items && Array.isArray(o.order_items) ? o.order_items.map((it, idx) => (
                       <li key={idx}><span className="text-white/70">{it.quantity}x</span> {it.product_name}</li>
-                    )) : <li className="text-red-400">Erreur produits</li>}
+                    )) : <li className="text-gray-400">Erreur produits</li>}
                   </ul>
                 </td>
                 <td className="p-4 font-bold text-primary">
@@ -51,9 +51,9 @@ export function OrdersTab({
                 </td>
                 <td className="p-4">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                    o.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                    o.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                    'bg-red-500/20 text-red-400'
+                    o.status === 'pending' ? 'bg-gray-500/20 text-gray-400' :
+                    o.status === 'completed' ? 'bg-gray-500/20 text-gray-400' :
+                    'bg-gray-500/20 text-gray-400'
                   }`}>
                     {o.status === 'pending' && 'En attente'}
                     {o.status === 'completed' && 'Livré'}
@@ -63,16 +63,16 @@ export function OrdersTab({
                 <td className="p-4 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {o.status === 'pending' && (
-                      <button onClick={() => onUpdateStatus(o.id, 'completed')} title="Marquer comme livré" className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/40 transition">
+                      <button onClick={() => onUpdateStatus(o.id, 'completed')} title="Marquer comme livré" className="p-1.5 rounded-lg bg-gray-500/20 text-gray-400 hover:bg-gray-500/40 transition">
                         <CheckCircle size={16} />
                       </button>
                     )}
                     {o.status !== 'cancelled' && (
-                      <button onClick={() => onUpdateStatus(o.id, 'cancelled')} title="Annuler la commande" className="p-1.5 rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition">
+                      <button onClick={() => onUpdateStatus(o.id, 'cancelled')} title="Annuler la commande" className="p-1.5 rounded-lg bg-gray-500/20 text-gray-400 hover:bg-gray-500/40 transition">
                         <XCircle size={16} />
                       </button>
                     )}
-                    <button onClick={() => onDelete(o.id)} title="Supprimer définitivement" className="p-1.5 rounded-lg bg-red-500/20 text-red-500 hover:bg-red-500/40 transition">
+                    <button onClick={() => onDelete(o.id)} title="Supprimer définitivement" className="p-1.5 rounded-lg bg-gray-500/20 text-gray-500 hover:bg-gray-500/40 transition">
                       <Trash2 size={16} />
                     </button>
                   </div>

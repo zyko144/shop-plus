@@ -9,12 +9,12 @@ export function DiscordSupport({ link = "https://discord.gg/UUBFjjCp" }: { link?
       {/* Floating button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-5 right-5 z-[90] h-14 w-14 rounded-full grid place-items-center text-white shadow-[0_10px_40px_rgba(220,38,38,.55)] hover:scale-110 active:scale-95 transition-all"
-        style={{ background: "linear-gradient(135deg,#dc2626,#991b1b)" }}
+        className="fixed bottom-5 right-5 z-[90] h-14 w-14 rounded-full grid place-items-center text-white shadow-[0_10px_40px_rgba(255,255,255,.55)] hover:scale-110 active:scale-95 transition-all"
+        style={{ background: "linear-gradient(135deg,#3f3f3f,#000000)" }}
         aria-label="Support Discord"
       >
         {open ? <X size={22} /> : <MessageCircle size={22} />}
-        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 ring-2 ring-black animate-pulse" />
+        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-gray-500 ring-2 ring-black animate-pulse" />
       </button>
 
       {/* Panel */}
@@ -23,7 +23,7 @@ export function DiscordSupport({ link = "https://discord.gg/UUBFjjCp" }: { link?
           <div className="flex items-start gap-3">
             <div
               className="h-11 w-11 rounded-xl grid place-items-center shrink-0"
-              style={{ background: "linear-gradient(135deg,#dc2626,#991b1b)" }}
+              style={{ background: "linear-gradient(135deg,#3f3f3f,#000000)" }}
             >
               <Ticket size={20} className="text-white" />
             </div>
@@ -47,7 +47,7 @@ export function DiscordSupport({ link = "https://discord.gg/UUBFjjCp" }: { link?
             target="_blank"
             rel="noreferrer"
             className="mt-4 w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition hover:scale-[1.02]"
-            style={{ background: "linear-gradient(135deg,#dc2626,#991b1b)", boxShadow: "0 8px 24px rgba(220,38,38,.45)" }}
+            style={{ background: "linear-gradient(135deg,#3f3f3f,#000000)", boxShadow: "0 8px 24px rgba(255,255,255,.45)" }}
           >
             Ouvrir un ticket Discord <ExternalLink size={14} />
           </a>

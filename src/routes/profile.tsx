@@ -11,7 +11,7 @@ import { OrderReview } from "@/components/OrderReview";
 import { ProductReviewsModal } from "@/components/ProductReviews";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Mon Compte — streamIN" }] }),
+  head: () => ({ meta: [{ title: "Mon Compte — Vercell" }] }),
   component: ProfilePage,
 });
 
@@ -72,11 +72,11 @@ function ProfilePage() {
       
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
-          <div className={`w-24 h-24 rounded-full p-1 ${isPremium ? 'bg-gradient-to-tr from-purple-600 to-pink-500 shadow-[0_0_30px_rgba(168,85,247,0.4)]' : 'bg-gradient-to-tr from-red-600 to-orange-500'}`}>
+          <div className={`w-24 h-24 rounded-full p-1 ${isPremium ? 'bg-gradient-to-tr from-gray-600 to-gray-500 shadow-[0_0_30px_rgba(255,255,255,0.4)]' : 'bg-gradient-to-tr from-gray-600 to-gray-500'}`}>
             <div className="w-full h-full bg-black rounded-full grid place-items-center text-4xl font-black relative">
               {user.email?.[0].toUpperCase()}
               {isPremium && (
-                <div className="absolute -top-2 -right-2 bg-purple-500 text-white p-1.5 rounded-full shadow-lg">
+                <div className="absolute -top-2 -right-2 bg-gray-500 text-white p-1.5 rounded-full shadow-lg">
                   <Crown size={16} />
                 </div>
               )}
@@ -85,7 +85,7 @@ function ProfilePage() {
           <div className="text-center md:text-left">
             <h1 className="font-display text-4xl font-black flex items-center justify-center md:justify-start gap-3">
               Espace Client
-              {isPremium && <span className="text-sm px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full font-bold flex items-center gap-1"><Crown size={14}/> Premium</span>}
+              {isPremium && <span className="text-sm px-3 py-1 bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full font-bold flex items-center gap-1"><Crown size={14}/> Premium</span>}
             </h1>
             <p className="text-muted-foreground">{user.email}</p>
           </div>
@@ -95,7 +95,7 @@ function ProfilePage() {
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
           <button 
             onClick={() => setActiveTab("coins")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all whitespace-nowrap ${activeTab === "coins" ? "bg-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all whitespace-nowrap ${activeTab === "coins" ? "bg-gray-500 text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
           >
             <Coins size={18} /> Ma Tirelire
           </button>
@@ -121,37 +121,37 @@ function ProfilePage() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
               {/* Premium Status Banner if Premium */}
               {isPremium && (
-                <div className="glass rounded-3xl p-8 border border-purple-500/50 relative overflow-hidden bg-gradient-to-br from-purple-900/20 to-black">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 blur-[100px] rounded-full"></div>
+                <div className="glass rounded-3xl p-8 border border-gray-500/50 relative overflow-hidden bg-gradient-to-br from-gray-900/20 to-black">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-gray-500/20 blur-[100px] rounded-full"></div>
                   <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center justify-between">
                     <div>
-                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-purple-400">
+                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-gray-400">
                         <Crown size={24} /> Avantages Premium
                       </h2>
                       <p className="text-white/70 max-w-md">
-                        En tant que membre Premium, vous bénéficiez de <strong className="text-purple-400">-30% de réduction automatique</strong> sur vos prochaines commandes (hors services Discord), ainsi qu'un accès exclusif au salon VIP sur notre Discord !
+                        En tant que membre Premium, vous bénéficiez de <strong className="text-gray-400">-30% de réduction automatique</strong> sur vos prochaines commandes (hors services Discord), ainsi qu'un accès exclusif au salon VIP sur notre Discord !
                       </p>
-                      <a href="https://discord.gg/8RBgw6ykQK" target="_blank" className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                      <a href="https://discord.gg/8RBgw6ykQK" target="_blank" className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                         Accéder au VIP Discord
                       </a>
                     </div>
                     <div className="shrink-0 text-center">
-                      <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">
+                      <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-400 to-gray-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
                         {premiumOrdersLeft}
                       </div>
-                      <div className="text-sm font-bold text-purple-400/80 uppercase mt-1">Commandes à -30%</div>
+                      <div className="text-sm font-bold text-gray-400/80 uppercase mt-1">Commandes à -30%</div>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Coins Banner */}
-              <div className="glass rounded-3xl p-8 border border-yellow-500/30 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 blur-[100px] rounded-full"></div>
+              <div className="glass rounded-3xl p-8 border border-gray-500/30 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gray-500/10 blur-[100px] rounded-full"></div>
                 
                 <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-yellow-500">
+                    <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-gray-500">
                       <Coins size={24} /> Solde de + Coins
                     </h2>
                     <p className="text-white/60 max-w-sm mb-6">
@@ -160,7 +160,7 @@ function ProfilePage() {
                     
                     <div className="w-full bg-black/50 h-4 rounded-full overflow-hidden border border-white/10 relative">
                       <div 
-                        className="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 transition-all duration-1000 relative"
+                        className="h-full bg-gradient-to-r from-gray-600 to-gray-400 transition-all duration-1000 relative"
                         style={{ width: `${progressPercent}%` }}
                       >
                         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] animate-[shimmer_2s_infinite]" style={{ backgroundSize: "200% 100%" }}></div>
@@ -172,11 +172,11 @@ function ProfilePage() {
                     </div>
                   </div>
                   
-                  <div className="shrink-0 w-48 h-48 rounded-full border-8 border-yellow-500/20 flex flex-col items-center justify-center shadow-[0_0_50px_rgba(234,179,8,0.2)]">
-                    <span className="text-5xl font-black text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+                  <div className="shrink-0 w-48 h-48 rounded-full border-8 border-gray-500/20 flex flex-col items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.2)]">
+                    <span className="text-5xl font-black text-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
                       {plusCoins}
                     </span>
-                    <span className="text-sm font-bold text-yellow-500/70 uppercase tracking-widest mt-1">Coins</span>
+                    <span className="text-sm font-bold text-gray-500/70 uppercase tracking-widest mt-1">Coins</span>
                   </div>
                 </div>
               </div>
@@ -191,7 +191,7 @@ function ProfilePage() {
                 <div className="glass rounded-3xl p-10 text-center border border-white/5">
                   <Package size={48} className="mx-auto text-white/20 mb-4" />
                   <p className="text-white/60 mb-6 text-lg">Vous n'avez pas encore d'abonnement actif.</p>
-                  <Link to="/" className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-black font-bold hover:scale-105 transition-transform">Voir la boutique</Link>
+                  <Link to="/" className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-500 text-black font-bold hover:scale-105 transition-transform">Voir la boutique</Link>
                 </div>
               )}
               {orders.map((o) => (
@@ -204,14 +204,14 @@ function ProfilePage() {
                         <div className="text-sm text-white/80">{new Date(o.created_at).toLocaleString("fr-FR")}</div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${o.status === "pending" ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" : "bg-green-500/20 text-green-400 border border-green-500/30"}`}>
+                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${o.status === "pending" ? "bg-gray-500/20 text-gray-400 border border-gray-500/30" : "bg-gray-500/20 text-gray-400 border border-gray-500/30"}`}>
                           {o.status === "pending" ? "En attente de confirmation de la commande" : o.status}
                         </span>
                         <span className="font-black text-xl text-white">{Number(o.total).toFixed(2)}€</span>
                         {o.status === "pending" && (
                           <button 
                             onClick={() => deleteOrder(o.id)} 
-                            className="p-2 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/30 transition-colors"
+                            className="p-2 rounded-full bg-gray-500/10 text-gray-500 hover:bg-gray-500/30 transition-colors"
                             title="Annuler la commande"
                           >
                             <X size={16} />
@@ -229,7 +229,7 @@ function ProfilePage() {
                             <span className="font-bold text-white/70">{(it.quantity * Number(it.unit_price)).toFixed(2)}€</span>
                             {o.status === "completed" && it.product_id && (
                               <button 
-                                onClick={() => setReviewingProduct({ id: it.product_id!, name: it.product_name, color: "#a855f7" })}
+                                onClick={() => setReviewingProduct({ id: it.product_id!, name: it.product_name, color: "#ffffff" })}
                                 className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-colors border border-white/10"
                               >
                                 Laisser un avis
@@ -241,13 +241,13 @@ function ProfilePage() {
                     </ul>
                     {o.status === "pending" && (
                       <div className="space-y-3">
-                        <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-2 text-red-500 animate-pulse">
+                        <div className="p-3 bg-gray-500/10 border border-gray-500/30 rounded-xl flex items-start gap-2 text-gray-500 animate-pulse">
                           <AlertTriangle size={16} className="shrink-0 mt-0.5" />
                           <p className="text-xs font-bold leading-tight">
                             ⚠️ ATTENTION : Le paiement Paypal doit OBLIGATOIREMENT être effectué en <span className="underline">"Amis et Famille" (Entre Proches)</span>. Sinon la commande ne sera ni validée, ni remboursée !
                           </p>
                         </div>
-                        <a href={`${PAYPAL_URL}/${Number(o.total).toFixed(2)}EUR`} target="_blank" className="inline-block w-full text-center py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-white font-black text-lg shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        <a href={`${PAYPAL_URL}/${Number(o.total).toFixed(2)}EUR`} target="_blank" className="inline-block w-full text-center py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-500 text-white font-black text-lg shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all">
                           Payer maintenant (PayPal)
                         </a>
                       </div>
@@ -274,8 +274,8 @@ function ProfilePage() {
                   </div>
                   {isPremium && (
                     <div>
-                      <label className="block text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Statut du Compte</label>
-                      <div className="px-5 py-4 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-2xl font-bold flex items-center gap-2">
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Statut du Compte</label>
+                      <div className="px-5 py-4 bg-gray-500/10 border border-gray-500/30 text-gray-400 rounded-2xl font-bold flex items-center gap-2">
                         <Crown size={18} /> Membre Premium (VIP Discord)
                       </div>
                     </div>
@@ -286,7 +286,7 @@ function ProfilePage() {
               <div className="pt-8 border-t border-white/10">
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 font-bold transition-all hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gray-500/10 text-gray-500 border border-gray-500/20 hover:bg-gray-500/20 font-bold transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                 >
                   <LogOut size={20} /> Se déconnecter de tous les appareils
                 </button>

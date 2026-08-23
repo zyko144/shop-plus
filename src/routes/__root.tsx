@@ -83,10 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "streamIN — Boutique premium" },
+      { title: "Vercell — Boutique premium" },
       { name: "description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
-      { name: "theme-color", content: "#dc2626" },
-      { property: "og:title", content: "streamIN — Boutique premium" },
+      { name: "theme-color", content: "#000000" },
+      { property: "og:title", content: "Vercell — Boutique premium" },
       { property: "og:description", content: "Comptes streaming, gaming, VPN et bonus exclusifs. Livraison instantanée, paiement PayPal." },
       { property: "og:type", content: "website" },
       { property: "og:image", content: "https://shop-plus-nu.vercel.app/banner.png?v=2" },

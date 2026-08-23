@@ -24,7 +24,7 @@ export function CursorGlow() {
         height: "1200px",
         marginLeft: "-600px", // center the glow on cursor
         marginTop: "-600px",
-        background: "radial-gradient(circle at center, rgba(255,0,0,0.2) 0%, rgba(255,0,0,0.08) 30%, transparent 60%)",
+        background: "radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 30%, transparent 60%)",
         willChange: "transform",
       }}
     />

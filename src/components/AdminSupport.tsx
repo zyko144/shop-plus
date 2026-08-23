@@ -163,7 +163,7 @@ export function AdminSupport() {
               >
                 <div className="flex justify-between items-start mb-1">
                   <div className="font-bold text-white text-sm truncate flex-1 mr-2">{conv.email}</div>
-                  {conv.unread > 0 && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{conv.unread}</span>}
+                  {conv.unread > 0 && <span className="bg-gray-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{conv.unread}</span>}
                 </div>
                 <div className="text-xs text-muted-foreground">{conv.username}</div>
               </button>
@@ -186,7 +186,7 @@ export function AdminSupport() {
                 const imageUrl = isImage ? msg.content.replace('[IMAGE] ', '') : '';
                 return (
                 <div key={msg.id} className={`flex ${msg.is_admin_reply ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${msg.is_admin_reply ? "bg-red-600 text-white rounded-tr-none" : "bg-white/10 text-white rounded-tl-none"}`}>
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${msg.is_admin_reply ? "bg-gray-600 text-white rounded-tr-none" : "bg-white/10 text-white rounded-tl-none"}`}>
                     {isImage ? (
                       <a href={imageUrl} target="_blank" rel="noreferrer">
                         <img src={imageUrl} alt="Pièce jointe" className="rounded-lg max-w-full h-auto max-h-[150px] object-contain border border-white/10 mt-1 mb-1 hover:opacity-80 transition cursor-zoom-in" />
@@ -212,9 +212,9 @@ export function AdminSupport() {
                   onPaste={handlePaste}
                   placeholder="Répondre au client ou Ctrl+V..."
                   disabled={isUploading}
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-red-500 outline-none transition disabled:opacity-50"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-gray-500 outline-none transition disabled:opacity-50"
                 />
-                <button type="submit" disabled={!reply.trim() || isUploading} className="px-4 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white rounded-xl font-bold transition flex items-center gap-2">
+                <button type="submit" disabled={!reply.trim() || isUploading} className="px-4 py-2 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-white rounded-xl font-bold transition flex items-center gap-2">
                   <Send size={16} /> Envoyer
                 </button>
               </form>

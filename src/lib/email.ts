@@ -20,9 +20,9 @@ export const sendOrderEmail = createServerFn({ method: "POST" })
 
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <h1 style="color: #ff0033;">Merci pour votre commande ! 🎉</h1>
+        <h1 style="color: #000000;">Merci pour votre commande ! 🎉</h1>
         <p>Bonjour,</p>
-        <p>Nous avons bien reçu votre commande sur <strong>streamIN</strong> pour un montant total de <strong>${data.total.toFixed(2)}€</strong>.</p>
+        <p>Nous avons bien reçu votre commande sur <strong>Vercell</strong> pour un montant total de <strong>${data.total.toFixed(2)}€</strong>.</p>
         
         <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <h3>Récapitulatif de vos achats :</h3>
@@ -31,23 +31,23 @@ export const sendOrderEmail = createServerFn({ method: "POST" })
           </ul>
         </div>
 
-        <div style="border-left: 4px solid #5865f2; padding-left: 15px; margin: 30px 0;">
-          <h2 style="color: #5865f2; margin-top: 0;">Comment récupérer votre commande ?</h2>
+        <div style="border-left: 4px solid #000000; padding-left: 15px; margin: 30px 0;">
+          <h2 style="color: #000000; margin-top: 0;">Comment récupérer votre commande ?</h2>
           <p>Pour recevoir vos accès ou votre produit, veuillez ouvrir un ticket sur notre serveur Discord en cliquant sur le lien ci-dessous :</p>
-          <a href="https://discord.gg/8RBgw6ykQK" style="display: inline-block; background-color: #5865f2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
+          <a href="https://discord.gg/8RBgw6ykQK" style="display: inline-block; background-color: #000000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 10px;">
             Ouvrir un ticket Discord
           </a>
         </div>
 
-        <p>À très vite,<br>L'équipe streamIN</p>
+        <p>À très vite,<br>L'équipe Vercell</p>
       </div>
     `;
 
     try {
       const { data: responseData, error } = await resend.emails.send({
-        from: "streamIN <onboarding@resend.dev>", // Resend requires 'onboarding@resend.dev' for free unverified accounts
+        from: "Vercell <onboarding@resend.dev>", // Resend requires 'onboarding@resend.dev' for free unverified accounts
         to: data.email,
-        subject: "Votre commande streamIN - Récupérez votre produit !",
+        subject: "Votre commande Vercell - Récupérez votre produit !",
         html: htmlBody,
       });
 

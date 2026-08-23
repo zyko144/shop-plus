@@ -43,19 +43,19 @@ export function Header() {
         {/* Left: Logo */}
         <div className="flex-1 flex items-center">
           <Link to="/" className="flex items-center gap-2.5 font-display font-black text-lg">
-            <img src={logoImg} alt="streamIN" className="w-9 h-9 rounded-xl shadow-[0_0_24px_rgba(220,38,38,.6)]" />
-            <span className="tracking-tight">stream<span className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 bg-clip-text text-transparent">IN</span></span>
+            <img src={logoImg} alt="Vercell" className="w-9 h-9 rounded-xl shadow-[0_0_24px_rgba(255,255,255,.25)]" />
+            <span className="tracking-tight">Vercell</span>
           </Link>
         </div>
 
         {/* Center: Navigation */}
         <div className="hidden md:flex flex-1 items-center justify-center gap-4 text-sm">
-          <Link to="/premium" className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-purple-500/10 hover:text-purple-400 hover:border-purple-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md">
+          <Link to="/premium" className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-gray-500/10 hover:text-gray-400 hover:border-gray-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md">
             👑 Premium
           </Link>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("open-support-chat"))}
-            className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md"
+            className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-muted-foreground hover:bg-gray-500/10 hover:text-gray-400 hover:border-gray-500/30 font-semibold transition-all flex items-center gap-2 backdrop-blur-md"
           >
             <MessageSquare size={16} /> Support en direct
           </button>
@@ -66,12 +66,12 @@ export function Header() {
           {user ? (
             <div className="flex items-center gap-1">
               {profile?.role === "admin" && (
-                <Link to="/admin" className="relative text-sm px-3 py-2 rounded-xl hover:bg-white/5 text-red-500 flex items-center gap-2 font-bold transition-colors">
+                <Link to="/admin" className="relative text-sm px-3 py-2 rounded-xl hover:bg-white/5 text-gray-500 flex items-center gap-2 font-bold transition-colors">
                   <Shield size={16} /> <span className="hidden sm:inline">Admin</span>
                   {hasUnreadSupport && (
                     <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gray-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gray-500"></span>
                     </span>
                   )}
                 </Link>

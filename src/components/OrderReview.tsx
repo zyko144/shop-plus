@@ -70,7 +70,7 @@ export function OrderReview({ orderId, createdAt }: { orderId: string; createdAt
             className="text-2xl transition-transform hover:scale-110"
             aria-label={`${n} étoile${n > 1 ? "s" : ""}`}
           >
-            <span className={n <= hover ? "text-yellow-400" : "text-muted-foreground"}>★</span>
+            <span className={n <= hover ? "text-gray-400" : "text-muted-foreground"}>★</span>
           </button>
         ))}
       </div>
@@ -91,7 +91,7 @@ export function Stars({ value }: { value: number }) {
   return (
     <span>
       {[1, 2, 3, 4, 5].map((n) => (
-        <span key={n} className={n <= value ? "text-yellow-400" : "text-muted-foreground/40"}>★</span>
+        <span key={n} className={n <= value ? "text-gray-400" : "text-muted-foreground/40"}>★</span>
       ))}
     </span>
   );

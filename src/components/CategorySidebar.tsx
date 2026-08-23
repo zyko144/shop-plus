@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-export type Cat = { id: string; label: string; emoji: string; color: string; count: number };
+export type Cat = { id: string; label: string; emoji: string; iconSlug?: string; color: string; count: number };
+
+function hex(c: string) {
+  return c.replace("#", "");
+}
 
 export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; active: string; onSelect: (id: string) => void }) {
   return (
@@ -12,7 +16,7 @@ export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; activ
             <select
               value={active}
               onChange={(e) => onSelect(e.target.value)}
-              className="w-full appearance-none bg-black/50 border border-white/10 rounded-2xl py-3.5 pl-4 pr-10 text-white font-bold text-sm outline-none focus:ring-2 focus:ring-red-500/50 backdrop-blur-md"
+              className="w-full appearance-none bg-black/50 border border-white/10 rounded-2xl py-3.5 pl-4 pr-10 text-white font-bold text-sm outline-none focus:ring-2 focus:ring-gray-500/50 backdrop-blur-md"
             >
               {cats.map((c) => (
                 <option key={c.id} value={c.id} className="bg-black text-white">
@@ -40,14 +44,22 @@ export function CategorySidebar({ cats, active, onSelect }: { cats: Cat[]; activ
                 style={isActive ? { background: `linear-gradient(135deg, ${c.color}33, transparent)`, boxShadow: `inset 0 0 0 1px ${c.color}66` } : undefined}
               >
                 <span
-                  className="grid place-items-center w-8 h-8 rounded-xl text-base shrink-0 transition-transform group-hover:scale-110"
+                  className="grid place-items-center w-8 h-8 rounded-xl text-base shrink-0 transition-transform group-hover:scale-110 overflow-hidden"
                   style={{
                     background: isActive ? c.color : `${c.color}22`,
                     color: isActive ? "#000" : c.color,
                     boxShadow: isActive ? `0 0 16px ${c.color}80` : undefined,
                   }}
                 >
-                  {c.emoji}
+                  {c.iconSlug ? (
+                    <img
+                      src={`https://cdn.simpleicons.org/${c.iconSlug}/${hex(isActive ? "#000000" : c.color)}`}
+                      alt=""
+                      className="w-[18px] h-[18px] object-contain"
+                    />
+                  ) : (
+                    c.emoji
+                  )}
                 </span>
                 <span className="text-left font-bold">{c.label}</span>
                 <span className="text-[10px] opacity-60 tabular-nums bg-black/20 px-1.5 py-0.5 rounded-md">{c.count}</span>

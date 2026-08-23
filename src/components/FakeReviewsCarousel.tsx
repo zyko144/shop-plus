@@ -23,7 +23,7 @@ const REVIEWS: { name: string; rating: number; text: string; product: string }[]
 
 function Stars({ value }: { value: number }) {
   return (
-    <span className="text-yellow-400 text-xs">
+    <span className="text-gray-400 text-xs">
       {"★".repeat(value)}<span className="text-muted-foreground/40">{"★".repeat(5 - value)}</span>
     </span>
   );
@@ -55,7 +55,7 @@ export function FakeReviewsCarousel() {
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background/85 backdrop-blur-xl">
       <div className="flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground">
         <span className="font-semibold text-foreground flex items-center gap-2">
-          <span className="text-yellow-400">★ 4.9/5</span>
+          <span className="text-gray-400">★ 4.9/5</span>
           <span className="opacity-70">— +2 400 avis vérifiés</span>
         </span>
         <button onClick={() => setOpen(false)} className="hover:text-foreground" aria-label="Fermer">✕</button>

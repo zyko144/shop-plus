@@ -48,25 +48,25 @@ export type SteamCategory = {
 export const STEAM_CATEGORIES: SteamCategory[] = [
   {
     name: "Action & Aventure",
-    color: "#ff5722",
+    color: "#f5f5f5",
     emoji: "⚔",
     games: ["God of War", "Cyberpunk 2077", "Hogwarts Legacy", "The Witcher 3", "GTA 5", "UNCHARTED: Legacy of Thieves", "Just Cause 4", "Resident Evil Village", "Hitman"],
   },
   {
     name: "Survie & Horreur",
-    color: "#7b1fa2",
+    color: "#a3a3a3",
     emoji: "👻",
     games: ["Outlast", "Outlast 2", "The Forest", "Sons of the Forest", "ARK", "Dead by Daylight", "Phasmophobia", "Escape the Backrooms", "Raft"],
   },
   {
     name: "Simulation & Bac à sable",
-    color: "#00bcd4",
+    color: "#8a8a8a",
     emoji: "🛠",
     games: ["Farming Simulator 25", "Cities Skylines", "Cities Skylines 2", "House Flipper 2", "Garry's Mod", "Supermarket Simulator", "Euro Truck Simulator 2", "Contraband Police", "Assetto Corsa", "BeamNG.drive"],
   },
   {
     name: "Multijoueur & Divers",
-    color: "#4caf50",
+    color: "#737373",
     emoji: "🎮",
     games: ["Sea of Thieves", "Among Us", "Ready or Not", "Marvel Rivals", "Detroit: Become Human", "Wallpaper Engine", "Schedule 1"],
   },

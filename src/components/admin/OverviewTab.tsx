@@ -2,7 +2,7 @@ import { DollarSign, Package, Clock, BarChart3 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useCountUp } from "@/hooks/useCountUp";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#a238ff', '#f47521'];
+const COLORS = ['#f5f5f5', '#d4d4d4', '#a3a3a3', '#737373', '#525252', '#262626'];
 
 function StatCard({ label, value, decimals = 0, suffix = "", icon, accent }: { label: string; value: number; decimals?: number; suffix?: string; icon: React.ReactNode; accent: string }) {
   const { ref, display } = useCountUp(value, { decimals, scrollTrigger: false });
@@ -36,16 +36,16 @@ export function OverviewTab({
     <div className="space-y-8">
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard label="Chiffre d'affaires" value={totalRevenue} decimals={2} suffix="€" icon={<DollarSign size={24} />} accent="#ef4444" />
-        <StatCard label="Commandes totales" value={orderCount} icon={<Package size={24} />} accent="#f97316" />
-        <StatCard label="En attente" value={pendingCount} icon={<Clock size={24} />} accent="#eab308" />
+        <StatCard label="Chiffre d'affaires" value={totalRevenue} decimals={2} suffix="€" icon={<DollarSign size={24} />} accent="#f5f5f5" />
+        <StatCard label="Commandes totales" value={orderCount} icon={<Package size={24} />} accent="#a3a3a3" />
+        <StatCard label="En attente" value={pendingCount} icon={<Clock size={24} />} accent="#737373" />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="glass rounded-2xl p-6 border border-border/50">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <BarChart3 size={18} className="text-red-500" />
+            <BarChart3 size={18} className="text-gray-500" />
             Ventes des 7 derniers jours
           </h3>
           <div className="h-[300px] w-full">
@@ -56,9 +56,9 @@ export function OverviewTab({
                 <YAxis stroke="#ffffff50" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}€`} />
                 <RechartsTooltip
                   contentStyle={{ backgroundColor: '#000000dd', border: '1px solid #333', borderRadius: '8px' }}
-                  itemStyle={{ color: '#ff0033' }}
+                  itemStyle={{ color: '#ffffff' }}
                 />
-                <Line type="monotone" dataKey="total" stroke="#ff0033" strokeWidth={3} dot={{ fill: '#ff0033', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="total" stroke="#ffffff" strokeWidth={3} dot={{ fill: '#ffffff', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -66,7 +66,7 @@ export function OverviewTab({
 
         <div className="glass rounded-2xl p-6 border border-border/50">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <Package size={18} className="text-orange-500" />
+            <Package size={18} className="text-gray-500" />
             Top 5 Produits Vendus
           </h3>
           <div className="h-[300px] w-full flex items-center justify-center">

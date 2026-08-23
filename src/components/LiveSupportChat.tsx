@@ -122,22 +122,22 @@ export function LiveSupportChat() {
       <button
         onClick={() => setOpen(true)}
         className="fixed bottom-6 right-6 p-4 rounded-full shadow-2xl transition-all hover:scale-110 z-50 animate-pulse group"
-        style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)" }}
+        style={{ background: "linear-gradient(135deg, #3f3f3f, #000000)" }}
       >
         <MessageSquare size={28} className="text-white group-hover:rotate-12 transition-transform" />
       </button>
 
       {open && (
         <div className="fixed bottom-24 right-6 w-[350px] sm:w-[400px] bg-black/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
-          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-red-600/20 to-transparent flex justify-between items-center">
+          <div className="p-4 border-b border-white/10 bg-gradient-to-r from-gray-600/20 to-transparent flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 border border-red-500/50">
+              <div className="w-10 h-10 rounded-full bg-gray-500/20 flex items-center justify-center text-gray-500 border border-gray-500/50">
                 <User size={20} />
               </div>
               <div>
                 <h3 className="font-bold text-white">Support en direct</h3>
-                <p className="text-xs text-green-400 font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> En ligne
+                <p className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-pulse"></span> En ligne
                 </p>
               </div>
             </div>
@@ -169,19 +169,19 @@ export function LiveSupportChat() {
                   {showFaq && (
                     <div className="p-4 text-xs space-y-3 bg-black/40 border-t border-white/5">
                       <div>
-                        <strong className="text-red-400 block mb-0.5">Mon compte a un problème ?</strong>
+                        <strong className="text-gray-400 block mb-0.5">Mon compte a un problème ?</strong>
                         <span className="text-muted-foreground">Tout problème avec un compte est remplacé immédiatement sous preuve (capture d'écran). N'hésitez pas à coller/uploader vos images ici.</span>
                       </div>
                       <div>
-                        <strong className="text-red-400 block mb-0.5">Puis-je changer les identifiants ?</strong>
+                        <strong className="text-gray-400 block mb-0.5">Puis-je changer les identifiants ?</strong>
                         <span className="text-muted-foreground">Il est strictement interdit de modifier l'e-mail ou le mot de passe des comptes fournis, sous peine d'annulation de votre garantie.</span>
                       </div>
                       <div>
-                        <strong className="text-red-400 block mb-0.5">Combien de temps dure la garantie ?</strong>
+                        <strong className="text-gray-400 block mb-0.5">Combien de temps dure la garantie ?</strong>
                         <span className="text-muted-foreground">La garantie est valable sur toute la durée de l'abonnement acheté. S'il y a une coupure, nous vous fournissons un compte de remplacement.</span>
                       </div>
                       <div>
-                        <strong className="text-red-400 block mb-0.5">Quels paiements acceptez-vous ?</strong>
+                        <strong className="text-gray-400 block mb-0.5">Quels paiements acceptez-vous ?</strong>
                         <span className="text-muted-foreground">Les paiements s'effectuent de manière 100% sécurisée via PayPal pour une livraison instantanée.</span>
                       </div>
                     </div>
@@ -200,7 +200,7 @@ export function LiveSupportChat() {
                       className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
                         msg.is_admin_reply
                           ? "bg-white/10 text-white rounded-tl-none"
-                          : "bg-red-600 text-white rounded-tr-none"
+                          : "bg-gray-600 text-white rounded-tr-none"
                       }`}
                     >
                       {isImage ? (
@@ -210,7 +210,7 @@ export function LiveSupportChat() {
                       ) : (
                         msg.content
                       )}
-                      <div className={`text-[10px] mt-1 ${msg.is_admin_reply ? "text-white/40" : "text-red-200"}`}>
+                      <div className={`text-[10px] mt-1 ${msg.is_admin_reply ? "text-white/40" : "text-gray-200"}`}>
                         {new Date(msg.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
@@ -235,12 +235,12 @@ export function LiveSupportChat() {
                   onPaste={handlePaste}
                   placeholder="Écrivez ou Ctrl+V..."
                   disabled={isUploading}
-                  className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-red-500 outline-none transition disabled:opacity-50"
+                  className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-gray-500 outline-none transition disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!newMessage.trim() || isUploading}
-                  className="p-2.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white rounded-xl transition flex-shrink-0"
+                  className="p-2.5 bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-white rounded-xl transition flex-shrink-0"
                 >
                   <Send size={18} />
                 </button>

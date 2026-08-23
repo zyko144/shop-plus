@@ -21,7 +21,7 @@ export const notifyDiscordOrder = createServerFn({ method: "POST" })
     );
 
     const embed = {
-      title: "🛒 Nouvelle commande streamIN",
+      title: "🛒 Nouvelle commande Vercell",
       color: 0xff2d2d,
       fields: [
         { name: "Client", value: data.email, inline: true },

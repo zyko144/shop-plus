@@ -171,7 +171,7 @@ export function CartDrawer() {
                 <div className="text-sm font-black mt-1" style={{ color: i.color }}>{(i.price * i.quantity).toFixed(2)}€</div>
               </div>
               <div className="flex flex-col items-end gap-2 relative z-10">
-                <button onClick={() => remove(i.id)} className="text-white/40 hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                <button onClick={() => remove(i.id)} className="text-white/40 hover:text-gray-500 transition-colors"><Trash2 size={14} /></button>
                 <div className="flex items-center gap-1 bg-black/50 border border-white/10 rounded-md">
                   <button onClick={() => setQty(i.id, i.quantity - 1)} className="p-1.5 hover:bg-white/10 transition-colors rounded-l-md"><Minus size={10} /></button>
                   <span className="text-xs w-4 text-center font-bold">{i.quantity}</span>
@@ -187,11 +187,11 @@ export function CartDrawer() {
             <>
               {/* Premium Status Banner */}
               {hasPremiumDiscount && (
-                <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-xl p-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-purple-400 font-bold text-sm">
+                <div className="bg-gradient-to-r from-gray-600/20 to-gray-600/20 border border-gray-500/30 rounded-xl p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-gray-400 font-bold text-sm">
                     <Crown size={16} /> Premium (-30%)
                   </div>
-                  <div className="text-xs font-bold text-purple-400/80 bg-purple-500/20 px-2 py-1 rounded-md">
+                  <div className="text-xs font-bold text-gray-400/80 bg-gray-500/20 px-2 py-1 rounded-md">
                     {premiumOrdersLeft} restantes
                   </div>
                 </div>
@@ -199,28 +199,28 @@ export function CartDrawer() {
 
               {/* Coins System */}
               {user && (
-                <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/20 blur-[50px] rounded-full"></div>
+                <div className="bg-gradient-to-r from-gray-500/10 to-gray-500/10 border border-gray-500/20 rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gray-500/20 blur-[50px] rounded-full"></div>
                   <div className="flex justify-between items-center relative z-10">
-                    <div className="flex items-center gap-2 text-yellow-500 font-bold text-sm">
+                    <div className="flex items-center gap-2 text-gray-500 font-bold text-sm">
                       <Coins size={16} />
                       Vos + Coins : {plusCoins}
                     </div>
-                    <div className="text-xs font-bold text-yellow-500/90">
+                    <div className="text-xs font-bold text-gray-500/90">
                       Gagnez +{coinsEarned} Coins
                     </div>
                   </div>
                   {plusCoins >= 1000 && (
                     <button
                       onClick={() => setUseCoins(!useCoins)}
-                      className={`relative z-10 text-xs font-bold py-2 px-3 rounded-lg transition-all border shadow-lg ${useCoins ? 'bg-yellow-500 text-black border-yellow-500 shadow-yellow-500/50' : 'bg-black/50 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500/20'}`}
+                      className={`relative z-10 text-xs font-bold py-2 px-3 rounded-lg transition-all border shadow-lg ${useCoins ? 'bg-gray-500 text-black border-gray-500 shadow-gray-500/50' : 'bg-black/50 text-gray-500 border-gray-500/50 hover:bg-gray-500/20'}`}
                     >
                       {useCoins ? "🔥 1000 Coins utilisés (-50%)" : "Utiliser 1000 Coins pour -50%"}
                     </button>
                   )}
                   {plusCoins < 1000 && (
                     <div className="relative z-10 text-xs font-medium text-white/50 bg-black/30 p-2 rounded-lg text-center">
-                      Encore <strong className="text-yellow-500">{1000 - plusCoins} Coins</strong> pour débloquer -50% !
+                      Encore <strong className="text-gray-500">{1000 - plusCoins} Coins</strong> pour débloquer -50% !
                     </div>
                   )}
                 </div>
@@ -234,7 +234,7 @@ export function CartDrawer() {
                     placeholder="Code promotionnel"
                     value={promoInput}
                     onChange={e => setPromoInput(e.target.value)}
-                    className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 text-sm font-medium focus:border-red-500 outline-none uppercase placeholder:normal-case transition-colors"
+                    className="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 text-sm font-medium focus:border-gray-500 outline-none uppercase placeholder:normal-case transition-colors"
                     disabled={!!promoApplied}
                   />
                   {!promoApplied ? (
@@ -242,13 +242,13 @@ export function CartDrawer() {
                       Appliquer
                     </button>
                   ) : (
-                    <button onClick={() => { setDiscount(0); setPromoApplied(""); setPromoInput(""); }} className="px-4 py-2.5 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-xl text-sm font-bold transition-all">
+                    <button onClick={() => { setDiscount(0); setPromoApplied(""); setPromoInput(""); }} className="px-4 py-2.5 bg-gray-500/20 text-gray-400 hover:bg-gray-500/40 rounded-xl text-sm font-bold transition-all">
                       Retirer
                     </button>
                   )}
                 </div>
-                {promoError && <div className="text-red-400 text-xs mt-2 font-medium flex items-center gap-1"><AlertTriangle size={12}/> {promoError}</div>}
-                {promoApplied && <div className="text-green-400 text-xs mt-2 font-medium flex items-center gap-1">✓ Code {promoApplied} actif (-{(discount * 100).toFixed(0)}%)</div>}
+                {promoError && <div className="text-gray-400 text-xs mt-2 font-medium flex items-center gap-1"><AlertTriangle size={12}/> {promoError}</div>}
+                {promoApplied && <div className="text-gray-400 text-xs mt-2 font-medium flex items-center gap-1">✓ Code {promoApplied} actif (-{(discount * 100).toFixed(0)}%)</div>}
               </div>
             </>
           )}
@@ -257,14 +257,14 @@ export function CartDrawer() {
             <span>Total</span>
             <div className="text-right flex flex-col items-end">
               {(discount > 0 || useCoins || hasPremiumDiscount) && (
-                <div className="text-xs text-white/40 font-bold line-through decoration-red-500 mb-0.5">{total.toFixed(2)}€</div>
+                <div className="text-xs text-white/40 font-bold line-through decoration-gray-500 mb-0.5">{total.toFixed(2)}€</div>
               )}
-              <span className="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400">{finalTotal.toFixed(2)}€</span>
+              <span className="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-gray-500 to-gray-400">{finalTotal.toFixed(2)}€</span>
             </div>
           </div>
           
           {items.length > 0 && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-2 text-red-500 animate-pulse">
+            <div className="p-3 bg-gray-500/10 border border-gray-500/30 rounded-xl flex items-start gap-2 text-gray-500 animate-pulse">
               <AlertTriangle size={16} className="shrink-0 mt-0.5" />
               <p className="text-xs font-bold leading-tight">
                 ⚠️ ATTENTION : Le paiement Paypal doit OBLIGATOIREMENT être effectué en <span className="underline">"Amis et Famille" (Entre Proches)</span>. Sinon la commande ne sera ni validée, ni remboursée !
@@ -275,7 +275,7 @@ export function CartDrawer() {
           <button
             onClick={checkout}
             disabled={loading || items.length === 0}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-white font-black text-lg disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_-5px_rgba(220,38,38,0.5)]"
+            className="w-full py-4 rounded-xl bg-gradient-to-r from-gray-600 to-gray-500 text-white font-black text-lg disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.5)]"
           >
             {loading ? "Chargement..." : "Payer via PayPal"}
           </button>
