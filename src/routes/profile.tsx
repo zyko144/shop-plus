@@ -72,11 +72,11 @@ function ProfilePage() {
       
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
-          <div className={`w-24 h-24 rounded-full p-1 ${isPremium ? 'bg-gradient-to-tr from-gray-600 to-gray-500 shadow-[0_0_30px_rgba(255,255,255,0.4)]' : 'bg-gradient-to-tr from-gray-600 to-gray-500'}`}>
+          <div className={`w-24 h-24 rounded-full p-1 ${isPremium ? 'bg-gradient-to-tr from-purple-600 to-pink-500 shadow-[0_0_30px_rgba(168,85,247,0.4)]' : 'bg-gradient-to-tr from-gray-600 to-gray-500'}`}>
             <div className="w-full h-full bg-black rounded-full grid place-items-center text-4xl font-black relative">
               {user.email?.[0].toUpperCase()}
               {isPremium && (
-                <div className="absolute -top-2 -right-2 bg-gray-500 text-white p-1.5 rounded-full shadow-lg">
+                <div className="absolute -top-2 -right-2 bg-purple-500 text-white p-1.5 rounded-full shadow-lg">
                   <Crown size={16} />
                 </div>
               )}
@@ -85,7 +85,7 @@ function ProfilePage() {
           <div className="text-center md:text-left">
             <h1 className="font-display text-4xl font-black flex items-center justify-center md:justify-start gap-3">
               Espace Client
-              {isPremium && <span className="text-sm px-3 py-1 bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full font-bold flex items-center gap-1"><Crown size={14}/> Premium</span>}
+              {isPremium && <span className="text-sm px-3 py-1 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full font-bold flex items-center gap-1"><Crown size={14}/> Premium</span>}
             </h1>
             <p className="text-muted-foreground">{user.email}</p>
           </div>
@@ -95,7 +95,7 @@ function ProfilePage() {
         <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
           <button 
             onClick={() => setActiveTab("coins")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all whitespace-nowrap ${activeTab === "coins" ? "bg-gray-500 text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
+            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all whitespace-nowrap ${activeTab === "coins" ? "bg-yellow-500 text-black shadow-[0_0_20px_rgba(234,179,8,0.3)]" : "bg-white/5 text-white/60 hover:bg-white/10"}`}
           >
             <Coins size={18} /> Ma Tirelire
           </button>
@@ -121,46 +121,46 @@ function ProfilePage() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
               {/* Premium Status Banner if Premium */}
               {isPremium && (
-                <div className="glass rounded-3xl p-8 border border-gray-500/50 relative overflow-hidden bg-gradient-to-br from-gray-900/20 to-black">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-gray-500/20 blur-[100px] rounded-full"></div>
+                <div className="glass rounded-3xl p-8 border border-purple-500/50 relative overflow-hidden bg-gradient-to-br from-purple-900/20 to-black">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 blur-[100px] rounded-full"></div>
                   <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center justify-between">
                     <div>
-                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-gray-400">
+                      <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-purple-400">
                         <Crown size={24} /> Avantages Premium
                       </h2>
                       <p className="text-white/70 max-w-md">
-                        En tant que membre Premium, vous bénéficiez de <strong className="text-gray-400">-30% de réduction automatique</strong> sur vos prochaines commandes (hors services Discord), ainsi qu'un accès exclusif au salon VIP sur notre Discord !
+                        En tant que membre Premium, vous bénéficiez de <strong className="text-purple-400">-30% de réduction automatique</strong> sur vos prochaines commandes (hors services Discord), ainsi qu'un accès exclusif au salon VIP sur notre Discord !
                       </p>
-                      <a href="https://discord.gg/8RBgw6ykQK" target="_blank" className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                      <a href="https://discord.gg/8RBgw6ykQK" target="_blank" className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)]">
                         Accéder au VIP Discord
                       </a>
                     </div>
                     <div className="shrink-0 text-center">
-                      <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-400 to-gray-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
+                      <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">
                         {premiumOrdersLeft}
                       </div>
-                      <div className="text-sm font-bold text-gray-400/80 uppercase mt-1">Commandes à -30%</div>
+                      <div className="text-sm font-bold text-purple-400/80 uppercase mt-1">Commandes à -30%</div>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Coins Banner */}
-              <div className="glass rounded-3xl p-8 border border-gray-500/30 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gray-500/10 blur-[100px] rounded-full"></div>
-                
+              <div className="glass rounded-3xl p-8 border border-yellow-500/30 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 blur-[100px] rounded-full"></div>
+
                 <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-gray-500">
+                    <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-yellow-500">
                       <Coins size={24} /> Solde de + Coins
                     </h2>
                     <p className="text-white/60 max-w-sm mb-6">
                       Gagnez 100 + Coins pour chaque euro dépensé. Atteignez 1000 + Coins pour débloquer -50% de réduction sur une commande complète !
                     </p>
-                    
+
                     <div className="w-full bg-black/50 h-4 rounded-full overflow-hidden border border-white/10 relative">
-                      <div 
-                        className="h-full bg-gradient-to-r from-gray-600 to-gray-400 transition-all duration-1000 relative"
+                      <div
+                        className="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 transition-all duration-1000 relative"
                         style={{ width: `${progressPercent}%` }}
                       >
                         <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] animate-[shimmer_2s_infinite]" style={{ backgroundSize: "200% 100%" }}></div>
@@ -171,12 +171,12 @@ function ProfilePage() {
                       <span>1000 (-50%)</span>
                     </div>
                   </div>
-                  
-                  <div className="shrink-0 w-48 h-48 rounded-full border-8 border-gray-500/20 flex flex-col items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.2)]">
-                    <span className="text-5xl font-black text-gray-500 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+
+                  <div className="shrink-0 w-48 h-48 rounded-full border-8 border-yellow-500/20 flex flex-col items-center justify-center shadow-[0_0_50px_rgba(234,179,8,0.2)]">
+                    <span className="text-5xl font-black text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]">
                       {plusCoins}
                     </span>
-                    <span className="text-sm font-bold text-gray-500/70 uppercase tracking-widest mt-1">Coins</span>
+                    <span className="text-sm font-bold text-yellow-500/70 uppercase tracking-widest mt-1">Coins</span>
                   </div>
                 </div>
               </div>
@@ -247,7 +247,7 @@ function ProfilePage() {
                             ⚠️ ATTENTION : Le paiement Paypal doit OBLIGATOIREMENT être effectué en <span className="underline">"Amis et Famille" (Entre Proches)</span>. Sinon la commande ne sera ni validée, ni remboursée !
                           </p>
                         </div>
-                        <a href={`${PAYPAL_URL}/${Number(o.total).toFixed(2)}EUR`} target="_blank" className="inline-block w-full text-center py-3 rounded-xl bg-gradient-to-r from-gray-600 to-gray-500 text-white font-black text-lg shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        <a href={`${PAYPAL_URL}/${Number(o.total).toFixed(2)}EUR`} target="_blank" className="inline-block w-full text-center py-3 rounded-xl bg-gradient-to-r from-[#003087] to-[#0070ba] text-white font-black text-lg shadow-[0_0_20px_rgba(0,112,186,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all">
                           Payer maintenant (PayPal)
                         </a>
                       </div>
@@ -274,8 +274,8 @@ function ProfilePage() {
                   </div>
                   {isPremium && (
                     <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Statut du Compte</label>
-                      <div className="px-5 py-4 bg-gray-500/10 border border-gray-500/30 text-gray-400 rounded-2xl font-bold flex items-center gap-2">
+                      <label className="block text-xs font-bold text-purple-400 uppercase tracking-wider mb-2">Statut du Compte</label>
+                      <div className="px-5 py-4 bg-purple-500/10 border border-purple-500/30 text-purple-400 rounded-2xl font-bold flex items-center gap-2">
                         <Crown size={18} /> Membre Premium (VIP Discord)
                       </div>
                     </div>

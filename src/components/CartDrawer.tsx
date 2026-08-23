@@ -275,7 +275,7 @@ export function CartDrawer() {
           <button
             onClick={checkout}
             disabled={loading || items.length === 0}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-gray-600 to-gray-500 text-white font-black text-lg disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_-5px_rgba(255,255,255,0.5)]"
+            className="w-full py-4 rounded-xl bg-gradient-to-r from-[#003087] to-[#0070ba] text-white font-black text-lg disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_-5px_rgba(0,112,186,0.6)]"
           >
             {loading ? "Chargement..." : "Payer via PayPal"}
           </button>

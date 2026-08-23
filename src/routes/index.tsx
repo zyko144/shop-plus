@@ -31,17 +31,17 @@ type Group = { id: string; label: string; emoji: string; iconSlug?: string; colo
 
 const GROUP_META: Record<string, Omit<Group, "items">> = {
   // Apps & Services
-  "Streaming": { id: "streaming", label: "Streaming", emoji: "📺", iconSlug: "netflix", color: "#f5f5f5", description: "Films, séries, musique — vos plateformes préférées dès 1€." },
-  "VPN": { id: "vpn", label: "VPN", emoji: "🛡", iconSlug: "nordvpn", color: "#d4d4d4", description: "Navigation sécurisée, débridez tout le web." },
-  "Discord": { id: "discord", label: "Discord", emoji: "✦", iconSlug: "discord", color: "#a3a3a3", description: "Décorations de profil — grille tarifaire officielle." },
-  "Twitch": { id: "twitch", label: "Twitch", emoji: "💜", iconSlug: "twitch", color: "#8a8a8a", description: "Boostez votre chaîne avec de vrais followers." },
+  "Streaming": { id: "streaming", label: "Streaming", emoji: "📺", iconSlug: "netflix", color: "#ff0033", description: "Films, séries, musique — vos plateformes préférées dès 1€." },
+  "VPN": { id: "vpn", label: "VPN", emoji: "🛡", iconSlug: "nordvpn", color: "#4687ff", description: "Navigation sécurisée, débridez tout le web." },
+  "Discord": { id: "discord", label: "Discord", emoji: "✦", iconSlug: "discord", color: "#5865f2", description: "Décorations de profil — grille tarifaire officielle." },
+  "Twitch": { id: "twitch", label: "Twitch", emoji: "💜", iconSlug: "twitch", color: "#9146ff", description: "Boostez votre chaîne avec de vrais followers." },
   // Jeux
-  "Fortnite": { id: "fortnite", label: "Fortnite", emoji: "🎯", iconSlug: "fortnite", color: "#f5f5f5", description: "Comptes Fortnite aléatoires avec skins inclus." },
-  "Fortnite Rare": { id: "rare", label: "Skins Rares", emoji: "👑", iconSlug: "fortnite", color: "#e5e5e5", description: "Pioches exclusives, skins légendaires, OG only." },
-  "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", iconSlug: "epicgames", color: "#d4d4d4", description: "Comptes chargés en V-Bucks prêts à dépenser." },
-  "Valorant EU": { id: "valorant", label: "Valorant EU", emoji: "🔫", iconSlug: "valorant", color: "#a3a3a3", description: "Comptes Valorant région EU blindés de Valorant Points." },
-  "Robux": { id: "robux", label: "Robux", emoji: "💰", iconSlug: "roblox", color: "#8a8a8a", description: "Des milliers de Robux instantanément sur votre compte." },
-  "Steam": { id: "steam", label: "Steam", emoji: "🎮", iconSlug: "steam", color: "#737373", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
+  "Fortnite": { id: "fortnite", label: "Fortnite", emoji: "🎯", iconSlug: "fortnite", color: "#00d2ff", description: "Comptes Fortnite aléatoires avec skins inclus." },
+  "Fortnite Rare": { id: "rare", label: "Skins Rares", emoji: "👑", iconSlug: "fortnite", color: "#ffb800", description: "Pioches exclusives, skins légendaires, OG only." },
+  "V-Bucks": { id: "vbucks", label: "V-Bucks", emoji: "💰", iconSlug: "epicgames", color: "#f0b400", description: "Comptes chargés en V-Bucks prêts à dépenser." },
+  "Valorant EU": { id: "valorant", label: "Valorant EU", emoji: "🔫", iconSlug: "valorant", color: "#ff4655", description: "Comptes Valorant région EU blindés de Valorant Points." },
+  "Robux": { id: "robux", label: "Robux", emoji: "💰", iconSlug: "roblox", color: "#1bd96a", description: "Des milliers de Robux instantanément sur votre compte." },
+  "Steam": { id: "steam", label: "Steam", emoji: "🎮", iconSlug: "steam", color: "#1b9cff", description: "Choisissez votre jeu Steam — 1€ chacun, ajout au panier instantané." },
   "Epic Games": { id: "epicgames", label: "Epic Games", emoji: "🎮", iconSlug: "epicgames", color: "#ffffff", description: "Des comptes avec des centaines de jeux premium." },
 };
 

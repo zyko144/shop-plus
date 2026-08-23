@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, X } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { CATEGORY_IMAGES } from "@/lib/products";
 import { useCart } from "@/lib/cart";
@@ -171,6 +171,18 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
         {!stockInfo.is_unlimited && stockInfo.stock > 0 && stockInfo.stock <= 5 && (
           <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-500 text-white shadow-lg shadow-gray-500/50">
             Plus que {stockInfo.stock} !
+          </div>
+        )}
+
+        {/* Rupture de stock */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 z-10 grid place-items-center bg-black/50">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-14 h-14 rounded-full bg-red-600 grid place-items-center shadow-lg shadow-red-600/50 ring-4 ring-red-600/30">
+                <X size={28} strokeWidth={3.5} className="text-white" />
+              </div>
+              <span className="text-red-400 font-black text-xs uppercase tracking-widest bg-black/70 px-3 py-1 rounded-full">Rupture de stock</span>
+            </div>
           </div>
         )}
       </div>
