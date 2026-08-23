@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { getAllProducts, Product } from "@/lib/products";
+import { getAllProducts, Product, CATEGORY_IMAGES } from "@/lib/products";
 import { notifyDiscordAnnouncement } from "@/lib/discord";
 import { AdminProductEditor } from "@/components/AdminProductEditor";
 import { AdminSupport } from "@/components/AdminSupport";
@@ -20,6 +20,13 @@ export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Dashboard Admin — Vercell" }] }),
   component: AdminDashboardErrorBoundary,
 });
+
+// Image la plus parlante possible pour une annonce Discord : l'image propre au
+// produit si l'admin en a mis une, sinon l'illustration de sa categorie.
+function resolveProductImage(product?: Partial<Product> | null): string | undefined {
+  if (!product) return undefined;
+  return product.image || (product.category ? CATEGORY_IMAGES[product.category] : undefined);
+}
 
 import React from "react";
 class LocalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
@@ -235,8 +242,9 @@ function AdminDashboard() {
             price: Number(productData.price) || 0,
             category: productData.category || "—",
             logo: productData.logo,
+            imageUrl: resolveProductImage(productData),
           },
-        }).catch(() => {});
+        }).catch((e) => console.error("Annonce Discord (nouveau produit) échouée:", e));
       } else {
         const { error } = await supabase.from("products").update(productData).eq("id", productData.id);
         if (error) throw error;
@@ -249,8 +257,9 @@ function AdminDashboard() {
               oldPrice: previous.price,
               newPrice: productData.price,
               logo: productData.logo ?? previous.logo,
+              imageUrl: resolveProductImage({ ...previous, ...productData }),
             },
-          }).catch(() => {});
+          }).catch((e) => console.error("Annonce Discord (prix) échouée:", e));
         }
       }
       setEditingProduct(null);
@@ -270,7 +279,9 @@ function AdminDashboard() {
       toast.success("Produit supprimé");
       setAllProducts(prev => prev.filter(p => p.id !== id));
       if (product) {
-        notifyDiscordAnnouncement({ data: { type: "product_removed", name: product.name, logo: product.logo } }).catch(() => {});
+        notifyDiscordAnnouncement({
+          data: { type: "product_removed", name: product.name, logo: product.logo, imageUrl: resolveProductImage(product) },
+        }).catch((e) => console.error("Annonce Discord (suppression) échouée:", e));
       }
     }
   };
@@ -352,8 +363,13 @@ function AdminDashboard() {
       if (wasAvailable !== isAvailable) {
         const product = allProducts.find(p => p.id === productId);
         notifyDiscordAnnouncement({
-          data: { type: isAvailable ? "back_in_stock" : "out_of_stock", name: product?.name || productId, logo: product?.logo },
-        }).catch(() => {});
+          data: {
+            type: isAvailable ? "back_in_stock" : "out_of_stock",
+            name: product?.name || productId,
+            logo: product?.logo,
+            imageUrl: resolveProductImage(product),
+          },
+        }).catch((e) => console.error("Annonce Discord (stock) échouée:", e));
       }
     } else {
       toast.error("Erreur: " + error.message);

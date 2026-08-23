@@ -97,11 +97,11 @@ export const notifyDiscordReview = createServerFn({ method: "POST" })
   });
 
 type AnnouncementInput =
-  | { type: "new_product"; name: string; price: number; category: string; logo?: string | null }
-  | { type: "price_change"; name: string; oldPrice: number; newPrice: number; logo?: string | null }
-  | { type: "product_removed"; name: string; logo?: string | null }
-  | { type: "out_of_stock"; name: string; logo?: string | null }
-  | { type: "back_in_stock"; name: string; logo?: string | null };
+  | { type: "new_product"; name: string; price: number; category: string; logo?: string | null; imageUrl?: string | null }
+  | { type: "price_change"; name: string; oldPrice: number; newPrice: number; logo?: string | null; imageUrl?: string | null }
+  | { type: "product_removed"; name: string; logo?: string | null; imageUrl?: string | null }
+  | { type: "out_of_stock"; name: string; logo?: string | null; imageUrl?: string | null }
+  | { type: "back_in_stock"; name: string; logo?: string | null; imageUrl?: string | null };
 
 function buildAnnouncementEmbed(data: AnnouncementInput) {
   const logoUrl = resolveLogoUrl(data.logo);
@@ -109,7 +109,8 @@ function buildAnnouncementEmbed(data: AnnouncementInput) {
     color: 0xffffff,
     footer: { text: "Vercell — https://shop-plus-nu.vercel.app/" },
     timestamp: new Date().toISOString(),
-    ...(logoUrl ? { thumbnail: { url: logoUrl } } : {}),
+    // Grande image produit/categorie si dispo, sinon petit logo de marque en vignette.
+    ...(data.imageUrl ? { image: { url: data.imageUrl } } : logoUrl ? { thumbnail: { url: logoUrl } } : {}),
   };
 
   switch (data.type) {
