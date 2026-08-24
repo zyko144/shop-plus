@@ -14,7 +14,8 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
   const [hover, setHover] = useState(false);
   const [added, setAdded] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
-  const [imgError, setImgError] = useState(false);
+  const [imgRetries, setImgRetries] = useState(0);
+  const MAX_IMG_RETRIES = 2;
   const cardRef = useRef<HTMLDivElement>(null);
   const tiltRef = useRef<{ x: (value: number) => void; y: (value: number) => void } | null>(null);
   const bgImg = product.image ?? CATEGORY_IMAGES[product.category];
@@ -114,14 +115,15 @@ export function ProductCard({ product, stockInfo = { is_unlimited: true, stock: 
         />
         {/* logo */}
         <div className="absolute inset-0 grid place-items-center p-8 text-center">
-          {logoUrl && !imgError ? (
+          {logoUrl && imgRetries <= MAX_IMG_RETRIES ? (
             <img
+              key={imgRetries}
               src={logoUrl}
               alt={product.name}
               loading="lazy"
               className={`${product.category === "Fortnite Rare" ? 'max-h-48 max-w-[90%]' : 'max-h-28 max-w-[75%]'} object-contain transition-transform duration-500 group-hover:scale-110`}
               style={{ filter: `drop-shadow(0 0 24px ${product.color}cc)` }}
-              onError={() => setImgError(true)}
+              onError={() => setImgRetries((n) => n + 1)}
             />
           ) : (
             <div
