@@ -80,13 +80,13 @@ export const notifyDiscordOrder = createServerFn({ method: "POST" })
     return postWebhook(webhookUrl, { embeds: [embed] }, "orders");
   });
 
-/** Reproduit la resolution de logo de ProductCard.tsx, toujours en blanc
- * pour coller au theme noir/blanc des embeds Discord. */
-function resolveLogoUrl(logo?: string | null): string | undefined {
+/** Reproduit la resolution de logo de ProductCard.tsx, dans la vraie couleur
+ * de la marque (comme sur le site) plutot que force en blanc. */
+function resolveLogoUrl(logo?: string | null, color?: string | null): string | undefined {
   if (!logo) return undefined;
   if (logo.startsWith("http")) return logo;
   if (logo.startsWith("/")) return `https://shop-plus-nu.vercel.app${logo}`;
-  return `https://cdn.simpleicons.org/${logo}/ffffff`;
+  return `https://cdn.simpleicons.org/${logo}/${(color || "ffffff").replace("#", "")}`;
 }
 
 type ReviewNotificationInput = {
@@ -96,6 +96,7 @@ type ReviewNotificationInput = {
   rating: number;
   comment: string;
   productLogo?: string | null;
+  productColor?: string | null;
   screenshotUrl?: string;
 };
 
@@ -103,7 +104,7 @@ export const notifyDiscordReview = createServerFn({ method: "POST" })
   .validator((data: ReviewNotificationInput) => data)
   .handler(async ({ data }) => {
     const stars = "★".repeat(data.rating) + "☆".repeat(5 - data.rating);
-    const logoUrl = resolveLogoUrl(data.productLogo);
+    const logoUrl = resolveLogoUrl(data.productLogo, data.productColor);
 
     const embed = {
       title: "⭐ Nouvel avis vérifié",
@@ -123,7 +124,7 @@ export const notifyDiscordReview = createServerFn({ method: "POST" })
     return postWebhook(avisWebhookUrl, { embeds: [embed] }, "avis");
   });
 
-type AnnouncementBase = { name: string; category?: string; price?: number; stock?: string; logo?: string | null; imageUrl?: string | null };
+type AnnouncementBase = { name: string; category?: string; price?: number; stock?: string; logo?: string | null; color?: string | null; imageUrl?: string | null };
 type AnnouncementInput =
   | (AnnouncementBase & { type: "new_product"; price: number; category: string })
   | (AnnouncementBase & { type: "price_change"; oldPrice: number; newPrice: number })
@@ -134,7 +135,7 @@ type AnnouncementInput =
 const SHOP_LINK_FIELD = { name: "🔗 Boutique", value: "[shop-plus-nu.vercel.app](https://shop-plus-nu.vercel.app/)" };
 
 function buildAnnouncementEmbed(data: AnnouncementInput) {
-  const logoUrl = resolveLogoUrl(data.logo);
+  const logoUrl = resolveLogoUrl(data.logo, data.color);
   const base = {
     color: 0xffffff,
     footer: { text: "Vercell — annonce automatique" },

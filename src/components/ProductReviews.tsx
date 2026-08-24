@@ -71,6 +71,7 @@ export function ProductReviewsModal({ productId, productName, color, logo, onClo
           rating: newRating,
           comment: newComment.trim(),
           productLogo: logo,
+          productColor: color,
           screenshotUrl: publicUrl,
         },
       }).catch(() => {});
